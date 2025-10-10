@@ -5,11 +5,7 @@
 .sidebar {
   width: var(--sidebar-w);
   min-width: var(--sidebar-w);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.01)
-  );
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
   padding: 20px;
   display: flex;
   flex-direction: column;

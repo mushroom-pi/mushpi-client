@@ -1,36 +1,28 @@
-import { useState } from "react";
-import { NavLink } from "react-router-dom";
-import styles from "./Sidebar.module.css";
-import { FiHome, FiActivity, FiSettings, FiMenu } from "react-icons/fi";
+import { useState } from 'react';
+import { FiActivity, FiHome, FiMenu, FiSettings } from 'react-icons/fi';
+import { NavLink } from 'react-router-dom';
+
+import styles from './Sidebar.module.css';
 
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <aside className={`${styles.sidebar} ${open ? styles.open : ""}`}>
+      <aside className={`${styles.sidebar} ${open ? styles.open : ''}`}>
         <div className={styles.brand}>
           <div className={styles.logo}>🍄</div>
           <div className={styles.title}>MushPi</div>
         </div>
 
         <nav className={styles.nav}>
-          <NavLink
-            to="/"
-            className={({ isActive }) => (isActive ? styles.active : "")}
-          >
+          <NavLink to="/" className={({ isActive }) => (isActive ? styles.active : '')}>
             <FiHome /> <span>Dashboard</span>
           </NavLink>
-          <NavLink
-            to="/sensors"
-            className={({ isActive }) => (isActive ? styles.active : "")}
-          >
+          <NavLink to="/sensors" className={({ isActive }) => (isActive ? styles.active : '')}>
             <FiActivity /> <span>Sensors</span>
           </NavLink>
-          <NavLink
-            to="/settings"
-            className={({ isActive }) => (isActive ? styles.active : "")}
-          >
+          <NavLink to="/settings" className={({ isActive }) => (isActive ? styles.active : '')}>
             <FiSettings /> <span>Settings</span>
           </NavLink>
         </nav>
@@ -42,20 +34,14 @@ export default function Sidebar() {
 
       {/* topbar for mobile */}
       <div className={styles.topbar}>
-        <button
-          aria-label="menu"
-          onClick={() => setOpen(!open)}
-          className={styles.menuBtn}
-        >
+        <button aria-label="menu" onClick={() => setOpen(!open)} className={styles.menuBtn}>
           <FiMenu />
         </button>
         <div className={styles.topTitle}>MushPi</div>
       </div>
 
       {/* backdrop when sidebar open on mobile */}
-      {open && (
-        <div className={styles.backdrop} onClick={() => setOpen(false)} />
-      )}
+      {open && <div className={styles.backdrop} onClick={() => setOpen(false)} />}
     </>
   );
 }

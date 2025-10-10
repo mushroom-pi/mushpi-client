@@ -1,16 +1,16 @@
-import Card from "../components/Card";
+import Card from '../components/Card';
 
 export default function Settings() {
   return (
     <div className="container">
       <h1>Settings</h1>
       <Card title="General">
-        <div style={{ display: "grid", gap: 8 }}>
+        <div style={{ display: 'grid', gap: 8 }}>
           <label>
             Grow Profile
             <select
               style={{
-                width: "100%",
+                width: '100%',
                 padding: 8,
                 borderRadius: 8,
                 marginTop: 6,

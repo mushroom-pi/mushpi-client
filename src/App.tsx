@@ -1,13 +1,13 @@
-import Sidebar from "./layout/Sidebar";
-import { Routes, Route } from "react-router-dom";
+import { Route, Routes } from 'react-router-dom';
 
-import Dashboard from "./pages/Dashboard";
-import Sensors from "./pages/Sensors";
-import Settings from "./pages/Settings";
+import Sidebar from './layout/Sidebar';
+import Dashboard from './pages/Dashboard';
+import Sensors from './pages/Sensors';
+import Settings from './pages/Settings';
 
 export default function App() {
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div style={{ display: 'flex', minHeight: '100vh' }}>
       <Sidebar />
       <main style={{ flex: 1, padding: 20 }}>
         <Routes>
