@@ -5,3 +5,4 @@ build
 *.min.js
 coverage
 *.css
+src/api/generated

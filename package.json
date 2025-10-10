@@ -11,18 +11,24 @@
     "format:check": "prettier --check .",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
-    "prepare": "husky"
+    "prepare": "husky",
+    "gen:client": "openapi-generator-cli generate -i ${OPENAPI_SPEC:-./openapi.json} -g typescript-axios -o src/api/generated --skip-validate-spec --additional-properties=supportsES6=true,useSingleRequestParameter=true",
+    "gen:client:remote": "OPENAPI_SPEC=http://localhost:3000/contract-json npm run gen:client"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.90.2",
+    "axios": "^1.12.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.9.4"
   },
   "devDependencies": {
-    "@eslint/js": "^9.36.0",
+    "@eslint/js": "^9.37.0",
+    "@openapitools/openapi-generator-cli": "^2.24.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
-    "@types/node": "^24.6.0",
+    "@types/axios": "^0.14.4",
+    "@types/node": "^24.7.1",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.1.9",
     "@types/react-router-dom": "^5.3.3",
