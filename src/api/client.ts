@@ -23,7 +23,6 @@ export function setAuthToken(token: string | null) {
   // If generator exposes an axios instance, prefer to set interceptors there.
   // Otherwise set global axios Authorization header:
   if (token) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const axios = require('axios');
     axios.defaults.headers.common.Authorization = `Bearer ${token}`;
   } else {

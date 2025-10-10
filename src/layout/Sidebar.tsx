@@ -19,8 +19,8 @@ export default function Sidebar() {
           <NavLink to="/" className={({ isActive }) => (isActive ? styles.active : '')}>
             <FiHome /> <span>Dashboard</span>
           </NavLink>
-          <NavLink to="/sensors" className={({ isActive }) => (isActive ? styles.active : '')}>
-            <FiActivity /> <span>Sensors</span>
+          <NavLink to="/pico-units" className={({ isActive }) => (isActive ? styles.active : '')}>
+            <FiActivity /> <span>Pico Units</span>
           </NavLink>
           <NavLink to="/settings" className={({ isActive }) => (isActive ? styles.active : '')}>
             <FiSettings /> <span>Settings</span>
