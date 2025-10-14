@@ -1,4 +1,4 @@
-import { type UseQueryOptions, useMutation, useQuery } from '@tanstack/react-query';
+import { type UseQueryOptions, useQuery } from '@tanstack/react-query';
 
 import { unwrap } from 'src/api/adapter';
 import { PicoUnits } from 'src/api/client';
@@ -6,7 +6,6 @@ import type {
   PicoUnitsApiPicoUnitsControllerListRequest as ListPicoUnitsParams,
   PicoUnit,
   PicoUnitListResponseDto,
-  UpdatePicoUnitDto,
 } from 'src/api/generated';
 
 export function useListPicoUnits(
@@ -44,33 +43,5 @@ export function useGetPicoUnit(picoUnitId: number | null) {
       (await unwrap(
         PicoUnits.picoUnitIdControllerGetOne({ picoUnitId } as any),
       )) as unknown as PicoUnit,
-  });
-}
-
-export function useUpdatePicoUnit() {
-  return useMutation({
-    mutationFn: async (vars: { picoUnitId: number; body: UpdatePicoUnitDto }) => {
-      const { picoUnitId, body } = vars;
-      const resp = await unwrap(PicoUnits.picoUnitIdControllerUpdate({ picoUnitId, body } as any));
-      return resp as unknown as PicoUnit;
-    },
-    // onSuccess: (_data, vars) => {
-    //   // invalidate the single item and the list so UI refreshes
-    //   qc.invalidateQueries({ queryKey: ['picoUnit', vars.picoUnitId] });
-    //   qc.invalidateQueries({ queryKey: ['picoUnits'] });
-    // },
-  });
-}
-
-export function useDeletePicoUnit() {
-  return useMutation({
-    mutationFn: async (picoUnitId: number) => {
-      await unwrap(PicoUnits.picoUnitIdControllerRemove({ picoUnitId } as any));
-      return undefined;
-    },
-    // onSuccess: (_data, picoUnitId) => {
-    //   qc.invalidateQueries({ queryKey: ['picoUnit', picoUnitId] });
-    //   qc.invalidateQueries({ queryKey: ['picoUnits'] });
-    // },
   });
 }

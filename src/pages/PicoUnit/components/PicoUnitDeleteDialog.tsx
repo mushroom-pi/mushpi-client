@@ -7,11 +7,10 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@mui/material';
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import type { PicoUnit } from '../../../api/generated';
-import { useDeletePicoUnit } from '../../../hooks/usePicoUnits';
+import type { PicoUnit } from 'src/api/generated';
+import { usePicoUnitContext } from 'src/contexts/PicoUnitContext';
 
 interface PicoUnitDeleteDialogProps {
   deleteOpen: boolean;
@@ -23,23 +22,27 @@ export const PicoUnitDeleteDialog: React.FC<PicoUnitDeleteDialogProps> = ({
   deleteOpen,
   setDeleteOpen,
   pico,
-}: PicoUnitDeleteDialogProps) => {
+}) => {
   const navigate = useNavigate();
-  const deleteMutation = useDeletePicoUnit();
-  const [deleting, setDeleting] = useState(false);
+  const { deletePico } = usePicoUnitContext();
 
   async function doDeletePico() {
     if (!pico) return;
-    setDeleting(true);
     try {
-      await deleteMutation.mutateAsync(pico.id);
-      // after delete, navigate back to the list
+      // mutateAsync will throw on error — provider handles optimistic removal and rollback
+      await deletePico.mutateAsync(pico.id);
+      // after successful delete, navigate back (or to a safe route)
       navigate(-1);
+    } catch (err) {
+      // optional: show toast / console error
+      console.error('Failed to delete pico unit', err);
     } finally {
-      setDeleting(false);
       setDeleteOpen(false);
     }
   }
+
+  const isDeleting = deletePico.isLoading;
+
   return (
     <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)}>
       <DialogTitle>Delete Pico Unit</DialogTitle>
@@ -51,7 +54,7 @@ export const PicoUnitDeleteDialog: React.FC<PicoUnitDeleteDialogProps> = ({
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => setDeleteOpen(false)} disabled={deleting}>
+        <Button onClick={() => setDeleteOpen(false)} disabled={isDeleting}>
           Cancel
         </Button>
         <Button
@@ -59,9 +62,9 @@ export const PicoUnitDeleteDialog: React.FC<PicoUnitDeleteDialogProps> = ({
           variant="contained"
           startIcon={<DeleteIcon />}
           onClick={doDeletePico}
-          disabled={deleting}
+          disabled={isDeleting}
         >
-          {deleting ? 'Deleting…' : 'Delete permanently'}
+          {isDeleting ? 'Deleting…' : 'Delete permanently'}
         </Button>
       </DialogActions>
     </Dialog>

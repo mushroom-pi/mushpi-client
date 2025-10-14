@@ -1,12 +1,11 @@
 import { Box, Button, Container, Typography } from '@mui/material';
-import type { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
 import type React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface ErrorProps {
   item?: string;
   error?: any;
-  refetch?: (options?: RefetchOptions | undefined) => Promise<QueryObserverResult<any, unknown>>;
+  refetch?: () => void;
 }
 
 export const Error: React.FC<ErrorProps> = ({ item, error, refetch }) => {

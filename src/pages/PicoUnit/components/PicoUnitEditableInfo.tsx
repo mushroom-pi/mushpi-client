@@ -8,38 +8,46 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import type { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import type { PicoUnit, UpdatePicoUnitDto } from 'src/api/generated';
-import { useUpdatePicoUnit } from 'src/hooks/usePicoUnits';
+import { usePicoUnitContext } from 'src/contexts/PicoUnitContext';
 
 interface PicoUnitEditableInfoProps {
-  data: PicoUnit;
-  refetch: (
-    options?: RefetchOptions | undefined,
-  ) => Promise<QueryObserverResult<PicoUnit, unknown>>;
+  pico?: PicoUnit;
 }
 
-export const PicoUnitEditableInfo: React.FC<PicoUnitEditableInfoProps> = ({ data, refetch }) => {
-  const updateMutation = useUpdatePicoUnit();
+export const PicoUnitEditableInfo: React.FC<PicoUnitEditableInfoProps> = ({ pico: dataProp }) => {
+  // Prefer reading pico from context (provider must wrap component)
+  const ctx = usePicoUnitContext();
+  const pico = dataProp ?? ctx.pico;
 
-  const [saving, setSaving] = useState(false);
+  // Use the provider's mutation state for loading
+  const updateMutation = ctx.updatePico;
+  const isSaving = updateMutation.isLoading;
 
-  // editable fields state (initialize from data when loaded)
-  const [editName, setEditName] = useState<string | undefined>(undefined);
-  const [editDescription, setEditDescription] = useState<string | undefined>(undefined);
-  const [editEnabled, setEditEnabled] = useState<boolean | undefined>(undefined);
+  // local editable state (initialized from pico)
+  const [editName, setEditName] = useState<string>('');
+  const [editDescription, setEditDescription] = useState<string>('');
+  const [editEnabled, setEditEnabled] = useState<boolean>(false);
 
+  // sync local inputs when pico changes (initial load, optimistic updates, or rollback)
   useEffect(() => {
-    if (data) {
-      setEditName(data.name ?? '');
-      setEditDescription(data.description ?? '');
-      setEditEnabled(!!data.enabled);
-    }
-  }, [data]);
+    if (!pico) return;
+    setEditName(pico.name ?? '');
+    setEditDescription(pico.description ?? '');
+    setEditEnabled(!!pico.enabled);
+  }, [pico?.id, pico?.name, pico?.description, pico?.enabled]);
 
-  const pico: PicoUnit = data;
+  // detect if anything changed so we can disable Save when no-op
+  const hasChanges = useMemo(() => {
+    if (!pico) return false;
+    return (
+      (editName ?? '') !== (pico.name ?? '') ||
+      (editDescription ?? '') !== (pico.description ?? '') ||
+      !!editEnabled !== !!pico.enabled
+    );
+  }, [pico, editName, editDescription, editEnabled]);
 
   async function doSaveEdits() {
     if (!pico) return;
@@ -49,13 +57,25 @@ export const PicoUnitEditableInfo: React.FC<PicoUnitEditableInfoProps> = ({ data
       enabled: !!editEnabled,
     };
 
-    setSaving(true);
     try {
+      // provider handles optimistic updates and final invalidation/refresh
       await updateMutation.mutateAsync({ picoUnitId: pico.id, body });
-      await refetch();
-    } finally {
-      setSaving(false);
+    } catch (err) {
+      // TODO: show a friendly toast/snackbar here (not included).
+      // console log so errors don't silently swallow
+      console.error('Failed to update pico unit', err);
     }
+  }
+
+  if (!pico) {
+    return (
+      <Card>
+        <CardContent>
+          <Typography variant="h6">Details (editable)</Typography>
+          <Typography variant="body2">No pico selected</Typography>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
@@ -68,13 +88,13 @@ export const PicoUnitEditableInfo: React.FC<PicoUnitEditableInfoProps> = ({ data
         <Stack spacing={2}>
           <TextField
             label="Name"
-            value={editName ?? ''}
+            value={editName}
             onChange={(e) => setEditName(e.target.value)}
             fullWidth
           />
           <TextField
             label="Description"
-            value={editDescription ?? ''}
+            value={editDescription}
             onChange={(e) => setEditDescription(e.target.value)}
             fullWidth
             multiline
@@ -92,19 +112,19 @@ export const PicoUnitEditableInfo: React.FC<PicoUnitEditableInfoProps> = ({ data
 
           <Box display="flex" gap={2} justifyContent="flex-end">
             <Button
-              disabled={saving}
               onClick={() => {
-                // reset to original values
+                // reset to original values from pico
                 setEditName(pico.name ?? '');
                 setEditDescription(pico.description ?? '');
                 setEditEnabled(!!pico.enabled);
               }}
+              disabled={isSaving || !hasChanges}
             >
               Cancel
             </Button>
 
-            <Button variant="contained" onClick={doSaveEdits} disabled={saving}>
-              {saving ? 'Saving…' : 'Save'}
+            <Button variant="contained" onClick={doSaveEdits} disabled={isSaving || !hasChanges}>
+              {isSaving ? 'Saving…' : 'Save'}
             </Button>
           </Box>
         </Stack>
