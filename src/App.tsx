@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 
+import { PicoUnitsProvider } from './contexts/PicoUnitsContext';
 import Sidebar from './layout/Sidebar';
 import Dashboard from './pages/Dashboard';
 import PicoUnitDetail from './pages/PicoUnit';
@@ -13,7 +14,14 @@ export default function App() {
       <main style={{ flex: 1, padding: 20 }}>
         <Routes>
           <Route path="/" element={<Dashboard />} />
-          <Route path="/pico-units" element={<PicoUnits />} />
+          <Route
+            path="/pico-units"
+            element={
+              <PicoUnitsProvider>
+                <PicoUnits />
+              </PicoUnitsProvider>
+            }
+          />
           <Route path="/pico-units/:id" element={<PicoUnitDetail />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>

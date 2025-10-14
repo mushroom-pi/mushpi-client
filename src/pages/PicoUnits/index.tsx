@@ -3,12 +3,14 @@ import { Box, Button, Container, Grid, Typography } from '@mui/material';
 import type { PicoUnit } from 'src/api/generated';
 import { Error } from 'src/components/Error';
 import { Loading } from 'src/components/Loading';
+import { usePicoUnitsUI } from 'src/contexts/PicoUnitsContext';
 import { useListPicoUnits } from 'src/hooks/usePicoUnits';
 
 import PicoUnitCard from './components/PicoUnitCard';
 
 export default function PicoUnitsPage() {
-  const { data, isLoading, isError, error, refetch } = useListPicoUnits({ page: 1, limit: 20 });
+  const { page, limit, q, setPage } = usePicoUnitsUI();
+  const { data, isLoading, isError, error, refetch } = useListPicoUnits({ page, limit, q });
 
   if (isLoading) return <Loading item="pico units" />;
   if (isError) return <Error item="pico units" error={error} />;

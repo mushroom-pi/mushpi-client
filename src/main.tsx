@@ -8,7 +8,14 @@ import App from './App';
 import './styles/global.css';
 import theme from './theme/mushroomTheme';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: true,
+    },
+  },
+});
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

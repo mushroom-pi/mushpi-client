@@ -2,35 +2,34 @@ import { type UseQueryOptions, useMutation, useQuery } from '@tanstack/react-que
 
 import { unwrap } from 'src/api/adapter';
 import { PicoUnits } from 'src/api/client';
-import {
-  type PicoUnit,
-  type PicoUnitListResponseDto,
-  type UpdatePicoUnitDto,
+import type {
+  PicoUnitsApiPicoUnitsControllerListRequest as ListPicoUnitsParams,
+  PicoUnit,
+  PicoUnitListResponseDto,
+  UpdatePicoUnitDto,
 } from 'src/api/generated';
 
 export function useListPicoUnits(
-  params?: { page?: number; limit?: number; enabled?: boolean; q?: string },
+  params?: ListPicoUnitsParams,
   queryOptions?: UseQueryOptions<PicoUnitListResponseDto, unknown, PicoUnitListResponseDto>,
 ) {
   const page = params?.page ?? 1;
   const limit = params?.limit ?? 20;
+  const enabled = params?.enabled;
+  const q = params?.q;
 
   // mark as readonly tuple to satisfy queryKey typing
-  const queryKey = ['picoUnits', { page, limit, ...params }] as const;
+  const queryKey = ['picoUnits', page, limit, enabled, q] as const;
 
   return useQuery<PicoUnitListResponseDto, unknown, PicoUnitListResponseDto>({
     queryKey,
     queryFn: async () => {
       const resp = await unwrap(
-        PicoUnits.picoUnitsControllerList({ page, limit, ...params } as any),
+        PicoUnits.picoUnitsControllerList({ page, limit, ...params } as ListPicoUnitsParams),
       );
       return resp as unknown as PicoUnitListResponseDto;
     },
-    // Ensures fetch happens every time the component mounts (so each page access)
-    refetchOnMount: 'always',
-    // Also commonly useful:
-    refetchOnWindowFocus: true,
-    // Spread user-supplied overrides last so callers can override defaults:
+    placeholderData: (previousData?: PicoUnitListResponseDto) => previousData,
     ...queryOptions,
   });
 }
@@ -45,8 +44,6 @@ export function useGetPicoUnit(picoUnitId: number | null) {
       (await unwrap(
         PicoUnits.picoUnitIdControllerGetOne({ picoUnitId } as any),
       )) as unknown as PicoUnit,
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: true,
   });
 }
 
