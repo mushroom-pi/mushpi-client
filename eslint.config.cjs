@@ -33,12 +33,6 @@ module.exports = [
     // same "settings" you had (react version detect)
     settings: { react: { version: 'detect' } },
 
-    // Register the simple-import-sort plugin so its rules are available
-    // (compat.extends already wires most plugin recommended configs).
-    plugins: {
-      'simple-import-sort': require('eslint-plugin-simple-import-sort'),
-    },
-
     rules: {
       // Prettier errors surfaced as ESLint errors (same as 'prettier/prettier': ['error'])
       'prettier/prettier': ['error'],
