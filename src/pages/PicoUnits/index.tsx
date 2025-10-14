@@ -1,32 +1,17 @@
-import { Box, Button, CircularProgress, Container, Grid, Typography } from '@mui/material';
+import { Box, Button, Container, Grid, Typography } from '@mui/material';
 
-import type { PicoUnit } from '../api/generated';
-import PicoUnitCard from '../components/PicoUnitCard';
-import { usePicoUnits } from '../hooks/usePicoUnits';
+import type { PicoUnit } from 'src/api/generated';
+import { Error } from 'src/components/Error';
+import { Loading } from 'src/components/Loading';
+import { useListPicoUnits } from 'src/hooks/usePicoUnits';
+
+import PicoUnitCard from './components/PicoUnitCard';
 
 export default function PicoUnitsPage() {
-  const { data, isLoading, isError, error, refetch } = usePicoUnits({ page: 1, limit: 20 });
+  const { data, isLoading, isError, error, refetch } = useListPicoUnits({ page: 1, limit: 20 });
 
-  if (isLoading) {
-    return (
-      <Container sx={{ py: 6 }}>
-        <Box display="flex" alignItems="center" gap={2}>
-          <CircularProgress />
-          <Typography>Loading pico units…</Typography>
-        </Box>
-      </Container>
-    );
-  }
-  if (isError) {
-    return (
-      <Container sx={{ py: 6 }}>
-        <Typography color="error">Error loading pico units: {(error as any)?.message}</Typography>
-        <Button onClick={() => refetch()} sx={{ mt: 2 }}>
-          Retry
-        </Button>
-      </Container>
-    );
-  }
+  if (isLoading) return <Loading item="pico units" />;
+  if (isError) return <Error item="pico units" error={error} />;
 
   const items: PicoUnit[] = (data?.items ?? []) as PicoUnit[];
 
