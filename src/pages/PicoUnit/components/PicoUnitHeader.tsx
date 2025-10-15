@@ -1,6 +1,7 @@
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { Box, Button, Chip, IconButton, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Chip, IconButton, Stack, Switch, Tooltip, Typography } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,6 +10,7 @@ import { usePicoUnitContext } from 'src/contexts/PicoUnitContext';
 
 interface PicoUnitHeaderProps {
   pico?: PicoUnit;
+  setEditOpen: (open: boolean) => void;
   setDeleteOpen: (open: boolean) => void;
 }
 
@@ -19,6 +21,7 @@ interface PicoUnitHeaderProps {
  */
 export const PicoUnitHeader: React.FC<PicoUnitHeaderProps> = ({
   setDeleteOpen,
+  setEditOpen,
   pico: dataProp,
 }) => {
   const navigate = useNavigate();
@@ -35,66 +38,99 @@ export const PicoUnitHeader: React.FC<PicoUnitHeaderProps> = ({
             Loading…
           </Typography>
         </Box>
-        <Box display="flex" gap={1} alignItems="center">
+        <Stack direction="row" spacing={1} alignItems="center">
           <Chip label="Loading" size="small" />
           <Button variant="outlined" onClick={() => navigate(-1)}>
             Back
           </Button>
-        </Box>
+        </Stack>
       </Box>
     );
   }
 
   const controlLoopEnabled = !!pico.latest_reading?.control_loop_enabled;
-  const failedCalls = pico.failed_calls;
+  const { enabled, failed_calls: failed_calls } = pico;
 
   return (
-    <Box display="flex" alignItems="center" justifyContent="space-between" mb={3}>
-      <Box>
-        <Typography variant="h4" sx={{ wordBreak: 'break-word' }}>
-          {pico.name}
-        </Typography>
+    <Box>
+      <Box></Box>
+
+      <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+        <Box>
+          <Typography variant="h4" sx={{ wordBreak: 'break-word' }}>
+            {pico.name ?? 'No name'}
+          </Typography>
+        </Box>
+
+        <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-end">
+          {/* {typeof failedCalls !== 'undefined' && (
+            <Chip
+              label={`Failed: ${failedCalls}`}
+              color={failedCalls > 3 ? 'warning' : 'default'}
+              size="small"
+            />
+          )} */}
+
+          <Tooltip title="Refresh">
+            <span>
+              <IconButton onClick={() => refetch()} disabled={isLoading} aria-label="refresh">
+                <RefreshIcon />
+              </IconButton>
+            </span>
+          </Tooltip>
+
+          <Button variant="outlined" onClick={() => navigate(-1)}>
+            Back
+          </Button>
+
+          <Button
+            color="secondary"
+            variant="contained"
+            startIcon={<EditIcon />}
+            onClick={() => setEditOpen(true)}
+          >
+            Edit
+          </Button>
+
+          <Button
+            color="error"
+            variant="contained"
+            startIcon={<DeleteIcon />}
+            onClick={() => setDeleteOpen(true)}
+          >
+            Delete
+          </Button>
+        </Stack>
+      </Box>
+
+      {/* Handle */}
+      <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
         <Typography variant="subtitle2" color="text.secondary">
           {pico.handle ?? ''}
         </Typography>
+
+        <Box display="flex" alignItems="center" gap={1} sx={{ mx: 2 }}>
+          <Typography variant="body2" color={enabled ? 'textDisabled' : 'info'}>
+            Off
+          </Typography>
+
+          <Switch checked={!!enabled} />
+
+          <Typography variant="body2" color={enabled ? 'info' : 'textDisabled'}>
+            On
+          </Typography>
+
+          {/* <Chip
+            label={controlLoopEnabled ? 'Control Loop Enabled' : 'Control Loop Disabled'}
+            color={controlLoopEnabled ? 'success' : 'default'}
+            size="small"
+            sx={{ ml: 1 }}
+          /> */}
+        </Box>
       </Box>
 
-      <Box display="flex" gap={1} alignItems="center">
-        <Chip
-          label={controlLoopEnabled ? 'Control Loop Enabled' : 'Control Loop Disabled'}
-          color={controlLoopEnabled ? 'success' : 'default'}
-          size="small"
-        />
-
-        {typeof failedCalls !== 'undefined' && (
-          <Chip
-            label={`Failed: ${failedCalls}`}
-            color={failedCalls > 3 ? 'warning' : 'default'}
-            size="small"
-          />
-        )}
-
-        <Tooltip title="Refresh">
-          <span>
-            {/* span to avoid tooltip warnings when child is disabled */}
-            <IconButton onClick={() => refetch()} disabled={isLoading} aria-label="refresh">
-              <RefreshIcon />
-            </IconButton>
-          </span>
-        </Tooltip>
-
-        <Button variant="outlined" onClick={() => navigate(-1)}>
-          Back
-        </Button>
-
-        <Button
-          color="error"
-          variant="contained"
-          startIcon={<DeleteIcon />}
-          onClick={() => setDeleteOpen(true)}
-        >
-          Delete
-        </Button>
+      <Box mb={3}>
+        <Typography variant="body2">{pico.description ?? 'No description'}</Typography>
       </Box>
     </Box>
   );

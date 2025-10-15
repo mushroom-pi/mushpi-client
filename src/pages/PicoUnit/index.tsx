@@ -9,10 +9,12 @@ import { PicoUnitProvider, usePicoUnitContext } from 'src/contexts/PicoUnitConte
 
 import { PicoUnitDeleteDialog as DeleteDialog } from './components/PicoUnitDeleteDialog';
 import { PicoUnitDetailGrid as DetailGrid } from './components/PicoUnitDetailGrid';
+import { PicoUnitEditModal as EditModal } from './components/PicoUnitEditModal';
 import { PicoUnitHeader as Header } from './components/PicoUnitHeader';
 
 function PicoUnitDetailInner() {
   const { pico, isLoading, isError, error, refetch } = usePicoUnitContext();
+  const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
   if (isLoading) return <Loading item="pico unit" />;
@@ -20,8 +22,9 @@ function PicoUnitDetailInner() {
 
   return (
     <Container sx={{ py: 4 }}>
-      <Header pico={pico} setDeleteOpen={setDeleteOpen} />
+      <Header setEditOpen={setEditOpen} setDeleteOpen={setDeleteOpen} />
       <DetailGrid pico={pico} />
+      <EditModal open={editOpen} onClose={() => setEditOpen(false)} />
       <DeleteDialog deleteOpen={deleteOpen} setDeleteOpen={setDeleteOpen} pico={pico} />
     </Container>
   );
