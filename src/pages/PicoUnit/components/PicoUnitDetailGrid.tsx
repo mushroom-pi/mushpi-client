@@ -1,22 +1,26 @@
 import { Grid } from '@mui/material';
 import type React from 'react';
 
-import type { PicoUnit } from 'src/api/generated';
+import type { OptionalPicoUnitProps } from 'src/interfaces/optionalPicoUnit';
 
-import PicoUnitPracticalInfo from './PicoUnitPracticalInfo';
-import PicoUnitTechnicalDetails from './PicoUnitTechnicalDetails';
+import { PicoUnitOverview as Overview } from './PicoUnitOverview';
+import { PicoUnitPerformance as Performance } from './PicoUnitPerformance';
+import { PicoUnitResources as Resources } from './PicoUnitResources';
+import { PicoUnitTechnicalDetails as TechnicalDetails } from './PicoUnitTechnicalDetails';
 
-interface PicoUnitDetailGridProps {
-  pico: PicoUnit;
-}
-
-export const PicoUnitDetailGrid: React.FC<PicoUnitDetailGridProps> = ({ pico }) => (
+export const PicoUnitDetailGrid: React.FC<OptionalPicoUnitProps> = () => (
   <Grid container spacing={2}>
-    <Grid size={6}>
-      <PicoUnitTechnicalDetails pico={pico} />
+    <Grid size={4}>
+      <Overview />
+    </Grid>
+    <Grid size={8}>
+      <TechnicalDetails />
     </Grid>
     <Grid size={6}>
-      <PicoUnitPracticalInfo pico={pico} />
+      <Resources />
+    </Grid>
+    <Grid size={6}>
+      <Performance />
     </Grid>
   </Grid>
 );

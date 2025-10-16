@@ -1,18 +1,17 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { Box, Button, Chip, IconButton, Stack, Switch, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import type { PicoUnit } from 'src/api/generated';
 import { usePicoUnitContext } from 'src/contexts/PicoUnitContext';
+import type { OptionalPicoUnitProps } from 'src/interfaces/optionalPicoUnit';
 
-interface PicoUnitHeaderProps {
-  pico?: PicoUnit;
+type PicoUnitHeaderProps = OptionalPicoUnitProps & {
   setEditOpen: (open: boolean) => void;
   setDeleteOpen: (open: boolean) => void;
-}
+};
 
 /**
  * Header for the Pico Unit detail page.
@@ -48,8 +47,7 @@ export const PicoUnitHeader: React.FC<PicoUnitHeaderProps> = ({
     );
   }
 
-  const controlLoopEnabled = !!pico.latest_reading?.control_loop_enabled;
-  const { enabled, failed_calls: failed_calls } = pico;
+  const { enabled } = pico;
 
   return (
     <Box>
@@ -63,14 +61,6 @@ export const PicoUnitHeader: React.FC<PicoUnitHeaderProps> = ({
         </Box>
 
         <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-end">
-          {/* {typeof failedCalls !== 'undefined' && (
-            <Chip
-              label={`Failed: ${failedCalls}`}
-              color={failedCalls > 3 ? 'warning' : 'default'}
-              size="small"
-            />
-          )} */}
-
           <Tooltip title="Refresh">
             <span>
               <IconButton onClick={() => refetch()} disabled={isLoading} aria-label="refresh">
@@ -103,31 +93,16 @@ export const PicoUnitHeader: React.FC<PicoUnitHeaderProps> = ({
         </Stack>
       </Box>
 
-      {/* Handle */}
-      <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
+      <Stack direction="row" spacing={2} alignItems="center" justifyContent="flex-start" mb={2}>
+        <Chip
+          label={enabled ? 'Enabled' : 'Disabled'}
+          color={enabled ? 'info' : 'default'}
+          size="small"
+        />
         <Typography variant="subtitle2" color="text.secondary">
           {pico.handle ?? ''}
         </Typography>
-
-        <Box display="flex" alignItems="center" gap={1} sx={{ mx: 2 }}>
-          <Typography variant="body2" color={enabled ? 'textDisabled' : 'info'}>
-            Off
-          </Typography>
-
-          <Switch checked={!!enabled} />
-
-          <Typography variant="body2" color={enabled ? 'info' : 'textDisabled'}>
-            On
-          </Typography>
-
-          {/* <Chip
-            label={controlLoopEnabled ? 'Control Loop Enabled' : 'Control Loop Disabled'}
-            color={controlLoopEnabled ? 'success' : 'default'}
-            size="small"
-            sx={{ ml: 1 }}
-          /> */}
-        </Box>
-      </Box>
+      </Stack>
 
       <Box mb={3}>
         <Typography variant="body2">{pico.description ?? 'No description'}</Typography>

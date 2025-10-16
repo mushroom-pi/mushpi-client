@@ -1,13 +1,19 @@
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Card, CardContent, IconButton, List, Tooltip, Typography } from '@mui/material';
-import { useMemo, useState } from 'react';
+import MemoryIcon from '@mui/icons-material/Memory';
+import React, { useMemo } from 'react';
 
-import { type PicoUnit } from 'src/api/generated';
-import { FieldRow } from 'src/components/FieldRow';
+import { BigDisplay } from 'src/components/BigDisplay';
+import { InfoCard } from 'src/components/InfoCard';
+import { InfoField } from 'src/components/InfoField';
+import { Loading } from 'src/components/Loading';
+import { usePicoUnitContext } from 'src/contexts/PicoUnitContext';
+import type { OptionalPicoUnitProps } from 'src/interfaces/optionalPicoUnit';
 import { bytesToMB } from 'src/utils/methods';
 
-export default function PicoUnitTechnicalDetails({ pico }: { pico: PicoUnit }) {
-  const [isOpen, setIsOpen] = useState(false);
+export const PicoUnitTechnicalDetails: React.FC<OptionalPicoUnitProps> = ({ pico: dataProp }) => {
+  const ctx = usePicoUnitContext();
+  const pico = dataProp ?? ctx.pico;
+
+  if (!pico) return <Loading />;
 
   const technical = useMemo(
     () => ({
@@ -22,35 +28,16 @@ export default function PicoUnitTechnicalDetails({ pico }: { pico: PicoUnit }) {
   );
 
   return (
-    <Card>
-      <CardContent>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-          <Typography variant="h6">Technical Details</Typography>
-          <Tooltip title={isOpen ? 'Collapse' : 'Expand'}>
-            <IconButton onClick={() => setIsOpen((s) => !s)} size="small">
-              <ExpandMoreIcon
-                sx={{
-                  transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                  transition: 'transform .2s',
-                }}
-              />
-            </IconButton>
-          </Tooltip>
-        </Box>
-
-        <List>
-          <FieldRow label="MicroPython version" value={technical.micropython_version} />
-          <FieldRow label="Software version" value={technical.software_version} />
-          {isOpen && (
-            <>
-              <FieldRow label="Board" value={technical.board} />
-              <FieldRow label="Board CPU freq (MHz)" value={technical.board_cpu_freq_mhz} />
-              <FieldRow label="Board RAM (MB)" value={technical.board_total_mem_mb} />
-              <FieldRow label="Board filesystem memory (MB)" value={technical.board_total_fs_mb} />
-            </>
-          )}
-        </List>
-      </CardContent>
-    </Card>
+    <InfoCard title="Technical details" subtitle="Static board data" icon={<MemoryIcon />}>
+      <InfoField label="Board">
+        <BigDisplay content={technical.board} />
+      </InfoField>
+      <InfoField label="MicroPython version">
+        <BigDisplay content={technical.micropython_version} />
+      </InfoField>
+      <InfoField label="Software version">
+        <BigDisplay content={technical.software_version} />
+      </InfoField>
+    </InfoCard>
   );
-}
+};
