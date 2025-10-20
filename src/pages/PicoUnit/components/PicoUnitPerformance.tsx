@@ -28,21 +28,21 @@ export const PicoUnitPerformance: React.FC<OptionalPicoUnitProps> = ({ pico: dat
 
   return (
     <InfoCard title="Perfomance" subtitle="Latest metrics" icon={<SpeedIcon />}>
-      <InfoField label="Failed calls">
+      <InfoField label="Failed calls" display="beside">
         <Chip
           label={typeof failed_calls === 'number' ? `${failed_calls}` : '0'}
           color={chipColorForFailedCalls(failed_calls)}
           size="medium"
         />
       </InfoField>
-      <InfoField label="Board temperature">
+      <InfoField label="Board temperature" display="beside">
         <Chip
-          label={typeof lr.board_temp === 'number' && isHealthy ? `${lr.board_temp}°C` : '—'}
+          label={typeof lr.board_temp === 'number' && isHealthy ? `${lr.board_temp} °C` : '—'}
           color={Math.abs(lr.board_temp ?? 0) > 85 ? 'error' : 'success'}
           size="medium"
         />
       </InfoField>
-      <InfoField label="Time to response">
+      <InfoField label="Response time" display="beside">
         <Chip
           label={
             typeof lr.time_to_response_ms === 'number' && isHealthy
