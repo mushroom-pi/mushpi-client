@@ -32,16 +32,3 @@ export function useListPicoUnits(
     ...queryOptions,
   });
 }
-
-export function useGetPicoUnit(picoUnitId: number | null) {
-  if (!picoUnitId) throw new Error('no id');
-  const queryKey = ['picoUnit', picoUnitId] as const;
-
-  return useQuery<PicoUnit, unknown, PicoUnit>({
-    queryKey,
-    queryFn: async () =>
-      (await unwrap(
-        PicoUnits.picoUnitIdControllerGetOne({ picoUnitId } as any),
-      )) as unknown as PicoUnit,
-  });
-}

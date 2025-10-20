@@ -8,7 +8,7 @@ import { InfoCard } from '~comp/InfoCard';
 import { InfoField } from '~comp/InfoField';
 import { Loading } from '~comp/Loading';
 import { ReadableTime } from '~comp/ReadableTime';
-import { usePicoUnitContext } from '~ctx/PicoUnitContext';
+import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 
 function pctNumber(value?: number | null, total?: number | null) {

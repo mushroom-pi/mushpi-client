@@ -1,0 +1,91 @@
+import { useQueryClient } from '@tanstack/react-query';
+import React, { createContext, useContext, useMemo } from 'react';
+
+import { useGetPicoUnit } from './hooks';
+import {
+  createChangeOutputsMutation,
+  createChangeTargetsMutation,
+  createDeleteMutation,
+  createToggleControlLoopMutation,
+  createUpdateMutation,
+} from './mutations';
+import type { PicoUnitCtx } from './types';
+
+const PicoUnitContext = createContext<PicoUnitCtx | undefined>(undefined);
+
+/**
+ * Provider fetches the pico unit by id and exposes update/delete wrappers that:
+ * - optimistically update the single-item query ['picoUnit', id]
+ * - update paginated list caches (['picoUnits', ...]) so lists reflect changes
+ * - invalidate queries on settle to get canonical server truth
+ */
+export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: number }>> = ({
+  picoUnitId,
+  children,
+}) => {
+  const qc = useQueryClient();
+
+  // fetch single item
+  const { data: pico, isLoading, isError, error, refetch } = useGetPicoUnit(picoUnitId);
+
+  const updateMutation = createUpdateMutation(qc);
+  const deleteMutation = createDeleteMutation(qc);
+  const toggleControlLoopMutation = createToggleControlLoopMutation(qc);
+  const changeTargetsMutation = createChangeTargetsMutation(qc);
+  const changeOutputsMutation = createChangeOutputsMutation(qc);
+
+  const value = useMemo<PicoUnitCtx>(
+    () => ({
+      pico,
+      isLoading,
+      isError,
+      error,
+      refetch: () => void refetch(),
+      updatePico: {
+        mutate: (vars) => updateMutation.mutate(vars),
+        mutateAsync: (vars) => updateMutation.mutateAsync(vars),
+        isLoading: updateMutation.isPending,
+      },
+      deletePico: {
+        mutate: (id) => deleteMutation.mutate(id),
+        mutateAsync: (id) => deleteMutation.mutateAsync(id),
+        isLoading: deleteMutation.isPending,
+      },
+      toggleControlLoop: {
+        mutate: (vars) => toggleControlLoopMutation.mutate(vars),
+        mutateAsync: (vars) => toggleControlLoopMutation.mutateAsync(vars),
+        isLoading: toggleControlLoopMutation.isPending,
+      },
+      changeTargets: {
+        mutate: (vars) => changeTargetsMutation.mutate(vars),
+        mutateAsync: (vars) => changeTargetsMutation.mutateAsync(vars),
+        isLoading: changeTargetsMutation.isPending,
+      },
+      changeOutputs: {
+        mutate: (vars) => changeOutputsMutation.mutate(vars),
+        mutateAsync: (vars) => changeOutputsMutation.mutateAsync(vars),
+        isLoading: changeOutputsMutation.isPending,
+      },
+    }),
+    [
+      pico,
+      isLoading,
+      isError,
+      error,
+      refetch,
+      updateMutation,
+      deleteMutation,
+      toggleControlLoopMutation,
+      changeTargetsMutation,
+      changeOutputsMutation,
+    ],
+  );
+
+  return <PicoUnitContext.Provider value={value}>{children}</PicoUnitContext.Provider>;
+};
+
+export function usePicoUnitContext() {
+  const ctx = useContext(PicoUnitContext);
+  if (!ctx) throw new Error('usePicoUnitContext must be used within <PicoUnitProvider>');
+  return ctx;
+}

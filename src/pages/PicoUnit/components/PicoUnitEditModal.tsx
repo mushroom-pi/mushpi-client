@@ -16,7 +16,7 @@ import {
 import React, { useEffect, useMemo, useState } from 'react';
 
 import type { PicoUnit, UpdatePicoUnitDto } from '~api/generated';
-import { usePicoUnitContext } from '~ctx/PicoUnitContext';
+import { usePicoUnitContext } from '~ctx/PicoUnit';
 
 interface PicoUnitEditModalProps {
   open: boolean;

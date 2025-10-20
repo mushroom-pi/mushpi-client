@@ -5,7 +5,7 @@ import { Box, Button, Chip, IconButton, Stack, Tooltip, Typography } from '@mui/
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { usePicoUnitContext } from '~ctx/PicoUnitContext';
+import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 
 type PicoUnitHeaderProps = OptionalPicoUnitProps & {

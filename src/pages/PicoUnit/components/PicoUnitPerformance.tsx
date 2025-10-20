@@ -7,7 +7,7 @@ import { chipColorForFailedCalls } from 'src/utils/methods';
 import { InfoCard } from '~comp/InfoCard';
 import { InfoField } from '~comp/InfoField';
 import { Loading } from '~comp/Loading';
-import { usePicoUnitContext } from '~ctx/PicoUnitContext';
+import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 
 function chipColorForResponse(ms?: number | null) {

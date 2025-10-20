@@ -10,7 +10,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 import type { PicoUnit } from '~api/generated';
-import { usePicoUnitContext } from '~ctx/PicoUnitContext';
+import { usePicoUnitContext } from '~ctx/PicoUnit';
 
 interface PicoUnitDeleteDialogProps {
   deleteOpen: boolean;

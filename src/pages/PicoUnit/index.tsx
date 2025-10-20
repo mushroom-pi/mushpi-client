@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { Error } from '~comp/Error';
 import { Invalid } from '~comp/Invalid';
 import { Loading } from '~comp/Loading';
-import { PicoUnitProvider, usePicoUnitContext } from '~ctx/PicoUnitContext';
+import { PicoUnitProvider, usePicoUnitContext } from '~ctx/PicoUnit';
 
 import { PicoUnitDeleteDialog as DeleteDialog } from './components/PicoUnitDeleteDialog';
 import { PicoUnitDetailGrid as DetailGrid } from './components/PicoUnitDetailGrid';
