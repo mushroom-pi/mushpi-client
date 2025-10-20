@@ -9,8 +9,8 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-import type { PicoUnit } from 'src/api/generated';
-import { usePicoUnitContext } from 'src/contexts/PicoUnitContext';
+import type { PicoUnit } from '~api/generated';
+import { usePicoUnitContext } from '~ctx/PicoUnitContext';
 
 interface PicoUnitDeleteDialogProps {
   deleteOpen: boolean;

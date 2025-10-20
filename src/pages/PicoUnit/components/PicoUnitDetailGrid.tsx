@@ -1,7 +1,7 @@
 import { Grid } from '@mui/material';
 import type React from 'react';
 
-import type { OptionalPicoUnitProps } from 'src/interfaces/optionalPicoUnit';
+import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 
 import { PicoUnitOverview as Overview } from './PicoUnitOverview';
 import { PicoUnitPerformance as Performance } from './PicoUnitPerformance';

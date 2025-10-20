@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-import type { PicoUnit } from 'src/api/generated';
+import type { PicoUnit } from '~api/generated';
 
 export default function PicoUnitCard({
   pico,

@@ -1,53 +1,69 @@
-const { FlatCompat } = require('@eslint/eslintrc');
-const js = require('@eslint/js');
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-});
+const ts = require('@typescript-eslint/eslint-plugin');
+const tsParser = require('@typescript-eslint/parser');
+const importPlugin = require('eslint-plugin-import');
 
 module.exports = [
-  // Convert the legacy "extends" entries into flat-config objects:
-  ...compat.extends(
-    'eslint:recommended',
-    'plugin:react/recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:import/errors',
-    'plugin:import/warnings',
-    'plugin:import/typescript',
-    'plugin:prettier/recommended',
-  ),
-
-  // Project-level settings / rules (applies to js/ts/jsx/tsx)
+  // Apply to TS/JS files in the project
   {
-    files: ['**/*.{js,jsx,ts,tsx}'],
+    files: ['**/*.{ts,tsx,js,jsx}'],
+
+    // languageOptions used by flat config
     languageOptions: {
-      ecmaVersion: 2024,
-      sourceType: 'module',
+      parser: tsParser,
       parserOptions: {
+        project: ['./tsconfig.app.json'], // important for type-aware rules (optional)
+        sourceType: 'module',
+        ecmaVersion: 2024,
         ecmaFeatures: { jsx: true },
       },
     },
-    ignores: ['eslint.config.cjs', 'node_modules/**', 'dist/**', 'build/**'],
 
-    // same "settings" you had (react version detect)
-    settings: { react: { version: 'detect' } },
+    plugins: {
+      '@typescript-eslint': ts,
+      import: importPlugin,
+    },
+
+    settings: {
+      // Tell eslint-plugin-import to use the typescript resolver which understands tsconfig "paths".
+      // This requires devDependency: eslint-import-resolver-typescript
+      'import/resolver': {
+        typescript: {
+          // path to your tsconfig that contains "paths"
+          project: './tsconfig.app.json',
+        },
+        node: {
+          extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
+        },
+      },
+    },
 
     rules: {
-      // Prettier errors surfaced as ESLint errors (same as 'prettier/prettier': ['error'])
-      'prettier/prettier': ['error'],
+      // recommended baseline: you can add/override rules here
+      'import/no-unresolved': 'error',
+      'import/order': [
+        'warn',
+        {
+          groups: [['builtin', 'external'], 'internal', ['parent', 'sibling', 'index']],
+          pathGroups: [
+            // keep these in sync with your tsconfig/vite aliases if you want special ordering
+            { pattern: '~api/**', group: 'internal' },
+            { pattern: '~ctx/**', group: 'internal' },
+            { pattern: '~hook/**', group: 'internal' },
+            { pattern: '~int/**', group: 'internal' },
+            { pattern: '~type/**', group: 'internal' },
+            { pattern: '~comp/**', group: 'internal' },
+            { pattern: '@/**', group: 'internal' },
+            { pattern: 'src/**', group: 'internal' },
+          ],
+          pathGroupsExcludedImportTypes: ['builtin'],
+          'newlines-between': 'always',
+          alphabetize: { order: 'asc', caseInsensitive: true },
+        },
+      ],
 
-      // import sorting (auto-fixable)
-      'simple-import-sort/imports': 'error',
-      'simple-import-sort/exports': 'error',
-
-      // import helper rules
-      'import/no-duplicates': 'error',
-      'import/order': 'off', // turned off because we use simple-import-sort
-
-      // keep the small react/typescript rule tweaks you had
-      'react/react-in-jsx-scope': 'off',
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      // typescript plugin rule recommendations — adapt to preference
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/explicit-function-return-type': 'off',
     },
   },
 ];

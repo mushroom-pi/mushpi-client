@@ -5,8 +5,8 @@ import { Box, Button, Chip, IconButton, Stack, Tooltip, Typography } from '@mui/
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { usePicoUnitContext } from 'src/contexts/PicoUnitContext';
-import type { OptionalPicoUnitProps } from 'src/interfaces/optionalPicoUnit';
+import { usePicoUnitContext } from '~ctx/PicoUnitContext';
+import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 
 type PicoUnitHeaderProps = OptionalPicoUnitProps & {
   setEditOpen: (open: boolean) => void;

@@ -15,8 +15,8 @@ import {
 } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import type { PicoUnit, UpdatePicoUnitDto } from 'src/api/generated';
-import { usePicoUnitContext } from 'src/contexts/PicoUnitContext';
+import type { PicoUnit, UpdatePicoUnitDto } from '~api/generated';
+import { usePicoUnitContext } from '~ctx/PicoUnitContext';
 
 interface PicoUnitEditModalProps {
   open: boolean;

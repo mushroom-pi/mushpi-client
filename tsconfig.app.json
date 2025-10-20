@@ -30,8 +30,13 @@
     "paths": {
       "src/*": ["src/*"],
       "@/*": ["src/*"],
-      "~/*": ["src/*"]
+      "~api/*": ["src/api/*"],
+      "~ctx/*": ["src/contexts/*"],
+      "~hook/*": ["src/hooks/*"],
+      "~int/*": ["src/interfaces/*"],
+      "~type/*": ["src/types/*"],
+      "~comp/*": ["src/components/*"]
     }
   },
-  "include": ["src"]
+  "include": ["."]
 }

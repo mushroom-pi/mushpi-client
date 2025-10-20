@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { createContext, useContext, useMemo } from 'react';
 
-import { unwrap } from 'src/api/adapter';
-import { PicoUnits } from 'src/api/client';
-import type { PicoUnit, UpdatePicoUnitDto } from 'src/api/generated';
+import { unwrap } from '~api/adapter';
+import { PicoUnits } from '~api/client';
+import type { PicoUnit, UpdatePicoUnitDto } from '~api/generated';
 
 function updateItemInAllPages(
   queryClient: ReturnType<typeof useQueryClient>,

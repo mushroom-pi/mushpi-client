@@ -1,12 +1,12 @@
 import { type UseQueryOptions, useQuery } from '@tanstack/react-query';
 
-import { unwrap } from 'src/api/adapter';
-import { PicoUnits } from 'src/api/client';
+import { unwrap } from '~api/adapter';
+import { PicoUnits } from '~api/client';
 import type {
   PicoUnitsApiPicoUnitsControllerListRequest as ListPicoUnitsParams,
   PicoUnit,
   PicoUnitListResponseDto,
-} from 'src/api/generated';
+} from '~api/generated';
 
 export function useListPicoUnits(
   params?: ListPicoUnitsParams,

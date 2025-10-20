@@ -2,13 +2,14 @@ import DataUsageIcon from '@mui/icons-material/DataUsage';
 import { LinearProgress } from '@mui/material';
 import React from 'react';
 
-import { InfoCard } from 'src/components/InfoCard';
-import { InfoField } from 'src/components/InfoField';
-import { Loading } from 'src/components/Loading';
-import { ReadableTime } from 'src/components/ReadableTime';
-import { usePicoUnitContext } from 'src/contexts/PicoUnitContext';
-import type { OptionalPicoUnitProps } from 'src/interfaces/optionalPicoUnit';
 import { bytesToMB } from 'src/utils/methods';
+
+import { InfoCard } from '~comp/InfoCard';
+import { InfoField } from '~comp/InfoField';
+import { Loading } from '~comp/Loading';
+import { ReadableTime } from '~comp/ReadableTime';
+import { usePicoUnitContext } from '~ctx/PicoUnitContext';
+import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 
 function pctNumber(value?: number | null, total?: number | null) {
   if (typeof value !== 'number' || typeof total !== 'number' || total === 0) return null;

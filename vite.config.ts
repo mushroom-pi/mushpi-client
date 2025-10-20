@@ -9,7 +9,12 @@ export default defineConfig({
     alias: [
       { find: 'src', replacement: path.resolve(__dirname, 'src') },
       { find: '@', replacement: path.resolve(__dirname, 'src') },
-      { find: '~', replacement: path.resolve(__dirname, 'src') },
+      { find: '~api', replacement: path.resolve(__dirname, 'src/api') },
+      { find: '~ctx', replacement: path.resolve(__dirname, 'src/contexts') },
+      { find: '~hook', replacement: path.resolve(__dirname, 'src/hooks') },
+      { find: '~int', replacement: path.resolve(__dirname, 'src/interfaces') },
+      { find: '~type', replacement: path.resolve(__dirname, 'src/types') },
+      { find: '~comp', replacement: path.resolve(__dirname, 'src/components') },
     ],
   },
 });

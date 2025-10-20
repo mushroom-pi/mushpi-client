@@ -1,10 +1,10 @@
 import { Box, Button, Container, Grid, Typography } from '@mui/material';
 
-import type { PicoUnit } from 'src/api/generated';
-import { Error } from 'src/components/Error';
-import { Loading } from 'src/components/Loading';
-import { usePicoUnitsUI } from 'src/contexts/PicoUnitsContext';
-import { useListPicoUnits } from 'src/hooks/usePicoUnits';
+import type { PicoUnit } from '~api/generated';
+import { Error } from '~comp/Error';
+import { Loading } from '~comp/Loading';
+import { usePicoUnitsUI } from '~ctx/PicoUnitsContext';
+import { useListPicoUnits } from '~hook/usePicoUnits';
 
 import PicoUnitCard from './components/PicoUnitCard';
 

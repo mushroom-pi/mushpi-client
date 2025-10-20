@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import type { PicoUnitsApiPicoUnitsControllerListRequest as ListPicoUnitsParams } from 'src/api/generated';
+import type { PicoUnitsApiPicoUnitsControllerListRequest as ListPicoUnitsParams } from '~api/generated';
 
 export type PicoUnitsUIState = ListPicoUnitsParams & {
   setPage: (p: number) => void;

@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
 
-import type { PicoUnit, PicoUnitListResponseDto } from 'src/api/generated';
+import type { PicoUnit, PicoUnitListResponseDto } from '~api/generated';
 
 export function updateItemInAllPages(
   qc: QueryClient,

@@ -1,4 +1,4 @@
-import type { PicoUnit } from 'src/api/generated';
+import type { PicoUnit } from '~api/generated';
 
 export interface OptionalPicoUnitProps {
   pico?: PicoUnit;
