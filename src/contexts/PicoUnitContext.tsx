@@ -42,6 +42,74 @@ function removeItemFromAllPages(queryClient: ReturnType<typeof useQueryClient>, 
   });
 }
 
+/**
+ * createOptimisticMutation centralizes the common mutation lifecycle for mutations that:
+ * - cancel queries for ['picoUnit', id] and ['picoUnits']
+ * - snapshot item and lists
+ * - apply an optimistic update to ['picoUnit', id] and all list pages
+ * - on error restore snapshot or invalidate
+ * - on settled invalidate queries to re-sync
+ *
+ * usage: createOptimisticMutation(qc, {
+ *   mutationFn,
+ *   applyOptimistic: (prevItem, body) => newItem
+ * })
+ */
+function createOptimisticMutation<Input, Result = any>(
+  qc: ReturnType<typeof useQueryClient>,
+  opts: {
+    mutationFn: (vars: Input) => Promise<Result>;
+    getIdFromVars: (vars: Input) => number;
+    applyOptimistic: (prevItem: PicoUnit | undefined, vars: Input) => PicoUnit | undefined;
+  },
+) {
+  return useMutation({
+    mutationFn: opts.mutationFn,
+    onMutate: async (vars: Input) => {
+      const id = opts.getIdFromVars(vars);
+
+      await qc.cancelQueries({ queryKey: ['picoUnit', id] });
+      await qc.cancelQueries({ queryKey: ['picoUnits'] });
+
+      const snapshotItem = qc.getQueryData(['picoUnit', id]);
+      const snapshotLists = qc.getQueryData(['picoUnits']);
+
+      const prevItem = qc.getQueryData<PicoUnit>(['picoUnit', id]);
+      const optimisticItem = opts.applyOptimistic(prevItem, vars);
+      if (optimisticItem) {
+        qc.setQueryData(['picoUnit', id], optimisticItem);
+      }
+
+      if (optimisticItem) {
+        updateItemInAllPages(qc, id, () => optimisticItem);
+      } else if (prevItem) {
+        // If applyOptimistic returns undefined but prevItem exists, we still may need to map partial changes:
+        // attempt to call applyOptimistic with prevItem to get a per-item updater (not all callers need this)
+        const maybe = opts.applyOptimistic(prevItem, vars);
+        if (maybe) updateItemInAllPages(qc, id, () => maybe);
+      }
+
+      return { snapshotItem, snapshotLists };
+    },
+    onError: (_err, vars: Input, context: any) => {
+      const id = opts.getIdFromVars(vars);
+      if (context?.snapshotItem) {
+        qc.setQueryData(['picoUnit', id], context.snapshotItem);
+      } else {
+        qc.invalidateQueries({ queryKey: ['picoUnit', id] });
+      }
+      if (context?.snapshotLists) {
+        qc.invalidateQueries({ queryKey: ['picoUnits'] });
+      }
+    },
+    onSettled: (_data, _err, vars: Input) => {
+      const id = opts.getIdFromVars(vars);
+      qc.invalidateQueries({ queryKey: ['picoUnit', id] });
+      qc.invalidateQueries({ queryKey: ['picoUnits'] });
+    },
+  });
+}
+
 type PicoUnitCtx = {
   pico?: PicoUnit;
   isLoading: boolean;
@@ -58,9 +126,32 @@ type PicoUnitCtx = {
     mutateAsync: (id: number) => Promise<any>;
     isLoading: boolean;
   };
+  toggleControlLoop?: {
+    mutate: (vars: { picoUnitId: number; body: ControlLoopDto }) => void;
+    mutateAsync: (vars: { picoUnitId: number; body: ControlLoopDto }) => Promise<any>;
+    isLoading: boolean;
+  };
+  changeTargets?: {
+    mutate: (vars: { picoUnitId: number; body: ChangeSetPointsDto }) => void;
+    mutateAsync: (vars: { picoUnitId: number; body: ChangeSetPointsDto }) => Promise<any>;
+    isLoading: boolean;
+  };
+  changeOutputs?: {
+    mutate: (vars: { picoUnitId: number; body: ChangeOutputsDto }) => void;
+    mutateAsync: (vars: { picoUnitId: number; body: ChangeOutputsDto }) => Promise<any>;
+    isLoading: boolean;
+  };
 };
 
 const PicoUnitContext = createContext<PicoUnitCtx | undefined>(undefined);
+
+/** small helper that applies/merges reading fields safely */
+function applyReadingPatch(prev: Readings | undefined, patch: Partial<Readings>): Readings {
+  return {
+    ...(prev ?? {}),
+    ...patch,
+  } as Readings;
+}
 
 /**
  * Provider fetches the pico unit by id and exposes update/delete wrappers that:
@@ -93,7 +184,7 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
   // -------------------------
   // Update mutation (patch)
   // -------------------------
-  const updateMutation = useMutation({
+  const updateMutation = createOptimisticMutation(qc, {
     mutationFn: async ({
       picoUnitId,
       body,
@@ -106,43 +197,16 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
       );
       return res as unknown as PicoUnit;
     },
-    onMutate: async ({ picoUnitId: id, body }) => {
-      // cancel ongoing queries for this item and lists
-      await qc.cancelQueries({ queryKey: ['picoUnit', id] });
-      await qc.cancelQueries({ queryKey: ['picoUnits'] });
-
-      // snapshot single-item and lists (coarse)
-      const snapshotItem = qc.getQueryData(['picoUnit', id]);
-      const snapshotLists = qc.getQueryData(['picoUnits']);
-
-      // optimistic -> update the single item in cache if present
-      const prevItem = qc.getQueryData<PicoUnit>(['picoUnit', id]);
-      if (prevItem) {
-        const optimistic = { ...prevItem, ...body };
-        qc.setQueryData(['picoUnit', id], optimistic);
-      }
-
-      // update any cached list pages that include the item
-      updateItemInAllPages(qc, id, (old) => ({ ...old, ...body }));
-
-      return { snapshotItem, snapshotLists };
-    },
-    onError: (_err, _vars, context: any) => {
-      // rollback: restore snapshots by invalidating (coarse) or setting data directly
-      if (context?.snapshotItem) {
-        qc.setQueryData(['picoUnit', (_vars as any)?.picoUnitId], context.snapshotItem);
-      } else {
-        qc.invalidateQueries({ queryKey: ['picoUnit', picoUnitId] });
-      }
-      // restore lists
-      if (context?.snapshotLists) {
-        qc.invalidateQueries({ queryKey: ['picoUnits'] });
-      }
-    },
-    onSettled: (_data, _err, _vars) => {
-      // revalidate both single item and lists to ensure canonical server state
-      qc.invalidateQueries({ queryKey: ['picoUnit', picoUnitId] });
-      qc.invalidateQueries({ queryKey: ['picoUnits'] });
+    getIdFromVars: (vars: { picoUnitId: number; body: Partial<UpdatePicoUnitDto> }) =>
+      vars.picoUnitId,
+    applyOptimistic: (prevItem, vars) => {
+      if (!prevItem) return undefined;
+      const { body } = vars;
+      // merge top-level fields from body into the item (same as previous behaviour)
+      return {
+        ...prevItem,
+        ...body,
+      } as PicoUnit;
     },
   });
 
@@ -170,7 +234,6 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
       return { snapshotItem, snapshotLists };
     },
     onError: (_err, id, context: any) => {
-      // rollback: restore single item and lists
       if (context?.snapshotItem) {
         qc.setQueryData(['picoUnit', id], context.snapshotItem);
       } else {
@@ -186,184 +249,73 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
   });
 
   // -------------------------
-  // toggleControlLoop mutation
+  // toggleControlLoop mutation (uses createOptimisticMutation)
   // -------------------------
-  const toggleControlLoopMutation = useMutation({
+  const toggleControlLoopMutation = createOptimisticMutation(qc, {
     mutationFn: async ({ picoUnitId, body }: { picoUnitId: number; body: ControlLoopDto }) => {
       const res = await unwrap(
         Control.picoUnitIdControlControllerLoop({ picoUnitId, controlLoopDto: body }),
       );
       return res as unknown as ControlLoopDto;
     },
-    onMutate: async ({ picoUnitId: id, body }) => {
-      await qc.cancelQueries({ queryKey: ['picoUnit', id] });
-      await qc.cancelQueries({ queryKey: ['picoUnits'] });
-
-      const snapshotItem = qc.getQueryData(['picoUnit', id]);
-      const snapshotLists = qc.getQueryData(['picoUnits']);
-
-      const prevItem = qc.getQueryData<PicoUnit>(['picoUnit', id]);
-      if (prevItem) {
-        const optimistic: PicoUnit = {
-          ...prevItem,
-          latest_reading: {
-            ...(prevItem.latest_reading ?? {}),
-            control_loop_enabled:
-              body.enabled === undefined
-                ? prevItem.latest_reading?.control_loop_enabled
-                : body.enabled,
-          } as Readings,
-        };
-        qc.setQueryData(['picoUnit', id], optimistic);
-      }
-
-      updateItemInAllPages(qc, id, (old) => ({
-        ...old,
-        latest_reading: {
-          ...(old.latest_reading ?? {}),
-          control_loop_enabled:
-            body.enabled === undefined ? old.latest_reading?.control_loop_enabled : body.enabled,
-        } as Readings,
-      }));
-
-      return { snapshotItem, snapshotLists };
-    },
-    onError: (_err, _vars, context: any) => {
-      const { picoUnitId: id } = _vars as any;
-      if (context?.snapshotItem) {
-        qc.setQueryData(['picoUnit', id], context.snapshotItem);
-      } else {
-        qc.invalidateQueries({ queryKey: ['picoUnit', picoUnitId] });
-      }
-      if (context?.snapshotLists) {
-        qc.invalidateQueries({ queryKey: ['picoUnits'] });
-      }
-    },
-    onSettled: (_data, _err, _vars) => {
-      qc.invalidateQueries({ queryKey: ['picoUnit', picoUnitId] });
-      qc.invalidateQueries({ queryKey: ['picoUnits'] });
+    getIdFromVars: (vars: { picoUnitId: number; body: ControlLoopDto }) => vars.picoUnitId,
+    applyOptimistic: (prevItem, vars) => {
+      const prev = prevItem;
+      const body = vars.body;
+      if (!prev) return undefined;
+      const patched = applyReadingPatch(prev.latest_reading, {
+        control_loop_enabled:
+          body.enabled === undefined ? prev.latest_reading?.control_loop_enabled : body.enabled,
+      });
+      return { ...prev, latest_reading: patched } as PicoUnit;
     },
   });
 
   // -------------------------
   // changeTargets mutation
   // -------------------------
-  const changeTargetsMutation = useMutation({
+  const changeTargetsMutation = createOptimisticMutation(qc, {
     mutationFn: async ({ picoUnitId, body }: { picoUnitId: number; body: ChangeSetPointsDto }) => {
       const res = await unwrap(
         Control.picoUnitIdControlControllerSetpoints({ picoUnitId, changeSetPointsDto: body }),
       );
       return res as unknown as ChangeSetPointsDto;
     },
-    onMutate: async ({ picoUnitId: id, body }) => {
-      await qc.cancelQueries({ queryKey: ['picoUnit', id] });
-      await qc.cancelQueries({ queryKey: ['picoUnits'] });
-
-      const snapshotItem = qc.getQueryData(['picoUnit', id]);
-      const snapshotLists = qc.getQueryData(['picoUnits']);
-
-      const prevItem = qc.getQueryData<PicoUnit>(['picoUnit', id]);
-      if (prevItem) {
-        const optimistic: PicoUnit = {
-          ...prevItem,
-          latest_reading: {
-            ...(prevItem.latest_reading ?? {}),
-            temperature_set: body.temperature ?? prevItem.latest_reading?.temperature_set,
-            humidity_set: body.humidity ?? prevItem.latest_reading?.humidity_set,
-          } as Readings,
-        };
-        qc.setQueryData(['picoUnit', id], optimistic);
-      }
-
-      updateItemInAllPages(qc, id, (old) => ({
-        ...old,
-        latest_reading: {
-          ...(old.latest_reading ?? {}),
-          temperature_set: body.temperature ?? old.latest_reading?.temperature_set,
-          humidity_set: body.humidity ?? old.latest_reading?.humidity_set,
-        } as Readings,
-      }));
-
-      return { snapshotItem, snapshotLists };
-    },
-    onError: (_err, _vars, context: any) => {
-      const { picoUnitId: id } = _vars as any;
-      if (context?.snapshotItem) {
-        qc.setQueryData(['picoUnit', id], context.snapshotItem);
-      } else {
-        qc.invalidateQueries({ queryKey: ['picoUnit', picoUnitId] });
-      }
-      if (context?.snapshotLists) {
-        qc.invalidateQueries({ queryKey: ['picoUnits'] });
-      }
-    },
-    onSettled: (_data, _err, _vars) => {
-      qc.invalidateQueries({ queryKey: ['picoUnit', picoUnitId] });
-      qc.invalidateQueries({ queryKey: ['picoUnits'] });
+    getIdFromVars: (vars: { picoUnitId: number; body: ChangeSetPointsDto }) => vars.picoUnitId,
+    applyOptimistic: (prevItem, vars) => {
+      const prev = prevItem;
+      const body = vars.body;
+      if (!prev) return undefined;
+      const patched = applyReadingPatch(prev.latest_reading, {
+        temperature_set: body.temperature ?? prev.latest_reading?.temperature_set,
+        humidity_set: body.humidity ?? prev.latest_reading?.humidity_set,
+      });
+      return { ...prev, latest_reading: patched } as PicoUnit;
     },
   });
 
   // -------------------------
   // changeOutputs mutation
   // -------------------------
-  const changeOutputsMutation = useMutation({
+  const changeOutputsMutation = createOptimisticMutation(qc, {
     mutationFn: async ({ picoUnitId, body }: { picoUnitId: number; body: ChangeOutputsDto }) => {
       const res = await unwrap(
         Control.picoUnitIdControlControllerOutputs({ picoUnitId, changeOutputsDto: body }),
       );
       return res as unknown as ChangeOutputsDto;
     },
-    onMutate: async ({ picoUnitId: id, body }) => {
-      await qc.cancelQueries({ queryKey: ['picoUnit', id] });
-      await qc.cancelQueries({ queryKey: ['picoUnits'] });
-
-      const snapshotItem = qc.getQueryData(['picoUnit', id]);
-      const snapshotLists = qc.getQueryData(['picoUnits']);
-
-      const prevItem = qc.getQueryData<PicoUnit>(['picoUnit', id]);
-      if (prevItem) {
-        const optimistic: PicoUnit = {
-          ...prevItem,
-          latest_reading: {
-            ...(prevItem.latest_reading ?? {}),
-            humidifier_on:
-              body.humidifier === undefined
-                ? prevItem.latest_reading?.humidifier_on
-                : body.humidifier,
-            heater_on: body.heater === undefined ? prevItem.latest_reading?.heater_on : body.heater,
-            fan_on: body.fan === undefined ? prevItem.latest_reading?.fan_on : body.fan,
-          } as Readings,
-        };
-        qc.setQueryData(['picoUnit', id], optimistic);
-      }
-
-      updateItemInAllPages(qc, id, (old) => ({
-        ...old,
-        latest_reading: {
-          ...(old.latest_reading ?? {}),
-          humidifier_on:
-            body.humidifier === undefined ? old.latest_reading?.humidifier_on : body.humidifier,
-          heater_on: body.heater === undefined ? old.latest_reading?.heater_on : body.heater,
-          fan_on: body.fan === undefined ? old.latest_reading?.fan_on : body.fan,
-        } as Readings,
-      }));
-
-      return { snapshotItem, snapshotLists };
-    },
-    onError: (_err, _vars, context: any) => {
-      const { picoUnitId: id } = _vars as any;
-      if (context?.snapshotItem) {
-        qc.setQueryData(['picoUnit', id], context.snapshotItem);
-      } else {
-        qc.invalidateQueries({ queryKey: ['picoUnit', picoUnitId] });
-      }
-      if (context?.snapshotLists) {
-        qc.invalidateQueries({ queryKey: ['picoUnits'] });
-      }
-    },
-    onSettled: (_data, _err, _vars) => {
-      qc.invalidateQueries({ queryKey: ['picoUnit', picoUnitId] });
-      qc.invalidateQueries({ queryKey: ['picoUnits'] });
+    getIdFromVars: (vars: { picoUnitId: number; body: ChangeOutputsDto }) => vars.picoUnitId,
+    applyOptimistic: (prevItem, vars) => {
+      const prev = prevItem;
+      const body = vars.body;
+      if (!prev) return undefined;
+      const patched = applyReadingPatch(prev.latest_reading, {
+        humidifier_on:
+          body.humidifier === undefined ? prev.latest_reading?.humidifier_on : body.humidifier,
+        heater_on: body.heater === undefined ? prev.latest_reading?.heater_on : body.heater,
+        fan_on: body.fan === undefined ? prev.latest_reading?.fan_on : body.fan,
+      });
+      return { ...prev, latest_reading: patched } as PicoUnit;
     },
   });
 
@@ -385,24 +337,18 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
         isLoading: deleteMutation.isPending,
       },
       toggleControlLoop: {
-        mutate: (vars: { picoUnitId: number; body: ControlLoopDto }) =>
-          toggleControlLoopMutation.mutate(vars),
-        mutateAsync: (vars: { picoUnitId: number; body: ControlLoopDto }) =>
-          toggleControlLoopMutation.mutateAsync(vars),
+        mutate: (vars) => toggleControlLoopMutation.mutate(vars),
+        mutateAsync: (vars) => toggleControlLoopMutation.mutateAsync(vars),
         isLoading: toggleControlLoopMutation.isPending,
       },
       changeTargets: {
-        mutate: (vars: { picoUnitId: number; body: ChangeSetPointsDto }) =>
-          changeTargetsMutation.mutate(vars),
-        mutateAsync: (vars: { picoUnitId: number; body: ChangeSetPointsDto }) =>
-          changeTargetsMutation.mutateAsync(vars),
+        mutate: (vars) => changeTargetsMutation.mutate(vars),
+        mutateAsync: (vars) => changeTargetsMutation.mutateAsync(vars),
         isLoading: changeTargetsMutation.isPending,
       },
-      changeOutputsMutation: {
-        mutate: (vars: { picoUnitId: number; body: ChangeOutputsDto }) =>
-          changeOutputsMutation.mutate(vars),
-        mutateAsync: (vars: { picoUnitId: number; body: ChangeOutputsDto }) =>
-          changeOutputsMutation.mutateAsync(vars),
+      changeOutputs: {
+        mutate: (vars) => changeOutputsMutation.mutate(vars),
+        mutateAsync: (vars) => changeOutputsMutation.mutateAsync(vars),
         isLoading: changeOutputsMutation.isPending,
       },
     }),
