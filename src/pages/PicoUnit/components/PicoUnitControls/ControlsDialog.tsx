@@ -18,6 +18,7 @@ import {
 import React, { useEffect, useMemo, useState } from 'react';
 
 import type { ChangeSetPointsDto, ControlLoopDto } from '~api/generated';
+import { HeaderAndIcon } from '~comp/HeaderAndIcon';
 import { Loading } from '~comp/Loading';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 
@@ -107,12 +108,7 @@ export const ControlsDialog: React.FC<ControlsDialogProps> = ({
       aria-labelledby="pico-edit-dialog-title"
     >
       <DialogTitle display="flex" alignItems="center" justifyContent="space-between">
-        <Stack direction="row" spacing={1} alignItems="center">
-          <TuneIcon />
-          <Typography id="pico-edit-dialog-title" variant="h6">
-            Controls
-          </Typography>
-        </Stack>
+        <HeaderAndIcon title="Controls" icon={<TuneIcon />} />
 
         <IconButton aria-label="close" onClick={onClose} size="small" sx={{ ml: 2 }}>
           <CloseIcon />

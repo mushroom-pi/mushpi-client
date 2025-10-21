@@ -2,6 +2,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Card, CardContent, Divider, IconButton, Stack, Typography } from '@mui/material';
 import type React from 'react';
 
+import { HeaderAndIcon } from './HeaderAndIcon';
+
 interface EditableInfoCardProps {
   title: string;
   subtitle?: string;
@@ -21,11 +23,7 @@ export const EditableInfoCard: React.FC<EditableInfoCardProps> = ({
     <Card>
       <CardContent>
         <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
-          <Stack direction="row" spacing={1} alignItems="center">
-            {icon}
-            <Typography variant="h6">{title}</Typography>
-          </Stack>
-
+          <HeaderAndIcon title={title} icon={icon} />
           <IconButton disabled={!onClickEdit} onClick={onClickEdit}>
             <EditIcon fontSize="small" />
           </IconButton>

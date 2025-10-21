@@ -15,6 +15,8 @@ import {
 } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { HeaderAndIcon } from 'src/components/HeaderAndIcon';
+
 import type { PicoUnit, UpdatePicoUnitDto } from '~api/generated';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 
@@ -119,9 +121,7 @@ export const PicoUnitEditModal: React.FC<PicoUnitEditModalProps> = ({
       aria-labelledby="pico-edit-dialog-title"
     >
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography id="pico-edit-dialog-title" variant="h6">
-          Edit Pico Details
-        </Typography>
+        <HeaderAndIcon title="Edit Pico Details" />
         <IconButton aria-label="close" onClick={onClose} size="small" sx={{ ml: 2 }}>
           <CloseIcon />
         </IconButton>
