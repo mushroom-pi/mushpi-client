@@ -1,29 +1,14 @@
-import CloseIcon from '@mui/icons-material/Close';
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  IconButton,
-  Stack,
-  Switch,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Stack, Switch, TextField, Typography } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { HeaderAndIcon } from 'src/components/HeaderAndIcon';
-
-import type { PicoUnit, UpdatePicoUnitDto } from '~api/generated';
+import type { UpdatePicoUnitDto } from '~api/generated';
+import { HeaderAndIcon } from '~comp/HeaderAndIcon';
+import { ModalDialog } from '~comp/ModalDialog';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 
 interface PicoUnitEditModalProps {
   open: boolean;
   onClose: () => void;
-  pico?: PicoUnit; // optional override; falls back to context pico
   /**
    * If true the modal will automatically close after a successful save.
    * Default: true
@@ -34,16 +19,9 @@ interface PicoUnitEditModalProps {
 export const PicoUnitEditModal: React.FC<PicoUnitEditModalProps> = ({
   open,
   onClose,
-  pico: dataProp,
   closeOnSave = true,
 }) => {
-  // Pico from prop or context
-  const ctx = usePicoUnitContext();
-  const pico = dataProp ?? ctx.pico;
-
-  // provider mutation state
-  const updateMutation = ctx.updatePico;
-  const isSaving = updateMutation.isLoading;
+  const { pico, updatePico: updateMutation } = usePicoUnitContext();
 
   // local editable state
   const [editName, setEditName] = useState<string>('');
@@ -113,70 +91,41 @@ export const PicoUnitEditModal: React.FC<PicoUnitEditModalProps> = ({
   }
 
   return (
-    <Dialog
+    <ModalDialog
       open={open}
+      hasChanges={hasChanges}
+      isSaving={updateMutation.isLoading}
       onClose={onClose}
-      fullWidth
-      maxWidth="sm"
-      aria-labelledby="pico-edit-dialog-title"
+      doSaveChanges={doSaveEdits}
+      handleCancel={handleCancel}
+      headerAndIcon={<HeaderAndIcon title="Edit Pico Details" />}
     >
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <HeaderAndIcon title="Edit Pico Details" />
-        <IconButton aria-label="close" onClick={onClose} size="small" sx={{ ml: 2 }}>
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
+      <Stack spacing={2} sx={{ width: '100%', mt: 0.5 }}>
+        <TextField
+          label="Name"
+          value={editName}
+          onChange={(e) => setEditName(e.target.value)}
+          fullWidth
+        />
 
-      <DialogContent dividers>
-        {!pico ? (
-          <Box py={2}>
-            <Typography variant="body2">No pico selected</Typography>
-          </Box>
-        ) : (
-          <Stack spacing={2} sx={{ width: '100%', mt: 0.5 }}>
-            <TextField
-              label="Name"
-              value={editName}
-              onChange={(e) => setEditName(e.target.value)}
-              fullWidth
-            />
+        <TextField
+          label="Description"
+          value={editDescription}
+          onChange={(e) => setEditDescription(e.target.value)}
+          fullWidth
+          multiline
+          minRows={3}
+        />
 
-            <TextField
-              label="Description"
-              value={editDescription}
-              onChange={(e) => setEditDescription(e.target.value)}
-              fullWidth
-              multiline
-              minRows={3}
-            />
-
-            <Box display="flex" alignItems="center" gap={2}>
-              <Typography variant="body2">Enabled</Typography>
-              <Switch
-                checked={!!editEnabled}
-                onChange={(e) => setEditEnabled(e.target.checked)}
-                inputProps={{ 'aria-label': 'enabled-toggle' }}
-              />
-            </Box>
-          </Stack>
-        )}
-      </DialogContent>
-
-      <Divider />
-
-      <DialogActions sx={{ px: 3, py: 2 }}>
-        <Button onClick={handleCancel} disabled={isSaving}>
-          Cancel
-        </Button>
-
-        <Button
-          variant="contained"
-          onClick={doSaveEdits}
-          disabled={isSaving || !hasChanges || !pico}
-        >
-          {isSaving ? 'Saving…' : 'Save'}
-        </Button>
-      </DialogActions>
-    </Dialog>
+        <Box display="flex" alignItems="center" gap={2}>
+          <Typography variant="body2">Enabled</Typography>
+          <Switch
+            checked={!!editEnabled}
+            onChange={(e) => setEditEnabled(e.target.checked)}
+            inputProps={{ 'aria-label': 'enabled-toggle' }}
+          />
+        </Box>
+      </Stack>
+    </ModalDialog>
   );
 };

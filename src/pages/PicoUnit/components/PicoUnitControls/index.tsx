@@ -28,7 +28,7 @@ export const PicoUnitControls: React.FC<OptionalPicoUnitProps> = ({ pico: dataPr
         <ControlsInfo />
       </EditableInfoCard>
 
-      {dialogOpen && <ControlsDialog open={dialogOpen} onClose={() => setDialogOpen(false)} />}
+      <ControlsDialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
     </>
   );
 };
