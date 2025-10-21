@@ -3,7 +3,7 @@ import type React from 'react';
 
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 
-import { PicoUnitControlsInfo as Controls } from './PicoUnitControlsInfo';
+import { PicoUnitControls as Controls } from './PicoUnitControls';
 import { PicoUnitDevicesInfo as Devices } from './PicoUnitDevicesInfo';
 import { PicoUnitMappingInfo as Mapping } from './PicoUnitMappingInfo';
 import { PicoUnitOverview as Overview } from './PicoUnitOverview';

@@ -1,5 +1,5 @@
 import EditIcon from '@mui/icons-material/Edit';
-import { Card, CardContent, Divider, Stack, Typography } from '@mui/material';
+import { Card, CardContent, Divider, IconButton, Stack, Typography } from '@mui/material';
 import type React from 'react';
 
 interface EditableInfoCardProps {
@@ -7,6 +7,7 @@ interface EditableInfoCardProps {
   subtitle?: string;
   icon?: React.ReactNode;
   children?: React.ReactNode;
+  onClickEdit?: () => void;
 }
 
 export const EditableInfoCard: React.FC<EditableInfoCardProps> = ({
@@ -14,6 +15,7 @@ export const EditableInfoCard: React.FC<EditableInfoCardProps> = ({
   subtitle,
   icon,
   children,
+  onClickEdit,
 }) => {
   return (
     <Card>
@@ -24,7 +26,9 @@ export const EditableInfoCard: React.FC<EditableInfoCardProps> = ({
             <Typography variant="h6">{title}</Typography>
           </Stack>
 
-          <EditIcon fontSize="small" />
+          <IconButton disabled={!onClickEdit} onClick={onClickEdit}>
+            <EditIcon fontSize="small" />
+          </IconButton>
         </Stack>
         <Divider />
 
