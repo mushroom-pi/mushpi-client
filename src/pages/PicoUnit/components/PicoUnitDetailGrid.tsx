@@ -4,7 +4,7 @@ import type React from 'react';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 
 import { PicoUnitControls as Controls } from './PicoUnitControls';
-import { PicoUnitDevicesInfo as Devices } from './PicoUnitDevicesInfo';
+import { PicoUnitDevices as Devices } from './PicoUnitDevices';
 import { PicoUnitMappingInfo as Mapping } from './PicoUnitMappingInfo';
 import { PicoUnitOverview as Overview } from './PicoUnitOverview';
 import { PicoUnitPerformance as Performance } from './PicoUnitPerformance';

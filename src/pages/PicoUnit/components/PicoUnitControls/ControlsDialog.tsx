@@ -2,25 +2,17 @@ import TuneIcon from '@mui/icons-material/Tune';
 import { Box, Grid, Slider, Stack, Switch, Typography } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { OnOffInput } from 'src/components/OnOffInput';
+
 import type { ChangeSetPointsDto, ControlLoopDto } from '~api/generated';
 import { HeaderAndIcon } from '~comp/HeaderAndIcon';
-import { Loading } from '~comp/Loading';
 import { ModalDialog } from '~comp/ModalDialog';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
+import type { DialogProps } from '~int/dialogProps';
 
-interface ControlsDialogProps {
-  open: boolean;
-  onClose: () => void;
-  closeOnSave?: boolean;
-}
-
-export const ControlsDialog: React.FC<ControlsDialogProps> = ({
-  open,
-  onClose,
-  closeOnSave = true,
-}) => {
+export const ControlsDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSave = true }) => {
   const { pico, changeTargets, toggleControlLoop } = usePicoUnitContext();
-  if (!pico || !pico.latest_reading) return <Loading />;
+  if (!pico || !pico.latest_reading) return;
 
   const { latest_reading: lr } = pico;
   const isSaving = changeTargets?.isLoading && toggleControlLoop?.isLoading;
@@ -101,22 +93,8 @@ export const ControlsDialog: React.FC<ControlsDialogProps> = ({
         isSaving={isSaving}
         headerAndIcon={<HeaderAndIcon title="Controls" icon={<TuneIcon />} />}
       >
-        <Stack spacing={2} width="100%" mt={0.5}>
-          {/* Two-column layout: left = label, right = control */}
-          <Grid container alignItems="center" columnSpacing={2}>
-            <Grid size={4}>
-              <Typography variant="body2">Control loop</Typography>
-            </Grid>
-            <Grid size={8}>
-              <Box display="flex" justifyContent="flex-start" alignItems="center">
-                <Switch
-                  checked={!!enabled}
-                  onChange={(e) => setEnabled(e.target.checked)}
-                  inputProps={{ 'aria-label': 'enabled-toggle' }}
-                />
-              </Box>
-            </Grid>
-          </Grid>
+        <Stack spacing={2} m={1}>
+          <OnOffInput label="Control loop" value={!!enabled} setter={setEnabled} />
 
           {/* Temperature */}
           <Grid container alignItems="center" columnSpacing={2}>
@@ -125,65 +103,61 @@ export const ControlsDialog: React.FC<ControlsDialogProps> = ({
             </Grid>
 
             <Grid size={8}>
-              <Box>
-                <Box display="flex" alignItems="center" gap={2} sx={{ width: '100%', px: 1 }}>
-                  <Typography variant="body2" sx={{ minWidth: 32 }}>
-                    0 °C
-                  </Typography>
-
-                  <Box sx={{ flex: 1 }}>
-                    <Slider
-                      aria-label="Target temperature"
-                      value={targetTemp ?? 20}
-                      step={1}
-                      min={0}
-                      max={50}
-                      size="medium"
-                      valueLabelDisplay="on"
-                      onChange={(_, value) => setTargetTemp(value as number)}
-                      disabled={!enabled}
-                    />
-                  </Box>
-
-                  <Typography variant="body2" sx={{ minWidth: 36 }}>
-                    50 °C
-                  </Typography>
-                </Box>
+              <Box display="flex" alignItems="center" gap={2} sx={{ width: '100%', px: 1 }} mt={2}>
+                <Slider
+                  aria-label="Target temperature"
+                  value={targetTemp ?? 20}
+                  step={1}
+                  min={0}
+                  max={50}
+                  size="medium"
+                  valueLabelDisplay="on"
+                  onChange={(_, value) => setTargetTemp(value as number)}
+                  disabled={!enabled}
+                  marks={[
+                    {
+                      value: 0,
+                      label: '0°C',
+                    },
+                    {
+                      value: 50,
+                      label: '50°C',
+                    },
+                  ]}
+                />
               </Box>
             </Grid>
           </Grid>
 
           {/* Humidity */}
-          <Grid container alignItems="center" columnSpacing={2}>
+          <Grid container alignItems="center" columnSpacing={2} mt={2}>
             <Grid size={4}>
               <Typography variant="body2">Target humidity</Typography>
             </Grid>
 
             <Grid size={8}>
-              <Box>
-                <Box display="flex" alignItems="center" gap={2} sx={{ width: '100%', px: 1 }}>
-                  <Typography variant="body2" sx={{ minWidth: 32 }}>
-                    20%{/* left min label */}
-                  </Typography>
-
-                  <Box sx={{ flex: 1 }}>
-                    <Slider
-                      aria-label="Target humidity"
-                      value={targetHum ?? 50}
-                      step={5}
-                      min={20}
-                      max={90}
-                      size="medium"
-                      valueLabelDisplay="on"
-                      onChange={(_, value) => setTargetHum(value as number)}
-                      disabled={!enabled}
-                    />
-                  </Box>
-
-                  <Typography variant="body2" sx={{ minWidth: 36 }}>
-                    90%
-                  </Typography>
-                </Box>
+              <Box display="flex" alignItems="center" gap={2} sx={{ width: '100%', px: 1 }}>
+                <Slider
+                  aria-label="Target humidity"
+                  value={targetHum ?? 50}
+                  step={5}
+                  min={20}
+                  max={90}
+                  size="medium"
+                  valueLabelDisplay="on"
+                  onChange={(_, value) => setTargetHum(value as number)}
+                  disabled={!enabled}
+                  marks={[
+                    {
+                      value: 20,
+                      label: '20%',
+                    },
+                    {
+                      value: 90,
+                      label: '90%',
+                    },
+                  ]}
+                />
               </Box>
             </Grid>
           </Grid>

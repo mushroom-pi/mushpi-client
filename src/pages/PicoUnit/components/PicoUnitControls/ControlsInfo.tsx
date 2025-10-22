@@ -3,6 +3,7 @@ import type React from 'react';
 
 import { InfoField } from '~comp/InfoField';
 import { Loading } from '~comp/Loading';
+import { OnOffInfo } from '~comp/OnOffInfo';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 
@@ -20,13 +21,7 @@ export const ControlsInfo: React.FC<OptionalPicoUnitProps> = ({ pico: dataProp }
 
   return (
     <>
-      <InfoField label="Control loop" display="beside">
-        <Chip
-          label={controlLoop ? 'Enabled' : 'Disabled'}
-          color={controlLoop ? 'info' : 'default'}
-          size="medium"
-        />
-      </InfoField>
+      <OnOffInfo label="Control loop" value={controlLoop} />
       <InfoField label="Target temperature" display="beside">
         <Chip
           label={tempTarget ? `${tempTarget} °C` : '—'}
