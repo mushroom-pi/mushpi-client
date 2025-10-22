@@ -8,10 +8,12 @@ import { HeaderAndIcon } from '~comp/HeaderAndIcon';
 import { ModalDialog } from '~comp/ModalDialog';
 import { OnOffInput } from '~comp/OnOffInput';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
+import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 import type { DialogProps } from '~int/dialogProps';
 
 export const DevicesDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSave = true }) => {
   const { pico, changeOutputs } = usePicoUnitContext();
+  const { run } = useAsyncWithToast();
   if (!pico || !pico.latest_reading) return;
 
   const { latest_reading: lr } = pico;
@@ -46,12 +48,13 @@ export const DevicesDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSav
       heater: heaterOn === null ? undefined : heaterOn,
     };
 
-    try {
-      await changeOutputs?.mutateAsync({ picoUnitId: pico.id, body });
-      if (closeOnSave) onClose();
-    } catch (error) {
-      console.error('Failed to update pico unit', error);
-    }
+    await run(() => changeOutputs!.mutateAsync({ picoUnitId: pico.id, body }), {
+      successMessage: "Devices' outputs changed successfully",
+      fallbackErrorMessage: "Failed to change the devices' outputs",
+      onSuccess: () => {
+        if (closeOnSave) onClose();
+      },
+    });
   }
 
   function handleCancel() {

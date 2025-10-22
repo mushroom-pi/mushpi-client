@@ -4,6 +4,8 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
+import { ToastProvider } from '~ctx/Toast';
+
 import App from './App';
 import './styles/global.css';
 import theme from './theme/mushroomTheme';
@@ -21,10 +23,12 @@ createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <ToastProvider>
+          <CssBaseline />
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </ToastProvider>
       </ThemeProvider>
     </QueryClientProvider>
   </React.StrictMode>,

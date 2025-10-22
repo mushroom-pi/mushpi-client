@@ -7,10 +7,12 @@ import { HeaderAndIcon } from '~comp/HeaderAndIcon';
 import { ModalDialog } from '~comp/ModalDialog';
 import { OnOffInput } from '~comp/OnOffInput';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
+import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 import type { DialogProps } from '~int/dialogProps';
 
 export const ControlsDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSave = true }) => {
   const { pico, changeTargets, toggleControlLoop } = usePicoUnitContext();
+  const { run } = useAsyncWithToast();
   if (!pico || !pico.latest_reading) return;
 
   const { latest_reading: lr } = pico;
@@ -56,16 +58,27 @@ export const ControlsDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSa
       humidity: targetHum ?? undefined,
     };
 
-    try {
-      if (changesControlLoop)
-        await toggleControlLoop?.mutateAsync({ picoUnitId: pico.id, body: toggleControlLoopBody });
-      if (changesTargets)
-        await changeTargets?.mutateAsync({ picoUnitId: pico.id, body: changeTargetsBody });
-
-      if (closeOnSave) onClose();
-    } catch (error) {
-      console.error('Failed to update pico unit', error);
-    }
+    await run(
+      () => {
+        const promises = [];
+        if (changesControlLoop)
+          promises.push(
+            toggleControlLoop?.mutateAsync({ picoUnitId: pico.id, body: toggleControlLoopBody }),
+          );
+        if (changesTargets)
+          promises.push(
+            changeTargets?.mutateAsync({ picoUnitId: pico.id, body: changeTargetsBody }),
+          );
+        return Promise.all(promises);
+      },
+      {
+        successMessage: "Pico unit's controls changed successfully",
+        fallbackErrorMessage: "Failed to change the pico unit's controls",
+        onSuccess: () => {
+          if (closeOnSave) onClose();
+        },
+      },
+    );
   }
 
   function handleCancel() {

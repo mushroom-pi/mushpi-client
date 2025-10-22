@@ -13,11 +13,6 @@ type PicoUnitHeaderProps = OptionalPicoUnitProps & {
   setDeleteOpen: (open: boolean) => void;
 };
 
-/**
- * Header for the Pico Unit detail page.
- * - Reads pico & refetch from PicoUnitProvider via usePicoUnitContext()
- * - Controls the delete dialog via setDeleteOpen prop (parent keeps dialog state)
- */
 export const PicoUnitHeader: React.FC<PicoUnitHeaderProps> = ({
   setDeleteOpen,
   setEditOpen,

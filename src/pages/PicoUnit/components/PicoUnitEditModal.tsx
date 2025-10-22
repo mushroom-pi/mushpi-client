@@ -5,6 +5,7 @@ import type { UpdatePicoUnitDto } from '~api/generated';
 import { HeaderAndIcon } from '~comp/HeaderAndIcon';
 import { ModalDialog } from '~comp/ModalDialog';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
+import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 
 interface PicoUnitEditModalProps {
   open: boolean;
@@ -22,15 +23,14 @@ export const PicoUnitEditModal: React.FC<PicoUnitEditModalProps> = ({
   closeOnSave = true,
 }) => {
   const { pico, updatePico: updateMutation } = usePicoUnitContext();
+  const { run } = useAsyncWithToast();
 
-  // local editable state
   const [editName, setEditName] = useState<string>('');
   const [editDescription, setEditDescription] = useState<string>('');
   const [editEnabled, setEditEnabled] = useState<boolean>(false);
 
-  // initialize/reset inputs whenever the dialog opens or pico changes
   useEffect(() => {
-    if (!open) return; // only initialize when opening
+    if (!open) return;
     if (!pico) {
       setEditName('');
       setEditDescription('');
@@ -60,23 +60,15 @@ export const PicoUnitEditModal: React.FC<PicoUnitEditModalProps> = ({
       enabled: !!editEnabled,
     };
 
-    try {
-      await updateMutation.mutateAsync({ picoUnitId: pico.id, body });
-      if (closeOnSave) {
-        onClose();
-      } else {
-        // re-sync inputs from pico in case provider updated it
-        // provider's optimistic update will usually make this unnecessary,
-        // but keeping parity with original behavior.
-        // (If pico in context updates, our open-effect will re-sync.)
-      }
-    } catch (err) {
-      // TODO: show a friendly toast/snackbar here (not included).
-      console.error('Failed to update pico unit', err);
-    }
+    await run(() => updateMutation.mutateAsync({ picoUnitId: pico.id, body }), {
+      successMessage: 'Pico unit details updated successfully',
+      fallbackErrorMessage: 'Failed to update pico unit details',
+      onSuccess: () => {
+        if (closeOnSave) onClose();
+      },
+    });
   }
 
-  // Cancel handler resets local fields to pico values and closes
   function handleCancel() {
     if (pico) {
       setEditName(pico.name ?? '');
