@@ -79,9 +79,24 @@ export const DevicesDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSav
         headerAndIcon={<HeaderAndIcon title="Devices" icon={<FanIcon />} />}
       >
         <Stack spacing={2} mt={1} mb={1} ml={10}>
-          <OnOffInput label="Humidifier" value={!!humidifierOn} setter={setHumidifierOn} />
-          <OnOffInput label="Fan" value={!!fanOn} setter={setFanOn} />
-          <OnOffInput label="Heater" value={!!heaterOn} setter={setHeaterOn} />
+          <OnOffInput
+            label="Humidifier"
+            value={!!humidifierOn}
+            setter={setHumidifierOn}
+            disabled={lr.control_loop_enabled}
+          />
+          <OnOffInput
+            label="Fan"
+            value={!!fanOn}
+            setter={setFanOn}
+            disabled={lr.control_loop_enabled}
+          />
+          <OnOffInput
+            label="Heater"
+            value={!!heaterOn}
+            setter={setHeaterOn}
+            disabled={lr.control_loop_enabled}
+          />
         </Stack>
       </ModalDialog>
     )

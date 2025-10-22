@@ -1,12 +1,11 @@
 import TuneIcon from '@mui/icons-material/Tune';
-import { Box, Grid, Slider, Stack, Switch, Typography } from '@mui/material';
+import { Box, Grid, Slider, Stack, Typography } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
-
-import { OnOffInput } from 'src/components/OnOffInput';
 
 import type { ChangeSetPointsDto, ControlLoopDto } from '~api/generated';
 import { HeaderAndIcon } from '~comp/HeaderAndIcon';
 import { ModalDialog } from '~comp/ModalDialog';
+import { OnOffInput } from '~comp/OnOffInput';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { DialogProps } from '~int/dialogProps';
 
