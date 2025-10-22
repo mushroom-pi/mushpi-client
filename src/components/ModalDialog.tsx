@@ -43,7 +43,6 @@ export const ModalDialog: React.FC<ModalDialogProps> = ({
       onClose={onClose}
       fullWidth
       maxWidth="sm"
-      aria-labelledby="pico-edit-dialog-title"
       sx={{
         '& .MuiDialog-paper': {
           borderRadius: '16px',

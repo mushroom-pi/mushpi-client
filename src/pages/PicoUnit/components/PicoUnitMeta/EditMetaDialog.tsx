@@ -7,7 +7,7 @@ import { ModalDialog } from '~comp/ModalDialog';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 
-interface PicoUnitEditModalProps {
+interface EditMetaDialogProps {
   open: boolean;
   onClose: () => void;
   /**
@@ -17,7 +17,7 @@ interface PicoUnitEditModalProps {
   closeOnSave?: boolean;
 }
 
-export const PicoUnitEditModal: React.FC<PicoUnitEditModalProps> = ({
+export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
   open,
   onClose,
   closeOnSave = true,
@@ -83,41 +83,43 @@ export const PicoUnitEditModal: React.FC<PicoUnitEditModalProps> = ({
   }
 
   return (
-    <ModalDialog
-      open={open}
-      hasChanges={hasChanges}
-      isSaving={updateMutation.isLoading}
-      onClose={onClose}
-      doSaveChanges={doSaveEdits}
-      handleCancel={handleCancel}
-      headerAndIcon={<HeaderAndIcon title="Edit Pico Details" />}
-    >
-      <Stack spacing={2} sx={{ width: '100%', mt: 0.5 }}>
-        <TextField
-          label="Name"
-          value={editName}
-          onChange={(e) => setEditName(e.target.value)}
-          fullWidth
-        />
-
-        <TextField
-          label="Description"
-          value={editDescription}
-          onChange={(e) => setEditDescription(e.target.value)}
-          fullWidth
-          multiline
-          minRows={3}
-        />
-
-        <Box display="flex" alignItems="center" gap={2}>
-          <Typography variant="body2">Enabled</Typography>
-          <Switch
-            checked={!!editEnabled}
-            onChange={(e) => setEditEnabled(e.target.checked)}
-            inputProps={{ 'aria-label': 'enabled-toggle' }}
+    open && (
+      <ModalDialog
+        open={open}
+        hasChanges={hasChanges}
+        isSaving={updateMutation.isLoading}
+        onClose={onClose}
+        doSaveChanges={doSaveEdits}
+        handleCancel={handleCancel}
+        headerAndIcon={<HeaderAndIcon title="Edit Pico Details" />}
+      >
+        <Stack spacing={2} sx={{ width: '100%', mt: 0.5 }}>
+          <TextField
+            label="Name"
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+            fullWidth
           />
-        </Box>
-      </Stack>
-    </ModalDialog>
+
+          <TextField
+            label="Description"
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+            fullWidth
+            multiline
+            minRows={3}
+          />
+
+          <Box display="flex" alignItems="center" gap={2}>
+            <Typography variant="body2">Enabled</Typography>
+            <Switch
+              checked={!!editEnabled}
+              onChange={(e) => setEditEnabled(e.target.checked)}
+              inputProps={{ 'aria-label': 'enabled-toggle' }}
+            />
+          </Box>
+        </Stack>
+      </ModalDialog>
+    )
   );
 };
