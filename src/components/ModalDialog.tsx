@@ -44,6 +44,11 @@ export const ModalDialog: React.FC<ModalDialogProps> = ({
       fullWidth
       maxWidth="sm"
       aria-labelledby="pico-edit-dialog-title"
+      sx={{
+        '& .MuiDialog-paper': {
+          borderRadius: '16px',
+        },
+      }}
     >
       <DialogTitle display="flex" alignItems="center" justifyContent="space-between">
         {headerAndIcon}

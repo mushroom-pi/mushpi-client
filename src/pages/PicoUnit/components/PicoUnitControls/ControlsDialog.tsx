@@ -1,5 +1,5 @@
 import TuneIcon from '@mui/icons-material/Tune';
-import { Box, Grid, Slider, Stack, Typography } from '@mui/material';
+import { Alert, Box, Grid, Slider, Stack, Typography } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import type { ChangeSetPointsDto, ControlLoopDto } from '~api/generated';
@@ -92,6 +92,15 @@ export const ControlsDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSa
         isSaving={isSaving}
         headerAndIcon={<HeaderAndIcon title="Controls" icon={<TuneIcon />} />}
       >
+        <Alert
+          severity={enabled ? 'info' : 'warning'}
+          variant="outlined"
+          sx={{ m: 1, mb: 2, borderRadius: 2 }}
+        >
+          {enabled
+            ? 'While the control loop is on, the unit will turn devices on and/or off automatically to try to meet the targets.'
+            : "With the control loop off, the devices have to be turned on and/or off manually, as the unit won't automatically try to reach the targets."}
+        </Alert>
         <Stack spacing={2} m={1}>
           <OnOffInput label="Control loop" value={!!enabled} setter={setEnabled} />
 

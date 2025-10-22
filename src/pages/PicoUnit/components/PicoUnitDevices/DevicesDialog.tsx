@@ -1,5 +1,5 @@
 import FanIcon from '@mui/icons-material/WindPower';
-import { Stack } from '@mui/material';
+import { Alert, Stack } from '@mui/material';
 import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -78,6 +78,15 @@ export const DevicesDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSav
         isSaving={changeOutputs?.isLoading}
         headerAndIcon={<HeaderAndIcon title="Devices" icon={<FanIcon />} />}
       >
+        <Alert
+          severity={lr.control_loop_enabled ? 'warning' : 'info'}
+          variant="outlined"
+          sx={{ m: 1, mb: 2, borderRadius: 2 }}
+        >
+          {lr.control_loop_enabled
+            ? 'While the control loop is on, the devices cannot be turned on and/or off manually, since the unit controls them.'
+            : 'With the control loop disabled, the devices can be turned on and/or off manually.'}
+        </Alert>
         <Stack spacing={2} mt={1} mb={1} ml={10}>
           <OnOffInput
             label="Humidifier"
