@@ -1,0 +1,37 @@
+import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+
+type NavItemProps = {
+  to: string;
+  label: string;
+  icon: React.ReactNode;
+  end?: boolean;
+};
+
+export function NavItem({ to, label, icon, end }: NavItemProps) {
+  return (
+    <ListItemButton
+      component={NavLink}
+      to={to}
+      end={end}
+      sx={{
+        borderRadius: 1.25,
+        px: 1.5,
+        py: 1,
+        mb: 0.5,
+        color: 'text.secondary',
+        fontWeight: 600,
+        '&:hover': { bgcolor: 'rgba(255,255,255,0.02)', color: 'text.primary' },
+        '&[aria-current="page"]': {
+          bgcolor: (theme) => theme.palette.warning.main,
+          color: 'background.default',
+          '& .MuiListItemIcon-root': { color: 'background.default' },
+        },
+      }}
+    >
+      <ListItemIcon sx={{ minWidth: 36, color: 'text.secondary' }}>{icon}</ListItemIcon>
+      <ListItemText primary={label} primaryTypographyProps={{ fontSize: 14, fontWeight: 600 }} />
+    </ListItemButton>
+  );
+}

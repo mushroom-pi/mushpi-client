@@ -4,7 +4,6 @@ import { unwrap } from '~api/adapter';
 import { PicoUnits } from '~api/client';
 import type {
   PicoUnitsApiPicoUnitsControllerListRequest as ListPicoUnitsParams,
-  PicoUnit,
   PicoUnitListResponseDto,
 } from '~api/generated';
 

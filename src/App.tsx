@@ -5,6 +5,7 @@ import Sidebar from './layout/Sidebar';
 import Dashboard from './pages/Dashboard';
 import PicoUnitDetail from './pages/PicoUnit';
 import PicoUnits from './pages/PicoUnits';
+import { ReadingsPage } from './pages/Readings';
 import Settings from './pages/Settings';
 
 export default function App() {
@@ -23,6 +24,7 @@ export default function App() {
             }
           />
           <Route path="/pico-units/:id" element={<PicoUnitDetail />} />
+          <Route path="/readings" element={<ReadingsPage />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </main>
