@@ -6,7 +6,7 @@ import { FiActivity as ActivityIcon } from 'react-icons/fi';
 
 export const navItems = [
   { to: '/', label: 'Dashboard', icon: <HomeIcon />, end: true },
-  { to: '/pico-units', label: 'Pico Units', icon: <ActivityIcon /> },
+  { to: '/pico-units', label: 'Pico Units', icon: <ActivityIcon size={24} /> },
   { to: '/readings', label: 'Readings', icon: <ShowChartIcon /> },
   { to: '/settings', label: 'Settings', icon: <SettingsIcon /> },
 ];

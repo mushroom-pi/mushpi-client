@@ -38,14 +38,14 @@ export const PicoUnitPerformance: React.FC<OptionalPicoUnitProps> = ({ pico: dat
       <InfoField label="Board temperature" display="beside">
         <Chip
           label={typeof lr.board_temp === 'number' && isHealthy ? `${lr.board_temp} °C` : '—'}
-          color={Math.abs(lr.board_temp ?? 0) > 85 ? 'error' : 'success'}
+          color={!isHealthy || Math.abs(lr.board_temp ?? 0) > 85 ? 'error' : 'success'}
           size="medium"
         />
       </InfoField>
       <InfoField label="Response time" display="beside">
         <Chip
           label={
-            typeof lr.time_to_response_ms === 'number' && isHealthy
+            isHealthy && typeof lr.time_to_response_ms === 'number'
               ? `${lr.time_to_response_ms} ms`
               : '—'
           }

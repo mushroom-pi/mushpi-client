@@ -1,6 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 
-const mushroom = {
+export const mushroom = {
   bg: '#0f1720',
   card: '#0f1b12',
   accent: '#C66F2F',

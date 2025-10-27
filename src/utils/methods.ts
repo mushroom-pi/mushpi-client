@@ -1,6 +1,6 @@
 export function bytesToMB(bytes?: number | null) {
   if (bytes == null || Number.isNaN(bytes)) return '—';
-  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  return (bytes / (1024 * 1024)).toFixed(2);
 }
 
 export const percentage = (part?: number, total?: number): number => {

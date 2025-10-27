@@ -45,7 +45,7 @@ export const PicoUnitResources: React.FC<OptionalPicoUnitProps> = ({ pico: dataP
         <ReadableTime seconds={isHealthy ? lr.board_uptime_s : null} variant="body1" />
       </InfoField>
       <InfoField
-        label={`RAM used${totalRAM ? ` (of ${bytesToMB(totalRAM)})` : ''} `}
+        label={`${bytesToMB(lr.board_used_mem)} MB RAM used${totalRAM ? ` (of ${bytesToMB(totalRAM)})` : ''} `}
         extra={memPct ? `${memPct}%` : undefined}
       >
         <LinearProgress
@@ -63,7 +63,7 @@ export const PicoUnitResources: React.FC<OptionalPicoUnitProps> = ({ pico: dataP
         />
       </InfoField>
       <InfoField
-        label={`Filesystem used${totalFS ? ` (of ${bytesToMB(totalFS)})` : ''}`}
+        label={`${bytesToMB(lr.board_used_fs)} MB Filesystem used${totalFS ? ` (of ${bytesToMB(totalFS)})` : ''}`}
         extra={fsPct ? `${fsPct}%` : undefined}
       >
         <LinearProgress
