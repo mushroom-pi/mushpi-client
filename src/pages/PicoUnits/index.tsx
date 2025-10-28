@@ -1,21 +1,16 @@
 import { Box, Button, Container, Grid, Typography } from '@mui/material';
 
-import type { PicoUnit } from '~api/generated';
 import { Error } from '~comp/Error';
 import { Loading } from '~comp/Loading';
-import { usePicoUnitsUI } from '~ctx/PicoUnitsContext';
-import { useListPicoUnits } from '~hook/usePicoUnits';
+import { usePicoUnitsContext } from '~ctx/PicoUnits';
 
 import PicoUnitCard from './components/PicoUnitCard';
 
 export default function PicoUnitsPage() {
-  const { page, limit, q, setPage } = usePicoUnitsUI();
-  const { data, isLoading, isError, error, refetch } = useListPicoUnits({ page, limit, q });
+  const { units: items, isLoading, isError, error, refetch, queryData } = usePicoUnitsContext();
 
   if (isLoading) return <Loading item="pico units" />;
   if (isError) return <Error item="pico units" error={error} />;
-
-  const items: PicoUnit[] = (data?.items ?? []) as PicoUnit[];
 
   return (
     <Container sx={{ py: 4 }}>
@@ -29,7 +24,7 @@ export default function PicoUnitsPage() {
       </Box>
 
       <Typography variant="body2" color="text.secondary" mb={2}>
-        Showing page {data?.page} of {data?.pages} — total: {data?.total}
+        Showing page {queryData?.page} of {queryData?.pages} — total: {queryData?.total}
       </Typography>
 
       <Grid container spacing={2}>

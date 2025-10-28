@@ -14,7 +14,8 @@ export const useListPicoUnitReadings = ({
   page = 1,
   limit = 500,
   picoUnitId,
-}: ListPicoUnitReadingsParams) => {
+}: Partial<ListPicoUnitReadingsParams>) => {
+  if (!picoUnitId) return;
   const queryKey = useMemo(
     () => ['picoReadings', picoUnitId, start || 'none', end || 'none', page, limit],
     [picoUnitId, start, end, page, limit],
