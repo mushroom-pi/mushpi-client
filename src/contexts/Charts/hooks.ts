@@ -2,10 +2,12 @@ import { useMemo } from 'react';
 
 import { bytesToMB } from 'src/utils/methods';
 
-import type { Readings } from '~api/generated';
+import type {
+  ReadingsApiPicoUnitIdReadingsControllerListForUnitRequest as ListPicoUnitReadingsParams,
+  Readings,
+} from '~api/generated';
+import { useListPicoUnitReadings } from '~hook/useReadings';
 import type { ChartPoint } from '~type/charts';
-
-import { useListPicoUnitReadings } from './useReadings';
 
 export const fmtTsShort = (iso?: string) => {
   if (!iso) return '';
@@ -35,22 +37,19 @@ export const toChartPoints = (items: Readings[]): ChartPoint[] =>
 
 const SAMPLE_TICK_COUNT = 5;
 
-export function useCharts(params: {
-  picoUnitId: number;
-  start?: string | Date | null;
-  end?: string | Date | null;
-  page?: number;
-  limit?: number;
-}) {
+export function useCharts(params: ListPicoUnitReadingsParams, enabled: boolean = true) {
   const { picoUnitId, start, end, page = 1, limit = 500 } = params;
 
-  const query = useListPicoUnitReadings({
-    picoUnitId,
-    start: start ?? undefined,
-    end: end ?? undefined,
-    page,
-    limit,
-  });
+  const query = useListPicoUnitReadings(
+    {
+      picoUnitId,
+      start: start?.toString() ?? undefined,
+      end: end?.toString() ?? undefined,
+      page,
+      limit,
+    },
+    enabled,
+  );
 
   const chartsData = useMemo<ChartPoint[]>(() => {
     if (!query.data) return [];
@@ -85,5 +84,5 @@ export function useCharts(params: {
     refetch: query.refetch,
     // raw response if needed
     raw: query.data,
-  } as const;
+  };
 }

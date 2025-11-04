@@ -8,14 +8,10 @@ import type {
   ReadingsListResponseDto,
 } from '~api/generated';
 
-export const useListPicoUnitReadings = ({
-  start,
-  end,
-  page = 1,
-  limit = 500,
-  picoUnitId,
-}: Partial<ListPicoUnitReadingsParams>) => {
-  if (!picoUnitId) return;
+export const useListPicoUnitReadings = (
+  { start, end, page = 1, limit = 500, picoUnitId }: Partial<ListPicoUnitReadingsParams>,
+  enabled: boolean = true,
+) => {
   const queryKey = useMemo(
     () => ['picoReadings', picoUnitId, start || 'none', end || 'none', page, limit],
     [picoUnitId, start, end, page, limit],
@@ -33,6 +29,6 @@ export const useListPicoUnitReadings = ({
       );
       return resp as unknown as ReadingsListResponseDto;
     },
-    enabled: picoUnitId != null,
+    enabled: picoUnitId != null && enabled, // This makes sure that the query is called ONLY if there is a picoUnitId
   });
 };

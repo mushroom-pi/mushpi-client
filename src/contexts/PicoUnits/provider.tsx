@@ -1,3 +1,4 @@
+import { omit } from 'lodash';
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 
@@ -9,7 +10,9 @@ import type {
 
 import { useListPicoUnits } from './hooks';
 
-// adapt import path
+interface PicoUnitsContextValue {
+  initialParams?: ListPicoUnitsParams;
+}
 
 type PicoUnitsContextType = {
   units: PicoUnit[];
@@ -26,43 +29,16 @@ type PicoUnitsContextType = {
 
 const PicoUnitsContext = createContext<PicoUnitsContextType | undefined>(undefined);
 
-function normalizeListResponse(resp?: PicoUnitListResponseDto | null): PicoUnit[] {
-  if (!resp) return [];
-  const asAny = resp as any;
-  if (Array.isArray(asAny)) return asAny;
-  if (Array.isArray(asAny.items)) return asAny.items;
-  if (Array.isArray(asAny.data)) return asAny.data;
-  if (Array.isArray(asAny.results)) return asAny.results;
-  // fallback: try to find the first array property
-  const firstArray = Object.values(asAny).find((v) => Array.isArray(v));
-  if (Array.isArray(firstArray)) return firstArray as any;
-  return [];
-}
-
-function extractQueryData(
-  resp?: PicoUnitListResponseDto | null,
-): Omit<PicoUnitListResponseDto, 'items'> | null {
-  if (!resp) return null;
-  const { page, limit, total, pages } = resp;
-
-  return { page, limit, total, pages };
-}
-
-export function PicoUnitsProvider({
+export const PicoUnitsProvider = ({
   children,
   initialParams,
-}: {
-  children: ReactNode;
-  initialParams?: ListPicoUnitsParams;
-}) {
+}: React.PropsWithChildren<PicoUnitsContextValue>) => {
   const [params, setParams] = useState<ListPicoUnitsParams | undefined>(initialParams);
-
-  // useListPicoUnits is your existing hook (react-query). We pass params from state.
   const query = useListPicoUnits(params);
 
   const rawData = query.data;
-  const units = useMemo(() => normalizeListResponse(rawData), [rawData]);
-  const queryData = useMemo(() => extractQueryData(rawData), [rawData]);
+  const units = useMemo(() => rawData?.items || [], [rawData]);
+  const queryData = useMemo(() => omit(rawData, 'items'), [rawData]);
 
   // local copy so we can optimistically update view without mutating react-query cache.
   // (You could also use queryClient.setQueryData to update react-query cache instead;
@@ -139,7 +115,7 @@ export function PicoUnitsProvider({
   );
 
   return <PicoUnitsContext.Provider value={contextValue}>{children}</PicoUnitsContext.Provider>;
-}
+};
 
 export function usePicoUnitsContext(): PicoUnitsContextType {
   const ctx = useContext(PicoUnitsContext);
