@@ -1,52 +1,94 @@
 import RefreshIcon from '@mui/icons-material/Refresh';
 import {
   Box,
+  Button,
   FormControl,
-  IconButton,
+  FormHelperText,
   InputLabel,
   MenuItem,
   Select,
   type SelectChangeEvent,
   Stack,
-  TextField,
+  type SxProps,
 } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import dayjs, { Dayjs } from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import type { ReadingsApiPicoUnitIdReadingsControllerListForUnitRequest as ListPicoUnitReadingsParams } from '~api/generated';
 import { useChartsContext } from '~ctx/Charts';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 
+dayjs.extend(utc);
+
+// Local params: keep start/end strictly Dayjs | null when used in the UI
+type LocalParams = Partial<Omit<ListPicoUnitReadingsParams, 'start' | 'end'>> & {
+  start?: Dayjs | null;
+  end?: Dayjs | null;
+};
+
+// ---- layout constants
+const DATE_TIME_PICKER_HEIGHT = 48;
+const SELECTORS_HEIGHT = DATE_TIME_PICKER_HEIGHT + 8;
+
+// Shared sx that tries to exactly match Select + TextField + Button
+const controlSx: SxProps<Theme> = {
+  // unify the root input container
+  '& .MuiInputBase-root': {
+    height: SELECTORS_HEIGHT,
+    display: 'flex',
+    alignItems: 'center',
+    boxSizing: 'border-box',
+  },
+  // unify the raw input element padding so text sits at same vertical spot
+  '& .MuiInputBase-input': {
+    paddingTop: '10px', // tune if needed; aim so text baseline matches Select
+    paddingBottom: '10px',
+    // keep left/right padding consistent
+    paddingLeft: '12px',
+    paddingRight: '12px',
+    lineHeight: '1.2',
+  },
+  // helper text reserved
+  '& .MuiFormHelperText-root': {
+    minHeight: '1.2em',
+  },
+};
+
 export const BuildQueryForm: React.FC = () => {
   const { units: picoUnits = [] } = usePicoUnitsContext();
   const { params, setParams } = useChartsContext();
 
-  // local staged params — Partial so we can edit individual fields safely
-  const [localParams, setLocalParams] = useState<Partial<ListPicoUnitReadingsParams>>(params ?? {});
+  // Initialize localParams converting ISO start/end -> Dayjs | null
+  const [localParams, setLocalParams] = useState<LocalParams>(() => ({
+    ...(params ?? {}),
+    start: params?.start ? dayjs(params.start) : undefined,
+    end: params?.end ? dayjs(params.end) : undefined,
+  }));
 
   // sync when provider params change
   useEffect(() => {
-    setLocalParams(params ?? {});
-  }, [params]);
+    setLocalParams({
+      ...(params ?? {}),
+      start: params?.start ? dayjs(params.start) : undefined,
+      end: params?.end ? dayjs(params.end) : undefined,
+    });
+  }, [params?.start, params?.end, params?.picoUnitId, params?.page, params?.limit]);
 
-  // Helper: convert local "YYYY-MM-DDTHH:mm" -> ISO string (or undefined)
-  const toIsoOrUndefined = (localDatetime?: string | null) =>
-    localDatetime ? new Date(localDatetime).toISOString() : undefined;
+  const dayjsToBackendIso = (d?: Dayjs | null) =>
+    d ? dayjs(d).utc().format('YYYY-MM-DDTHH:mm:ss[Z]') : undefined;
 
   const apply = () => {
     const picoUnitId =
       localParams?.picoUnitId != null ? Number(localParams.picoUnitId) : params?.picoUnitId;
     if (!picoUnitId) return;
 
-    // merge provider params with local staged params, converting dates to ISO
     const merged: ListPicoUnitReadingsParams = {
       ...(params ?? {}),
-      ...(localParams ?? {}),
-      // ensure picoUnitId numeric if present
       picoUnitId,
-      // convert start/end from local input string -> ISO (backend expects ISO)
-      start: toIsoOrUndefined(localParams?.start as unknown as string) ?? params?.start,
-      end: toIsoOrUndefined(localParams?.end as unknown as string) ?? params?.end,
-      // page/limit as numbers (fall back to existing)
+      start: dayjsToBackendIso(localParams.start) ?? params?.start,
+      end: dayjsToBackendIso(localParams.end) ?? params?.end,
       page: localParams?.page ?? params?.page,
       limit: localParams?.limit ?? params?.limit,
     };
@@ -54,24 +96,53 @@ export const BuildQueryForm: React.FC = () => {
     setParams(merged);
   };
 
-  // Render helpers / safe values
+  // validation
+  const start = localParams.start ?? null;
+  const end = localParams.end ?? null;
+  const isEndBeforeStart = useMemo(() => {
+    if (!start || !end) return false;
+    return end.isBefore(start);
+  }, [start, end]);
+
+  const hasPicoUnit = Boolean(localParams?.picoUnitId ?? params?.picoUnitId);
+  const isApplyDisabled = !hasPicoUnit || isEndBeforeStart;
+
+  // UI values
   const currentPicoUnitValue = String(localParams?.picoUnitId ?? params?.picoUnitId ?? '');
   const currentLimitValue = String(localParams?.limit ?? params?.limit ?? 500);
-  const currentStartLocal = maybeIsoToInputLocal(localParams?.start ?? params?.start);
-  const currentEndLocal = maybeIsoToInputLocal(localParams?.end ?? params?.end);
+  const currentStartValue: Dayjs | null = start;
+  const currentEndValue: Dayjs | null = end;
 
   return (
-    <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems="center" mb={2}>
-      <FormControl sx={{ minWidth: 240 }}>
+    <Stack
+      direction={{ xs: 'column', md: 'row' }}
+      spacing={2}
+      alignItems="center"
+      mb={2}
+      sx={{ '& > *': { flexShrink: 0 } }}
+    >
+      {/* Pico Unit select — medium size; match inner padding/height with controlSx */}
+      <FormControl sx={{ minWidth: 280, ...controlSx }} size="medium">
         <InputLabel id="pico-unit-selector-label">Pico Unit</InputLabel>
         <Select
           labelId="pico-unit-selector-label"
           id="pico-unit-selector"
           label="Pico Unit"
           value={currentPicoUnitValue}
+          size="medium"
           onChange={(e: SelectChangeEvent) =>
             setLocalParams((prev) => ({ ...prev, picoUnitId: Number(e.target.value) }))
           }
+          sx={{
+            // ensure the displayed select area matches DATE_TIME_PICKER_HEIGHT and padding
+            '& .MuiSelect-select': {
+              height: SELECTORS_HEIGHT,
+              display: 'flex',
+              alignItems: 'center',
+              paddingTop: 0,
+              paddingBottom: 0,
+            },
+          }}
         >
           {(picoUnits ?? []).map(({ id, name, handle }) => (
             <MenuItem key={id} value={String(id)}>
@@ -79,37 +150,57 @@ export const BuildQueryForm: React.FC = () => {
             </MenuItem>
           ))}
         </Select>
+        <FormHelperText sx={{ minHeight: '1.2em' }}> </FormHelperText>
       </FormControl>
 
-      <TextField
+      {/* Start picker — pass controlSx to inner TextField via slotProps */}
+      <DateTimePicker
         label="Start (local)"
-        type="datetime-local"
-        InputLabelProps={{ shrink: true }}
-        value={currentStartLocal}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setLocalParams((prev) => ({ ...prev, start: e.target.value }))
-        }
+        value={currentStartValue}
+        onChange={(v) => setLocalParams((prev) => ({ ...prev, start: v ?? null }))}
+        slotProps={{
+          textField: {
+            size: 'medium',
+            helperText: start && end && start.isAfter(end) ? 'Start must be ≤ End' : ' ',
+            sx: controlSx,
+          },
+        }}
       />
 
-      <TextField
+      {/* End picker */}
+      <DateTimePicker
         label="End (local)"
-        type="datetime-local"
-        InputLabelProps={{ shrink: true }}
-        value={currentEndLocal}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setLocalParams((prev) => ({ ...prev, end: e.target.value }))
-        }
+        value={currentEndValue}
+        onChange={(v) => setLocalParams((prev) => ({ ...prev, end: v ?? null }))}
+        slotProps={{
+          textField: {
+            size: 'medium',
+            helperText: isEndBeforeStart ? 'End must be ≥ Start' : ' ',
+            sx: controlSx,
+          },
+        }}
       />
 
-      <FormControl sx={{ minWidth: 120 }}>
+      {/* Limit select */}
+      <FormControl sx={{ minWidth: 140, ...controlSx }} size="medium">
         <InputLabel id="limit-label">Limit</InputLabel>
         <Select
           labelId="limit-label"
           value={currentLimitValue}
           label="Limit"
+          size="medium"
           onChange={(e: SelectChangeEvent) =>
             setLocalParams((prev) => ({ ...prev, limit: Number(e.target.value) }))
           }
+          sx={{
+            '& .MuiSelect-select': {
+              height: SELECTORS_HEIGHT,
+              display: 'flex',
+              alignItems: 'center',
+              paddingTop: 0,
+              paddingBottom: 0,
+            },
+          }}
         >
           {[25, 50, 100, 250, 500].map((n) => (
             <MenuItem key={n} value={String(n)}>
@@ -117,34 +208,34 @@ export const BuildQueryForm: React.FC = () => {
             </MenuItem>
           ))}
         </Select>
+        <FormHelperText sx={{ minHeight: '1.2em' }}> </FormHelperText>
       </FormControl>
 
-      <IconButton onClick={apply} aria-label="apply">
-        <RefreshIcon />
-      </IconButton>
-
-      <Box flex={1} />
+      <Stack>
+        {' '}
+        <Button
+          variant="contained"
+          onClick={apply}
+          disabled={isApplyDisabled}
+          startIcon={<RefreshIcon />}
+          aria-label="apply"
+          size="medium"
+          sx={{
+            minHeight: SELECTORS_HEIGHT,
+            height: SELECTORS_HEIGHT,
+            paddingLeft: 2,
+            paddingRight: 2,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            // ensure icon and text don't shift baseline
+            lineHeight: 1,
+          }}
+        >
+          Apply
+        </Button>
+        <Box flex={1} sx={{ minHeight: '1.2em' }} />
+      </Stack>
     </Stack>
   );
 };
-
-/** Helpers below **/
-
-/** Convert Date -> input[type="datetime-local"] string local */
-function toInputDatetimeLocal(d: Date) {
-  const pad = (n: number) => String(n).padStart(2, '0');
-  const year = d.getFullYear();
-  const month = pad(d.getMonth() + 1);
-  const day = pad(d.getDate());
-  const hours = pad(d.getHours());
-  const minutes = pad(d.getMinutes());
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
-
-/** Convert ISO (or other) date -> input-local string, or empty string if falsy */
-function maybeIsoToInputLocal(iso?: string | null): string {
-  if (!iso) return '';
-  const parsed = new Date(iso);
-  if (Number.isNaN(parsed.getTime())) return '';
-  return toInputDatetimeLocal(parsed);
-}
