@@ -1,5 +1,6 @@
 const ts = require('@typescript-eslint/eslint-plugin');
 const tsParser = require('@typescript-eslint/parser');
+const { group } = require('console');
 const importPlugin = require('eslint-plugin-import');
 
 module.exports = [
@@ -52,6 +53,7 @@ module.exports = [
             { pattern: '~int/**', group: 'internal' },
             { pattern: '~type/**', group: 'internal' },
             { pattern: '~comp/**', group: 'internal' },
+            { pattern: '~layout/**', group: 'internal' },
             { pattern: '@/**', group: 'internal' },
             { pattern: 'src/**', group: 'internal' },
           ],

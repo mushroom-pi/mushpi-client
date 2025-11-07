@@ -35,7 +35,8 @@
       "~hook/*": ["src/hooks/*"],
       "~int/*": ["src/interfaces/*"],
       "~type/*": ["src/types/*"],
-      "~comp/*": ["src/components/*"]
+      "~comp/*": ["src/components/*"],
+      "~layout/*": ["src/layout/*"]
     }
   },
   "include": ["."]

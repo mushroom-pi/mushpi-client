@@ -1,8 +1,9 @@
-import { Box, Button, Container, Grid, Typography } from '@mui/material';
+import { Box, Button, Grid, Typography } from '@mui/material';
 
 import { Error } from '~comp/Error';
 import { Loading } from '~comp/Loading';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
+import { Page } from '~layout/Page';
 
 import PicoUnitCard from './components/PicoUnitCard';
 
@@ -13,7 +14,7 @@ export default function PicoUnitsPage() {
   if (isError) return <Error item="pico units" error={error} />;
 
   return (
-    <Container sx={{ py: 4 }}>
+    <Page>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Pico Units</Typography>
         <Box>
@@ -40,6 +41,6 @@ export default function PicoUnitsPage() {
           ))
         )}
       </Grid>
-    </Container>
+    </Page>
   );
 }

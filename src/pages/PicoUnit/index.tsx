@@ -1,4 +1,3 @@
-import { Container } from '@mui/material';
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -7,6 +6,7 @@ import { Invalid } from '~comp/Invalid';
 import { Loading } from '~comp/Loading';
 import { PicoUnitProvider, usePicoUnitContext } from '~ctx/PicoUnit';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
+import { Page } from '~layout/Page';
 
 import { PicoUnitDetailGrid as DetailGrid } from './components/PicoUnitDetailGrid';
 import { PicoUnitMeta as Meta } from './components/PicoUnitMeta';
@@ -18,10 +18,10 @@ function PicoUnitDetailInner() {
   if (isError || !pico) return <Error item="pico unit" refetch={refetch} error={error} />;
 
   return (
-    <Container sx={{ py: 4 }}>
+    <Page>
       <Meta pico={pico} />
       <DetailGrid pico={pico} />
-    </Container>
+    </Page>
   );
 }
 

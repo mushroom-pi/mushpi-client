@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { Loading } from '~comp/Loading';
 import { ChartsProvider } from '~ctx/Charts';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
+import { Page } from '~layout/Page';
 
 import { BuildQueryForm } from './components/BuildQueryForm';
 import { ControlLoopCard } from './components/ChartsCards/ControlLoopCard';
@@ -30,7 +31,7 @@ export const ReadingsPage = () => {
 
   return (
     <ChartsProvider initialParams={{ picoUnitId: selectedId, page: 1, limit: 250 }}>
-      <Container sx={{ py: 4 }}>
+      <Page>
         <Box>
           <BuildQueryForm />
 
@@ -42,7 +43,7 @@ export const ReadingsPage = () => {
             </Stack>
           </Stack>
         </Box>
-      </Container>
+      </Page>
     </ChartsProvider>
   );
 };
