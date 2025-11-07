@@ -1,6 +1,8 @@
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
 import { Button, IconButton, Stack, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
@@ -25,8 +27,17 @@ export const MetaButtons: React.FC<MetaButtonsProps> = ({ setDeleteOpen, setEdit
         </span>
       </Tooltip>
 
-      <Button variant="outlined" onClick={() => navigate(-1)}>
+      <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)}>
         Back
+      </Button>
+
+      <Button
+        color="info"
+        variant="outlined"
+        startIcon={<ShowChartIcon />}
+        onClick={() => navigate('/readings')}
+      >
+        Readings
       </Button>
 
       <Button

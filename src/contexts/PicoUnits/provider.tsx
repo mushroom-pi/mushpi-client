@@ -25,6 +25,8 @@ type PicoUnitsContextType = {
   setParams: (p: ListPicoUnitsParams | undefined) => void;
   params?: ListPicoUnitsParams;
   queryData: Omit<PicoUnitListResponseDto, 'items'> | null;
+  selectedUnitId: number | null;
+  setSelectedUnitId: (id: number | null) => void;
 };
 
 const PicoUnitsContext = createContext<PicoUnitsContextType | undefined>(undefined);
@@ -44,6 +46,8 @@ export const PicoUnitsProvider = ({
   // (You could also use queryClient.setQueryData to update react-query cache instead;
   // this local state approach keeps things simple and immediate.)
   const [localUnits, setLocalUnits] = useState<PicoUnit[] | null>(null);
+
+  const [selectedUnitId, setSelectedUnitId] = useState<number | null>(null);
 
   // Keep localUnits in sync when fresh data arrives
   React.useEffect(() => {
@@ -99,6 +103,8 @@ export const PicoUnitsProvider = ({
       setParams,
       params,
       queryData,
+      selectedUnitId,
+      setSelectedUnitId,
     }),
     [
       localUnits,
@@ -111,6 +117,8 @@ export const PicoUnitsProvider = ({
       updateLocal,
       params,
       queryData,
+      selectedUnitId,
+      setSelectedUnitId,
     ],
   );
 

@@ -1,5 +1,5 @@
 import { Box, Container, Stack } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { Loading } from '~comp/Loading';
 import { ChartsProvider } from '~ctx/Charts';
@@ -11,14 +11,18 @@ import { DevicesCard } from './components/ChartsCards/DevicesCard';
 import { TempHumCard } from './components/ChartsCards/TempHumCard';
 
 export const ReadingsPage = () => {
-  const [picoUnitId, setPicoUnitId] = useState<number | null>(null);
-  const { units: picoUnits, isLoading: isLoadingPicoUnits } = usePicoUnitsContext();
+  const {
+    units: picoUnits,
+    isLoading: isLoadingPicoUnits,
+    selectedUnitId,
+    setSelectedUnitId,
+  } = usePicoUnitsContext();
 
   useEffect(() => {
-    if (picoUnitId == null && picoUnits?.length) setPicoUnitId(picoUnits[0].id);
-  }, [picoUnits, picoUnitId]);
+    if (selectedUnitId == null && picoUnits?.length) setSelectedUnitId(picoUnits[0].id);
+  }, [picoUnits, selectedUnitId]);
 
-  const selectedId = picoUnitId ?? picoUnits?.[0]?.id ?? null;
+  const selectedId = selectedUnitId ?? picoUnits?.[0]?.id ?? null;
 
   if (isLoadingPicoUnits || !selectedId) {
     return <Loading item="pico unit" />;
