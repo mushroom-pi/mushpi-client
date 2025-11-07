@@ -6,9 +6,9 @@ import { ChartsProvider } from '~ctx/Charts';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 
 import { BuildQueryForm } from './components/BuildQueryForm';
-import ControlLoopCard from './components/ControlLoopCard';
-import { DevicesCard } from './components/DevicesCard';
-import { TempHumCard } from './components/TempHumCard';
+import { ControlLoopCard } from './components/ChartsCards/ControlLoopCard';
+import { DevicesCard } from './components/ChartsCards/DevicesCard';
+import { TempHumCard } from './components/ChartsCards/TempHumCard';
 
 export const ReadingsPage = () => {
   const [picoUnitId, setPicoUnitId] = useState<number | null>(null);

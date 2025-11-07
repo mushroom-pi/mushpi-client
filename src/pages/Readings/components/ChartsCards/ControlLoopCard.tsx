@@ -3,7 +3,7 @@ import React from 'react';
 
 import { InfoCard } from '~comp/InfoCard';
 
-import { OnOffChart } from './OnOffChart';
+import { OnOffChart } from './Charts/OnOffChart';
 
 export const ControlLoopCard: React.FC = () => (
   <InfoCard title="Control Loop" subtitle="Whether the control loop is enabled or disabled">
@@ -15,5 +15,3 @@ export const ControlLoopCard: React.FC = () => (
     </Box>
   </InfoCard>
 );
-
-export default ControlLoopCard;

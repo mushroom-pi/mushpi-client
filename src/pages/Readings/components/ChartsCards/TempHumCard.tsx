@@ -5,9 +5,9 @@ import { RiWaterPercentFill as HumidityIcon } from 'react-icons/ri';
 
 import { InfoCard } from '~comp/InfoCard';
 
-import { TempHumChart } from './TempHumChart';
+import { TempHumChart } from './Charts/TempHumChart';
 
-export const TempHumCard: React.F = () => (
+export const TempHumCard: React.FC = () => (
   <InfoCard title="Temperature and Humidity" subtitle="Measurements and targets in time">
     <Box display="flex" flexDirection="column" gap={1}>
       <Box display="flex" alignItems="center">

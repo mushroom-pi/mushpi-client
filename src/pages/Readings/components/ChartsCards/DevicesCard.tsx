@@ -5,7 +5,7 @@ import { PiFanFill as FanIcon } from 'react-icons/pi';
 
 import { InfoCard } from '~comp/InfoCard';
 
-import { OnOffChart } from './OnOffChart';
+import { OnOffChart } from './Charts/OnOffChart';
 
 export const DevicesCard: React.FC = () => (
   <InfoCard title="Devices" subtitle="ON/OFF status of each connected component">
