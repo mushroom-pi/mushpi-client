@@ -1,15 +1,19 @@
+import DownloadIcon from '@mui/icons-material/Download';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import {
   Box,
   Button,
   FormControl,
   FormHelperText,
+  IconButton,
   InputLabel,
   MenuItem,
   Select,
   type SelectChangeEvent,
   Stack,
   type SxProps,
+  type Theme,
+  Tooltip,
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import dayjs, { Dayjs } from 'dayjs';
@@ -19,6 +23,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import type { ReadingsApiPicoUnitIdReadingsControllerListForUnitRequest as ListPicoUnitReadingsParams } from '~api/generated';
 import { useChartsContext } from '~ctx/Charts';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
+import { useExportPicoUnitReadings } from '~hook/useReadings';
 
 dayjs.extend(utc);
 
@@ -28,7 +33,7 @@ type LocalParams = Partial<Omit<ListPicoUnitReadingsParams, 'start' | 'end'>> & 
   end?: Dayjs | null;
 };
 
-// ---- layout constants
+// layout constants
 const DATE_TIME_PICKER_HEIGHT = 48;
 const SELECTORS_HEIGHT = DATE_TIME_PICKER_HEIGHT + 8;
 
@@ -79,7 +84,7 @@ export const BuildQueryForm: React.FC = () => {
   const dayjsToBackendIso = (d?: Dayjs | null) =>
     d ? dayjs(d).utc().format('YYYY-MM-DDTHH:mm:ss[Z]') : undefined;
 
-  const apply = () => {
+  const update = () => {
     const picoUnitId =
       localParams?.picoUnitId != null ? Number(localParams.picoUnitId) : params?.picoUnitId;
     if (!picoUnitId) return;
@@ -105,13 +110,48 @@ export const BuildQueryForm: React.FC = () => {
   }, [start, end]);
 
   const hasPicoUnit = Boolean(localParams?.picoUnitId ?? params?.picoUnitId);
-  const isApplyDisabled = !hasPicoUnit || isEndBeforeStart;
+  const isUpdateDisabled = !hasPicoUnit || isEndBeforeStart;
+  const isDownloadDisabled = !start || !end || isUpdateDisabled;
 
   // UI values
   const currentPicoUnitValue = String(localParams?.picoUnitId ?? params?.picoUnitId ?? '');
   const currentLimitValue = String(localParams?.limit ?? params?.limit ?? 500);
   const currentStartValue: Dayjs | null = start;
   const currentEndValue: Dayjs | null = end;
+
+  const { isFetching: isFetchingCsv, refetch: refetchCsv } = useExportPicoUnitReadings({
+    picoUnitId: Number(currentPicoUnitValue),
+    start: start?.toISOString() ?? undefined,
+    end: end?.toISOString() ?? undefined,
+  });
+
+  const download = async () => {
+    if (!params?.picoUnitId || !start || !end) return;
+
+    try {
+      // Trigger the query manually
+      const result = await refetchCsv();
+
+      // v5 refetch returns a result object: { data, error, status, fetchStatus... }
+      const blob = result.data;
+      if (!blob) {
+        console.error('No blob returned', result.error);
+        return;
+      }
+
+      // create + click a hidden anchor to download
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = `readings-${params.picoUnitId}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(objectUrl);
+    } catch (err) {
+      console.error('Download failed', err);
+    }
+  };
 
   return (
     <Stack
@@ -213,27 +253,39 @@ export const BuildQueryForm: React.FC = () => {
 
       <Stack>
         {' '}
-        <Button
-          variant="contained"
-          onClick={apply}
-          disabled={isApplyDisabled}
-          startIcon={<RefreshIcon />}
-          aria-label="apply"
-          size="medium"
-          sx={{
-            minHeight: SELECTORS_HEIGHT,
-            height: SELECTORS_HEIGHT,
-            paddingLeft: 2,
-            paddingRight: 2,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            // ensure icon and text don't shift baseline
-            lineHeight: 1,
-          }}
-        >
-          Apply
-        </Button>
+        <Tooltip title="Reload data graphs">
+          <span>
+            <IconButton onClick={update} disabled={isUpdateDisabled} aria-label="update">
+              <RefreshIcon />
+            </IconButton>
+          </span>
+        </Tooltip>
+        <Box flex={1} sx={{ minHeight: '1.2em' }} />
+      </Stack>
+
+      <Stack>
+        {' '}
+        <Tooltip title="Download data as CSV file">
+          <Button
+            variant="contained"
+            onClick={download}
+            disabled={isDownloadDisabled || isFetchingCsv}
+            startIcon={<DownloadIcon />}
+            aria-label="download"
+            size="medium"
+            sx={{
+              minHeight: DATE_TIME_PICKER_HEIGHT,
+              paddingLeft: 2,
+              paddingRight: 2,
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 1,
+            }}
+          >
+            {isFetchingCsv ? 'Fetching...' : 'CSV'}
+          </Button>
+        </Tooltip>
         <Box flex={1} sx={{ minHeight: '1.2em' }} />
       </Stack>
     </Stack>
