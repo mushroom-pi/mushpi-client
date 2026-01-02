@@ -8,7 +8,7 @@ export const navItems = [
   { to: '/', label: 'Dashboard', icon: <HomeIcon />, end: true },
   { to: '/pico-units', label: 'Pico Units', icon: <ActivityIcon size={24} /> },
   { to: '/readings', label: 'Readings', icon: <ShowChartIcon /> },
-  { to: '/settings', label: 'Settings', icon: <SettingsIcon /> },
+  { to: '/server', label: 'Server', icon: <SettingsIcon /> },
 ];
 
 export const activeSx = (theme: Theme) => ({

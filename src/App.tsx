@@ -5,7 +5,7 @@ import Dashboard from './pages/Dashboard';
 import PicoUnitDetail from './pages/PicoUnit';
 import PicoUnits from './pages/PicoUnits';
 import { ReadingsPage } from './pages/Readings';
-import Settings from './pages/Settings';
+import { Server } from './pages/Server';
 
 export default function App() {
   return (
@@ -17,7 +17,7 @@ export default function App() {
           <Route path="/pico-units" element={<PicoUnits />} />
           <Route path="/pico-units/:id" element={<PicoUnitDetail />} />
           <Route path="/readings" element={<ReadingsPage />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/server" element={<Server />} />
         </Routes>
       </main>
     </div>
