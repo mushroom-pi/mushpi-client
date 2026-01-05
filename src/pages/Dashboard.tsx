@@ -1,4 +1,4 @@
-import Card from '~comp/Card';
+import { Card } from '~comp/Card';
 
 export default function Dashboard() {
   return (
