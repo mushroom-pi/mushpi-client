@@ -6,11 +6,12 @@ export { InfoField } from './InfoField';
 export { FieldRow } from './FieldRow';
 export { OnOffInput } from './OnOffInput';
 export { ReadableTime } from './ReadableTime';
-export { ModalDialog } from './ModalDialog';
 export { DateTimeField } from './DateTimeField';
 export { HeaderAndIcon } from './HeaderAndIcon';
-export { InfoCard } from './InfoCard';
-export { EditableInfoCard } from './EditableInfoCard';
-export { OnOffInfo } from './OnOffInfo';
+// Composite components (molecules) are implemented in ../molecules
+export { InfoCard } from '../molecules/InfoCard';
+export { EditableInfoCard } from '../molecules/EditableInfoCard';
+export { OnOffInfo } from '../molecules/OnOffInfo';
+export { ModalDialog } from '../molecules/ModalDialog';
 export { Invalid } from './Invalid';
 export { Error } from './Error';

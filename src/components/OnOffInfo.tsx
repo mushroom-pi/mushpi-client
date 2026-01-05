@@ -1,1 +1,1 @@
-export { OnOffInfo } from './ui/atoms/OnOffInfo';
+export { OnOffInfo } from './ui/molecules/OnOffInfo';

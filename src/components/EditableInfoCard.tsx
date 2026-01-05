@@ -1,1 +1,1 @@
-export { EditableInfoCard } from './ui/atoms/EditableInfoCard';
+export { EditableInfoCard } from './ui/molecules/EditableInfoCard';

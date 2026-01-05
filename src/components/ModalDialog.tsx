@@ -1,1 +1,1 @@
-export { ModalDialog } from './ui/atoms/ModalDialog';
+export { ModalDialog } from './ui/molecules/ModalDialog';

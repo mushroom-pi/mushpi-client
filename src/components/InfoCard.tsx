@@ -1,1 +1,1 @@
-export { InfoCard } from './ui/atoms/InfoCard';
+export { InfoCard } from './ui/molecules/InfoCard';
