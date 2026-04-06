@@ -6,7 +6,7 @@ import utc from 'dayjs/plugin/utc';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import type { ReadingsApiPicoUnitIdReadingsControllerListForUnitRequest as ListPicoUnitReadingsParams } from '~api/generated';
-import { DateTimeField } from '~comp/DateTimeField';
+import { DateTimeField } from '~components';
 import { useChartsContext } from '~ctx/Charts';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { useExportPicoUnitReadings } from '~hook/useReadings';

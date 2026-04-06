@@ -1,7 +1,7 @@
 import { Box, Container, Stack } from '@mui/material';
 import { useEffect } from 'react';
 
-import { Loading } from '~comp/Loading';
+import { Loading } from '~components';
 import { ChartsProvider } from '~ctx/Charts';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { Page } from '~layout/Page';

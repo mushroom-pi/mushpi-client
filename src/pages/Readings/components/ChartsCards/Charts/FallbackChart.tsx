@@ -1,7 +1,6 @@
 import type React from 'react';
 
-import { Error } from '~comp/Error';
-import { Loading } from '~comp/Loading';
+import { Error, Loading } from '~components';
 import { useChartsContext } from '~ctx/Charts';
 
 interface FallbackChartProps {

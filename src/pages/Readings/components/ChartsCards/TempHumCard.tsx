@@ -3,7 +3,7 @@ import type React from 'react';
 import { FaTemperatureHigh as TemperatureIcon } from 'react-icons/fa';
 import { RiWaterPercentFill as HumidityIcon } from 'react-icons/ri';
 
-import { InfoCard } from '~comp/InfoCard';
+import { InfoCard } from '~components';
 
 import { TempHumChart } from './Charts/TempHumChart';
 

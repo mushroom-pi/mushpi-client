@@ -3,11 +3,7 @@ import ThermostatIcon from '@mui/icons-material/Thermostat';
 import { Box, Chip, Grid, LinearProgress, Stack, Typography } from '@mui/material';
 import type { FC } from 'react';
 
-import { BigDisplay } from '~comp/BigDisplay';
-import { InfoCard } from '~comp/InfoCard';
-import { InfoField } from '~comp/InfoField';
-import { Loading } from '~comp/Loading';
-import { ReadableTime } from '~comp/ReadableTime';
+import { BigDisplay, InfoCard, InfoField, Loading, ReadableTime } from '~components';
 import { useServerHealth } from '~hook/useServerHealth';
 import { Page } from '~layout/Page';
 

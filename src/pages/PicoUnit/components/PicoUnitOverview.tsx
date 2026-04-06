@@ -1,10 +1,7 @@
 import ThermostatIcon from '@mui/icons-material/Thermostat';
 import React from 'react';
 
-import { BigDisplay } from '~comp/BigDisplay';
-import { InfoCard } from '~comp/InfoCard';
-import { InfoField } from '~comp/InfoField';
-import { Loading } from '~comp/Loading';
+import { BigDisplay, InfoCard, InfoField, Loading } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 

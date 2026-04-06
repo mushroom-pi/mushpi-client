@@ -2,9 +2,7 @@ import ConnectionsIcon from '@mui/icons-material/SettingsInputComponent';
 import { Chip } from '@mui/material';
 import type React from 'react';
 
-import { EditableInfoCard } from '~comp/EditableInfoCard';
-import { InfoField } from '~comp/InfoField';
-import { Loading } from '~comp/Loading';
+import { EditableInfoCard, InfoField, Loading } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 

@@ -3,7 +3,7 @@ import React from 'react';
 import { FaHotjar as HeaterIcon, FaCloudRain as HumidifierIcon } from 'react-icons/fa';
 import { PiFanFill as FanIcon } from 'react-icons/pi';
 
-import { InfoCard } from '~comp/InfoCard';
+import { InfoCard } from '~components';
 
 import { OnOffChart } from './Charts/OnOffChart';
 

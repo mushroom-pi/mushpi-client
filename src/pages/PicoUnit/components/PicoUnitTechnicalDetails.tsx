@@ -3,10 +3,7 @@ import React, { useMemo } from 'react';
 
 import { bytesToMB } from 'src/utils/methods';
 
-import { BigDisplay } from '~comp/BigDisplay';
-import { InfoCard } from '~comp/InfoCard';
-import { InfoField } from '~comp/InfoField';
-import { Loading } from '~comp/Loading';
+import { BigDisplay, InfoCard, InfoField, Loading } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 

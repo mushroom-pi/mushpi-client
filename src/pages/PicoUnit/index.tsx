@@ -1,9 +1,7 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { Error } from '~comp/Error';
-import { Invalid } from '~comp/Invalid';
-import { Loading } from '~comp/Loading';
+import { Error, Invalid, Loading } from '~components';
 import { PicoUnitProvider, usePicoUnitContext } from '~ctx/PicoUnit';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { Page } from '~layout/Page';

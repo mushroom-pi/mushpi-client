@@ -2,8 +2,7 @@ import FanIcon from '@mui/icons-material/WindPower';
 import type React from 'react';
 import { useState } from 'react';
 
-import { EditableInfoCard } from '~comp/EditableInfoCard';
-import { Loading } from '~comp/Loading';
+import { EditableInfoCard, Loading } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 

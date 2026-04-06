@@ -4,9 +4,7 @@ import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import type { ChangeOutputsDto } from '~api/generated';
-import { HeaderAndIcon } from '~comp/HeaderAndIcon';
-import { ModalDialog } from '~comp/ModalDialog';
-import { OnOffInput } from '~comp/OnOffInput';
+import { HeaderAndIcon, ModalDialog, OnOffInput } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 import type { DialogProps } from '~int/dialogProps';

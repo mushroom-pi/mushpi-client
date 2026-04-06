@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import React from 'react';
 
-import { InfoCard } from '~comp/InfoCard';
+import { InfoCard } from '~components';
 
 import { OnOffChart } from './Charts/OnOffChart';
 

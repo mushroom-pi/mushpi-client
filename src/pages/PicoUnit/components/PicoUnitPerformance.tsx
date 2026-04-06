@@ -4,9 +4,7 @@ import React from 'react';
 
 import { chipColorForFailedCalls } from 'src/utils/methods';
 
-import { InfoCard } from '~comp/InfoCard';
-import { InfoField } from '~comp/InfoField';
-import { Loading } from '~comp/Loading';
+import { InfoCard, InfoField, Loading } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 

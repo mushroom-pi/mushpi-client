@@ -1,8 +1,7 @@
 import { Box } from '@mui/material';
 import type React from 'react';
 
-import { Loading } from '~comp/Loading';
-import { OnOffInfo } from '~comp/OnOffInfo';
+import { Loading, OnOffInfo } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 

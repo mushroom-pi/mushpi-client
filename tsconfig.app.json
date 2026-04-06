@@ -36,6 +36,7 @@
       "~int/*": ["src/interfaces/*"],
       "~type/*": ["src/types/*"],
       "~comp/*": ["src/components/*"],
+      "~components": ["src/components/index.ts"],
       "~layout/*": ["src/layout/*"]
     }
   },

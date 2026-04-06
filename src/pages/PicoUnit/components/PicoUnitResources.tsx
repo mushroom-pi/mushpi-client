@@ -4,10 +4,7 @@ import React from 'react';
 
 import { bytesToMB } from 'src/utils/methods';
 
-import { InfoCard } from '~comp/InfoCard';
-import { InfoField } from '~comp/InfoField';
-import { Loading } from '~comp/Loading';
-import { ReadableTime } from '~comp/ReadableTime';
+import { InfoCard, InfoField, Loading, ReadableTime } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 

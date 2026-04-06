@@ -15,6 +15,7 @@ export default defineConfig({
       { find: '~int', replacement: path.resolve(__dirname, 'src/interfaces') },
       { find: '~type', replacement: path.resolve(__dirname, 'src/types') },
       { find: '~comp', replacement: path.resolve(__dirname, 'src/components') },
+      { find: '~components', replacement: path.resolve(__dirname, 'src/components/index.ts') },
       { find: '~layout', replacement: path.resolve(__dirname, 'src/layout') },
     ],
   },

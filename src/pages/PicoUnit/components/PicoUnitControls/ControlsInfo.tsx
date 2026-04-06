@@ -1,9 +1,7 @@
 import { Chip } from '@mui/material';
 import type React from 'react';
 
-import { InfoField } from '~comp/InfoField';
-import { Loading } from '~comp/Loading';
-import { OnOffInfo } from '~comp/OnOffInfo';
+import { InfoField, Loading, OnOffInfo } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 

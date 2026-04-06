@@ -2,8 +2,7 @@ import { Box, Stack, Switch, TextField, Typography } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import type { UpdatePicoUnitDto } from '~api/generated';
-import { HeaderAndIcon } from '~comp/HeaderAndIcon';
-import { ModalDialog } from '~comp/ModalDialog';
+import { HeaderAndIcon, ModalDialog } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 

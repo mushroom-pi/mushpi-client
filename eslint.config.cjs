@@ -53,6 +53,7 @@ module.exports = [
             { pattern: '~int/**', group: 'internal' },
             { pattern: '~type/**', group: 'internal' },
             { pattern: '~comp/**', group: 'internal' },
+            { pattern: '~components', group: 'internal' },
             { pattern: '~layout/**', group: 'internal' },
             { pattern: '@/**', group: 'internal' },
             { pattern: 'src/**', group: 'internal' },

@@ -1,7 +1,6 @@
 import { Box, Button, Grid, Typography } from '@mui/material';
 
-import { Error } from '~comp/Error';
-import { Loading } from '~comp/Loading';
+import { Error, Loading } from '~components';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { Page } from '~layout/Page';
 
