@@ -74,29 +74,3 @@ export const useExportPicoUnitReadingsCmd = () => {
     return new Blob([resp as any], { type: 'text/csv' });
   }, []);
 };
-
-/**
- * @deprecated Use useExportPicoUnitReadingsCmd instead.
- * Kept for backwards compatibility but will be removed in next major version.
- * This was previously a useQuery but downloads should be imperative actions.
- */
-export const useExportPicoUnitReadings = (
-  { start, end, picoUnitId }: Partial<ExportPicoUnitReadingsParams>,
-  enabled: boolean = false,
-) => {
-  const exportCmd = useExportPicoUnitReadingsCmd();
-
-  // Return a query-like object with refetch capability for backwards compatibility
-  return {
-    isFetching: false,
-    isLoading: false,
-    refetch: async () => {
-      try {
-        const data = await exportCmd({ picoUnitId, start, end });
-        return { data, error: null };
-      } catch (error) {
-        return { data: undefined, error };
-      }
-    },
-  };
-};

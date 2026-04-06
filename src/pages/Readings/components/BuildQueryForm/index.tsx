@@ -9,7 +9,7 @@ import type { ReadingsApiPicoUnitIdReadingsControllerListForUnitRequest as ListP
 import { DateTimeField } from '~components';
 import { useChartsContext } from '~ctx/Charts';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
-import { useExportPicoUnitReadings } from '~hook/useReadings';
+import { useExportPicoUnitReadingsCmd } from '~hook/useReadings';
 
 import { AlignedButton } from './AlignedButton';
 import { LimitSelect } from './LimitSelect';
@@ -93,12 +93,8 @@ export const BuildQueryForm: React.FC = () => {
   const currentStartValue: Dayjs | null = start;
   const currentEndValue: Dayjs | null = end;
 
-  /* data fetch hook */
-  const { isFetching: isFetchingCsv, refetch: refetchCsv } = useExportPicoUnitReadings({
-    picoUnitId: Number(currentPicoUnitValue),
-    start: start?.toISOString() ?? undefined,
-    end: end?.toISOString() ?? undefined,
-  });
+  const exportCsv = useExportPicoUnitReadingsCmd();
+  const [isFetchingCsv, setIsFetchingCsv] = useState(false);
 
   /* Actions */
 
@@ -122,13 +118,13 @@ export const BuildQueryForm: React.FC = () => {
   const download = async () => {
     if (!params?.picoUnitId || !start || !end) return;
 
+    setIsFetchingCsv(true);
     try {
-      const result = await refetchCsv();
-      const blob = result.data;
-      if (!blob) {
-        console.error('No blob returned', result.error);
-        return;
-      }
+      const blob = await exportCsv({
+        picoUnitId: params.picoUnitId,
+        start: start.toISOString(),
+        end: end.toISOString(),
+      });
 
       const objectUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -140,6 +136,8 @@ export const BuildQueryForm: React.FC = () => {
       URL.revokeObjectURL(objectUrl);
     } catch (err) {
       console.error('Download failed', err);
+    } finally {
+      setIsFetchingCsv(false);
     }
   };
 
