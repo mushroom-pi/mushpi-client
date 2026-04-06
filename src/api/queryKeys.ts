@@ -12,8 +12,8 @@ import type { PicoUnitsApiPicoUnitsControllerListRequest as ListPicoUnitsParams 
 export const picoUnitsKeys = {
   all: ['picoUnits'] as const,
   list: (params?: Partial<ListPicoUnitsParams>) => {
-    const { page = 1, limit = 20, enabled, q } = params ?? {};
-    return ['picoUnits', page, limit, enabled, q] as const;
+    const { page = 1, limit = 20, q } = params ?? {};
+    return ['picoUnits', page, limit, q] as const;
   },
 };
 
