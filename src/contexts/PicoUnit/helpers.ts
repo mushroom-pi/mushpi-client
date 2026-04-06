@@ -1,6 +1,7 @@
 import { useMutation, type useQueryClient } from '@tanstack/react-query';
 
 import type { PicoUnit, Readings } from '~api/generated';
+import { picoUnitKeys, picoUnitsKeys } from '~api/queryKeys';
 
 export function updateItemInAllPages(
   queryClient: ReturnType<typeof useQueryClient>,
@@ -8,7 +9,7 @@ export function updateItemInAllPages(
   updater: (item: PicoUnit) => PicoUnit,
 ) {
   const cache = queryClient.getQueryCache();
-  const queries = cache.findAll({ queryKey: ['picoUnits'], exact: false, type: 'all' });
+  const queries = cache.findAll({ queryKey: picoUnitsKeys.all, exact: false, type: 'all' });
   queries.forEach((q) => {
     const cur = queryClient.getQueryData<{ items: PicoUnit[] }>(q.queryKey as any);
     if (!cur?.items) return;
@@ -22,7 +23,7 @@ export function removeItemFromAllPages(
   itemId: number,
 ) {
   const cache = queryClient.getQueryCache();
-  const queries = cache.findAll({ queryKey: ['picoUnits'], exact: false, type: 'all' });
+  const queries = cache.findAll({ queryKey: picoUnitsKeys.all, exact: false, type: 'all' });
   queries.forEach((q) => {
     const cur = queryClient.getQueryData<{ items: PicoUnit[]; total?: number }>(q.queryKey as any);
     if (!cur?.items) return;
@@ -61,16 +62,16 @@ export function createOptimisticMutation<Input, Result = any>(
     onMutate: async (vars: Input) => {
       const id = opts.getIdFromVars(vars);
 
-      await qc.cancelQueries({ queryKey: ['picoUnit', id] });
-      await qc.cancelQueries({ queryKey: ['picoUnits'] });
+      await qc.cancelQueries({ queryKey: picoUnitKeys.detail(id) });
+      await qc.cancelQueries({ queryKey: picoUnitsKeys.all });
 
-      const snapshotItem = qc.getQueryData(['picoUnit', id]);
-      const snapshotLists = qc.getQueryData(['picoUnits']);
+      const snapshotItem = qc.getQueryData(picoUnitKeys.detail(id));
+      const snapshotLists = qc.getQueryData(picoUnitsKeys.all);
 
-      const prevItem = qc.getQueryData<PicoUnit>(['picoUnit', id]);
+      const prevItem = qc.getQueryData<PicoUnit>(picoUnitKeys.detail(id));
       const optimisticItem = opts.applyOptimistic(prevItem, vars);
       if (optimisticItem) {
-        qc.setQueryData(['picoUnit', id], optimisticItem);
+        qc.setQueryData(picoUnitKeys.detail(id), optimisticItem);
       }
 
       if (optimisticItem) {
@@ -87,18 +88,18 @@ export function createOptimisticMutation<Input, Result = any>(
     onError: (_err, vars: Input, context: any) => {
       const id = opts.getIdFromVars(vars);
       if (context?.snapshotItem) {
-        qc.setQueryData(['picoUnit', id], context.snapshotItem);
+        qc.setQueryData(picoUnitKeys.detail(id), context.snapshotItem);
       } else {
-        qc.invalidateQueries({ queryKey: ['picoUnit', id] });
+        qc.invalidateQueries({ queryKey: picoUnitKeys.detail(id) });
       }
       if (context?.snapshotLists) {
-        qc.invalidateQueries({ queryKey: ['picoUnits'] });
+        qc.invalidateQueries({ queryKey: picoUnitsKeys.all });
       }
     },
     onSettled: (_data, _err, vars: Input) => {
       const id = opts.getIdFromVars(vars);
-      qc.invalidateQueries({ queryKey: ['picoUnit', id] });
-      qc.invalidateQueries({ queryKey: ['picoUnits'] });
+      qc.invalidateQueries({ queryKey: picoUnitKeys.detail(id) });
+      qc.invalidateQueries({ queryKey: picoUnitsKeys.all });
     },
   });
 }

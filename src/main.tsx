@@ -16,8 +16,9 @@ import theme from './theme/mushroomTheme';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnMount: 'always',
-      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5, // 5 minutes
     },
   },
 });

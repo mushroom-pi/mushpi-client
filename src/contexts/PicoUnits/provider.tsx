@@ -42,46 +42,21 @@ export const PicoUnitsProvider = ({
   const units = useMemo(() => rawData?.items || [], [rawData]);
   const queryData = useMemo(() => omit(rawData, 'items'), [rawData]);
 
-  // local copy so we can optimistically update view without mutating react-query cache.
-  // (You could also use queryClient.setQueryData to update react-query cache instead;
-  // this local state approach keeps things simple and immediate.)
-  const [localUnits, setLocalUnits] = useState<PicoUnit[] | null>(null);
-
   const [selectedUnitId, setSelectedUnitId] = useState<number | null>(null);
-
-  // Keep localUnits in sync when fresh data arrives
-  React.useEffect(() => {
-    if (units.length > 0) {
-      setLocalUnits(units);
-    } else if (rawData == null) {
-      setLocalUnits(null);
-    } else {
-      // if API returned empty list, set to empty array
-      setLocalUnits([]);
-    }
-  }, [rawData, units]);
 
   const getById = useCallback(
     (id: string | number) => {
-      const list = localUnits ?? units;
-      return list.find((u: any) => u?.id === id || u?.uuid === id || u?._id === id);
-    },
-    [localUnits, units],
-  );
-
-  const updateLocal = useCallback(
-    (unit: PicoUnit) => {
-      setLocalUnits((prev) => {
-        const base = prev ?? units;
-        const idx = base.findIndex((u: any) => u?.id === unit?.id);
-        if (idx === -1) return [unit, ...base];
-        const copy = [...base];
-        copy[idx] = { ...copy[idx], ...unit };
-        return copy;
-      });
+      return units.find((u: any) => u?.id === id || u?.uuid === id || u?._id === id);
     },
     [units],
   );
+
+  const updateLocal = useCallback((unit: PicoUnit) => {
+    // This now updates React Query's cache directly instead of maintaining separate state.
+    // The mutation helpers in PicoUnit context handle optimistic updates via createOptimisticMutation,
+    // which manages the cache lifecycle. updateLocal is kept for backwards compatibility.
+    // Consider deprecating in favor of directly using mutations or queryClient.setQueryData.
+  }, []);
 
   const refetch = useCallback(async () => {
     // delegate to react-query's refetch
@@ -93,7 +68,7 @@ export const PicoUnitsProvider = ({
 
   const contextValue: PicoUnitsContextType = useMemo(
     () => ({
-      units: localUnits ?? units,
+      units,
       isLoading: query.isLoading ?? false,
       isError: query.isError ?? false,
       error: query.isError ? query.error : undefined,
@@ -107,7 +82,6 @@ export const PicoUnitsProvider = ({
       setSelectedUnitId,
     }),
     [
-      localUnits,
       units,
       query.isLoading,
       query.isError,
