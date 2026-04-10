@@ -1,4 +1,4 @@
-import { Box, Container, Stack } from '@mui/material';
+import { Box } from '@mui/material';
 import { useEffect } from 'react';
 
 import { Loading } from '~components';
@@ -7,9 +7,7 @@ import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { Page } from '~layout/Page';
 
 import { BuildQueryForm } from './components/BuildQueryForm';
-import { ControlLoopCard } from './components/ChartsCards/ControlLoopCard';
-import { DevicesCard } from './components/ChartsCards/DevicesCard';
-import { TempHumCard } from './components/ChartsCards/TempHumCard';
+import { ChartsTabs } from './components/ChartsCards/ChartsTabs';
 
 export const ReadingsPage = () => {
   const {
@@ -34,14 +32,7 @@ export const ReadingsPage = () => {
       <Page>
         <Box>
           <BuildQueryForm />
-
-          <Stack spacing={2}>
-            <Stack direction="column" spacing={2}>
-              <TempHumCard />
-              <DevicesCard />
-              <ControlLoopCard />
-            </Stack>
-          </Stack>
+          <ChartsTabs />
         </Box>
       </Page>
     </ChartsProvider>
