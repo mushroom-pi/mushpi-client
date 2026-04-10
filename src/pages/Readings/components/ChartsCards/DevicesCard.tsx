@@ -7,6 +7,9 @@ import { InfoCard } from '~components';
 
 import { OnOffChart } from './Charts/OnOffChart';
 
+const DEVICE_PANEL_HEIGHT = 200;
+const HEATER_ICON_OFFSET_Y = -18;
+
 export const DevicesCard: React.FC = () => (
   <InfoCard title="Devices" subtitle="ON/OFF status of each connected component">
     <Box display="flex" flexDirection="column" gap={1}>
@@ -14,19 +17,21 @@ export const DevicesCard: React.FC = () => (
         <Tooltip title="Humidifier">
           <HumidifierIcon size={35} />
         </Tooltip>
-        <OnOffChart dataKey="humidifier" />
+        <OnOffChart dataKey="humidifier" height={DEVICE_PANEL_HEIGHT} />
       </Box>
       <Box display="flex" alignItems="center" ml={1}>
         <Tooltip title="Fan">
           <FanIcon size={35} />
         </Tooltip>
-        <OnOffChart dataKey="fan" />
+        <OnOffChart dataKey="fan" height={DEVICE_PANEL_HEIGHT} />
       </Box>
       <Box display="flex" alignItems="center" ml={1}>
-        <Tooltip title="Heater">
-          <HeaterIcon size={35} />
-        </Tooltip>
-        <OnOffChart dataKey="heater" showXAxis />
+        <Box sx={{ transform: `translateY(${HEATER_ICON_OFFSET_Y}px)` }}>
+          <Tooltip title="Heater">
+            <HeaterIcon size={35} />
+          </Tooltip>
+        </Box>
+        <OnOffChart dataKey="heater" showXAxis showBrush height={DEVICE_PANEL_HEIGHT} />
       </Box>
     </Box>
   </InfoCard>

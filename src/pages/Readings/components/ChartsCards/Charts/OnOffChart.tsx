@@ -20,17 +20,19 @@ export interface OnOffChartProps {
   dataKey: ChartLabel;
   showXAxis?: boolean;
   showBrush?: boolean;
+  height?: number;
 }
 
 export const OnOffChart: React.FC<OnOffChartProps> = ({
   dataKey,
   showXAxis = false,
   showBrush = false,
+  height,
 }) => {
   const { chartsData: data, commonTicks } = useChartsContext();
   const { palette } = useTheme();
 
-  const chartHeight = showXAxis ? 200 : 120;
+  const chartHeight = height ?? (showXAxis ? 200 : 120);
 
   return (
     <FallbackChart item={dataKey}>

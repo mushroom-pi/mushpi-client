@@ -1,6 +1,7 @@
 import { useTheme } from '@mui/material';
 import type React from 'react';
 import {
+  Brush,
   CartesianGrid,
   Legend,
   Line,
@@ -84,6 +85,7 @@ export const TempHumChart: React.FC = () => {
             dot={false}
             strokeWidth={2}
           />
+          <Brush dataKey="label" height={20} />
           <Legend />
         </LineChart>
       </ResponsiveContainer>
