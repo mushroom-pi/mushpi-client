@@ -7,7 +7,7 @@ import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { Page } from '~layout/Page';
 
 import { BuildQueryForm } from './components/BuildQueryForm';
-import { ChartsTabs } from './components/ChartsCards/ChartsTabs';
+import { ChartsTabs } from './components/ChartsTabs/ChartsTabs';
 
 export const ReadingsPage = () => {
   const {

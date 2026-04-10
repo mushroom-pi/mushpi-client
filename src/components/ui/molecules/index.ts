@@ -6,3 +6,4 @@ export { ModalDialog } from './ModalDialog';
 export { OnOffInput } from './OnOffInput';
 export { Error } from './Error';
 export { Invalid } from './Invalid';
+export { GraphTab } from './GraphTab';

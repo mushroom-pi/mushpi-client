@@ -1,9 +1,12 @@
 import { Box, Tab, Tabs } from '@mui/material';
+import type { ReactNode } from 'react';
 import { useState } from 'react';
 
-import { ControlLoopCard } from './ControlLoopCard';
-import { DevicesCard } from './DevicesCard';
-import { TempHumCard } from './TempHumCard';
+import { GraphTab } from '~components';
+
+import { ControlLoopTab } from './ControlLoopTab';
+import { DevicesTab } from './DevicesTab';
+import { TempHumTab } from './TempHumTab';
 
 const tabA11yProps = (index: number) => ({
   id: `readings-tab-${index}`,
@@ -14,10 +17,12 @@ const TabPanel = ({
   children,
   value,
   index,
+  subtitle,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   value: number;
   index: number;
+  subtitle: string;
 }) => (
   <Box
     role="tabpanel"
@@ -25,7 +30,7 @@ const TabPanel = ({
     id={`readings-tabpanel-${index}`}
     aria-labelledby={`readings-tab-${index}`}
   >
-    {value === index ? children : null}
+    {value === index ? <GraphTab subtitle={subtitle}>{children}</GraphTab> : null}
   </Box>
 );
 
@@ -41,19 +46,23 @@ export const ChartsTabs = () => {
         scrollButtons="auto"
         aria-label="Readings charts tabs"
       >
-        <Tab label="Temp & Humidity" {...tabA11yProps(0)} />
+        <Tab label="Temperature and Humidity" {...tabA11yProps(0)} />
         <Tab label="Devices" {...tabA11yProps(1)} />
         <Tab label="Control Loop" {...tabA11yProps(2)} />
       </Tabs>
 
-      <TabPanel value={tab} index={0}>
-        <TempHumCard />
+      <TabPanel
+        value={tab}
+        index={0}
+        subtitle="Split view: humidity and temperature with individual targets"
+      >
+        <TempHumTab />
       </TabPanel>
-      <TabPanel value={tab} index={1}>
-        <DevicesCard />
+      <TabPanel value={tab} index={1} subtitle="ON/OFF status of each connected component">
+        <DevicesTab />
       </TabPanel>
-      <TabPanel value={tab} index={2}>
-        <ControlLoopCard />
+      <TabPanel value={tab} index={2} subtitle="Whether the control loop is enabled or disabled">
+        <ControlLoopTab />
       </TabPanel>
     </Box>
   );
