@@ -33,7 +33,7 @@ export const TempHumChart: React.FC = () => {
           syncId="anyId"
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="label" orientation="top" ticks={commonTicks} />
+          <XAxis dataKey="label" ticks={commonTicks} />
           <YAxis
             dataKey="temperature"
             unit="°C"

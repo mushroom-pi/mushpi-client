@@ -26,7 +26,7 @@ export const DevicesCard: React.FC = () => (
         <Tooltip title="Heater">
           <HeaterIcon size={35} />
         </Tooltip>
-        <OnOffChart dataKey="heater" />
+        <OnOffChart dataKey="heater" showXAxis />
       </Box>
     </Box>
   </InfoCard>
