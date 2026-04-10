@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { bytesToMB } from 'src/utils/methods';
+import { bytesToMB, downsampleChartPoints, rleDeduplicateOnOffPoints } from 'src/utils/methods';
 
 import type {
   ReadingsApiPicoUnitIdReadingsControllerListForUnitRequest as ListPicoUnitReadingsParams,
@@ -36,6 +36,7 @@ export const toChartPoints = (items: Readings[]): ChartPoint[] =>
   }));
 
 const SAMPLE_TICK_COUNT = 5;
+const MAX_DISPLAY_POINTS = 100;
 
 export function useCharts(params: ListPicoUnitReadingsParams, enabled: boolean = true) {
   const { picoUnitId, start, end, page = 1, limit = 500 } = params;
@@ -54,7 +55,10 @@ export function useCharts(params: ListPicoUnitReadingsParams, enabled: boolean =
   const chartsData = useMemo<ChartPoint[]>(() => {
     if (!query.data) return [];
 
-    return toChartPoints(query.data.items);
+    const points = toChartPoints(query.data.items);
+    const withStateTransitions = rleDeduplicateOnOffPoints(points);
+
+    return downsampleChartPoints(withStateTransitions, MAX_DISPLAY_POINTS);
   }, [query.data]);
 
   const labels = useMemo(() => chartsData.map((d) => d.label ?? ''), [chartsData]);
