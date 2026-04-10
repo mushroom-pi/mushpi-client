@@ -1,7 +1,6 @@
-import { Box } from '@mui/material';
 import { useEffect } from 'react';
 
-import { Loading } from '~components';
+import { Loading, PageTitle } from '~components';
 import { ChartsProvider } from '~ctx/Charts';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { Page } from '~layout/Page';
@@ -30,10 +29,9 @@ export const ReadingsPage = () => {
   return (
     <ChartsProvider initialParams={{ picoUnitId: selectedId, page: 1, limit: 250 }}>
       <Page>
-        <Box>
-          <BuildQueryForm />
-          <ChartsTabs />
-        </Box>
+        <PageTitle mb={2.5}>Readings</PageTitle>
+        <BuildQueryForm />
+        <ChartsTabs />
       </Page>
     </ChartsProvider>
   );

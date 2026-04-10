@@ -168,7 +168,7 @@ export const BuildQueryForm: React.FC = () => {
   };
 
   return (
-    <Stack spacing={1.5} mb={2} sx={{ '& > *': { flexShrink: 0 } }}>
+    <Stack spacing={1.5} mb={0.25} sx={{ '& > *': { flexShrink: 0 } }}>
       <Stack direction={{ xs: 'column', lg: 'row' }} spacing={2} alignItems="center">
         <PicoUnitSelect
           picoUnits={picoUnits}

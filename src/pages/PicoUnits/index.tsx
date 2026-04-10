@@ -1,6 +1,6 @@
 import { Box, Button, Grid, Typography } from '@mui/material';
 
-import { Error, Loading } from '~components';
+import { Error, Loading, PageTitle } from '~components';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { Page } from '~layout/Page';
 
@@ -14,14 +14,16 @@ export default function PicoUnitsPage() {
 
   return (
     <Page>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4">Pico Units</Typography>
-        <Box>
+      <PageTitle
+        mb={3}
+        actions={
           <Button variant="contained" onClick={() => refetch()}>
             Refresh
           </Button>
-        </Box>
-      </Box>
+        }
+      >
+        Pico Units
+      </PageTitle>
 
       <Typography variant="body2" color="text.secondary" mb={2}>
         Showing page {queryData?.page} of {queryData?.pages} — total: {queryData?.total}

@@ -1,9 +1,9 @@
 import DataUsageIcon from '@mui/icons-material/DataUsage';
 import ThermostatIcon from '@mui/icons-material/Thermostat';
-import { Box, Chip, Grid, LinearProgress, Stack, Typography } from '@mui/material';
+import { Chip, Grid, LinearProgress, Stack, Typography } from '@mui/material';
 import type { FC } from 'react';
 
-import { BigDisplay, InfoCard, InfoField, Loading, ReadableTime } from '~components';
+import { BigDisplay, InfoCard, InfoField, Loading, PageTitle, ReadableTime } from '~components';
 import { useServerHealth } from '~hook/useServerHealth';
 import { Page } from '~layout/Page';
 
@@ -22,9 +22,7 @@ export const Server: FC = () => {
     <Page>
       {serverHealth ? (
         <>
-          <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-            <Typography variant="h4">Server</Typography>
-          </Box>
+          <PageTitle>Server</PageTitle>
           <Stack direction="row" spacing={2} alignItems="center" justifyContent="flex-start" mb={2}>
             <Chip
               label={isHealthy ? 'Healthy' : 'Unhealthy'}
