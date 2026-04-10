@@ -1,5 +1,9 @@
 import type { ChartPoint } from '~type/charts';
 
+type OnOffChartKey = 'fan' | 'heater' | 'humidifier' | 'control_loop';
+
+const DEFAULT_ON_OFF_KEYS: OnOffChartKey[] = ['fan', 'heater', 'humidifier', 'control_loop'];
+
 export function bytesToMB(bytes?: number | null) {
   if (bytes == null || Number.isNaN(bytes)) return '—';
   return (bytes / (1024 * 1024)).toFixed(2);
@@ -48,4 +52,27 @@ export const downsampleChartPoints = (
   if (last && sampled[sampled.length - 1] !== last) sampled.push(last);
 
   return sampled;
+};
+
+export const rleDeduplicateOnOffPoints = (
+  points: ChartPoint[],
+  keys: OnOffChartKey[] = DEFAULT_ON_OFF_KEYS,
+): ChartPoint[] => {
+  if (points.length <= 2) return points;
+
+  const keep = new Set<number>([0, points.length - 1]);
+
+  for (const key of keys) {
+    for (let i = 1; i < points.length; i += 1) {
+      if (points[i][key] !== points[i - 1][key]) {
+        keep.add(i - 1);
+        keep.add(i);
+      }
+    }
+  }
+
+  return [...keep]
+    .sort((a, b) => a - b)
+    .map((idx) => points[idx])
+    .filter(Boolean);
 };
