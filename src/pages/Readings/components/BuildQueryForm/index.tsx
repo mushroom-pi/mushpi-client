@@ -94,6 +94,10 @@ export const BuildQueryForm: React.FC = () => {
   const hasPicoUnit = Boolean(localParams?.picoUnitId ?? params?.picoUnitId);
   const isUpdateDisabled = !hasPicoUnit || isEndBeforeStart;
   const isDownloadDisabled = !start || !end || isUpdateDisabled;
+  const downloadTooltip =
+    !start || !end
+      ? 'Select a start and end time window to enable CSV download'
+      : 'Download data as CSV file';
 
   /* UI values */
   const currentPicoUnitValue = String(localParams?.picoUnitId ?? params?.picoUnitId ?? '');
@@ -197,27 +201,29 @@ export const BuildQueryForm: React.FC = () => {
           sx={controlSx}
         />
 
-        <AlignedButton tooltip="Download data as CSV file">
-          <Button
-            variant="contained"
-            onClick={download}
-            disabled={isDownloadDisabled || isFetchingCsv}
-            startIcon={<DownloadIcon />}
-            aria-label="download"
-            size="medium"
-            color="secondary"
-            sx={{
-              minHeight: DATE_TIME_PICKER_HEIGHT,
-              paddingLeft: 2,
-              paddingRight: 2,
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              lineHeight: 1,
-            }}
-          >
-            {isFetchingCsv ? 'Fetching...' : 'CSV'}
-          </Button>
+        <AlignedButton tooltip={downloadTooltip}>
+          <span>
+            <Button
+              variant="contained"
+              onClick={download}
+              disabled={isDownloadDisabled || isFetchingCsv}
+              startIcon={<DownloadIcon />}
+              aria-label="download"
+              size="medium"
+              color="secondary"
+              sx={{
+                minHeight: DATE_TIME_PICKER_HEIGHT,
+                paddingLeft: 2,
+                paddingRight: 2,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                lineHeight: 1,
+              }}
+            >
+              {isFetchingCsv ? 'Fetching...' : 'CSV'}
+            </Button>
+          </span>
         </AlignedButton>
       </Stack>
     </Stack>
