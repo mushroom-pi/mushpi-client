@@ -97,6 +97,14 @@ Shared query params (unit, date range, limit) come from `Charts` context.
 VITE_API_BASE_URL=http://localhost:3000   # mushpi-server URL
 ```
 
+## Build & Development
+
+- **Build Status**: ✅ `yarn build` works properly — builds to `dist/` with Vite
+- **Dev Server**: ✅ `yarn dev` works properly — runs on `http://localhost:5173/`
+- **Permissions**: Agent has full permission to execute `yarn build` and `yarn dev` scripts
+- **Build Config**: Fixed TypeScript config issues (removed `erasableSyntaxOnly` & invalid `ignoreDeprecations`)
+- **Known**: Vite chunk size warning (~1.35 MB) is informational; can be addressed with code splitting if needed
+
 ## Coding Rules
 
 - Functional components only; no class components.
@@ -105,3 +113,73 @@ VITE_API_BASE_URL=http://localhost:3000   # mushpi-server URL
 - Use **dayjs** for dates, not `Date` directly.
 - ESLint + Prettier enforced via Husky pre-commit hook.
 - Import order managed by `@trivago/prettier-plugin-sort-imports`.
+
+## Readings Page
+
+The Readings page (`/readings`) provides a comprehensive interface for querying and visualizing sensor data from Pico units. It serves as the main charting dashboard, allowing users to explore temperature, humidity, device states, and control loop data over time.
+
+### Overview
+
+- **Purpose**: Query and display historical readings data in interactive charts.
+- **Key Features**: Query builder form, tabbed chart views, CSV export, responsive design for mobile devices.
+- **Data Source**: Fetches data from `mushpi-server` via React Query, using the `useReadings` hook.
+- **Shared State**: Uses `Charts` context for query parameters (unit, date range, limit) across all charts.
+
+### Components Structure
+
+Located in `src/pages/Readings/`:
+
+- `index.tsx`: Main page component, wraps content in `ChartsProvider` and `Page` layout.
+- `components/`
+  - `BuildQueryForm/`: Form for setting query parameters.
+    - `index.tsx`: Main form with unit select, time window, limit, and export button.
+    - `TimeWindowSelect.tsx`: Floating selector for date range with centered popup and title.
+    - `PicoUnitSelect.tsx`, `LimitSelect.tsx`: Dropdown components for unit and data limit.
+  - `ChartsTabs/`: Tabbed interface for chart views.
+    - `ChartsTabs.tsx`: Manages tab state and renders panels.
+    - `TempHumTab.tsx`: Temperature and humidity line chart.
+    - `DevicesTab.tsx`: Binary on/off chart for devices (fan, humidifier, heater).
+    - `ControlLoopTab.tsx`: Binary chart for control loop state.
+
+### Query Form
+
+The `BuildQueryForm` allows users to configure data queries:
+
+- **Unit Selection**: Dropdown to choose which Pico unit to query.
+- **Time Window**: `TimeWindowSelect` provides preset ranges (e.g., last hour, day) and custom date picker.
+- **Data Limit**: Controls the number of data points fetched.
+- **CSV Export**: Downloads query results as CSV file.
+- **Responsiveness**: Form adapts to mobile screens with adjusted layouts.
+
+### Charts
+
+Three chart types using Recharts:
+
+- **TempHum Chart**: Dual-axis line chart showing temperature (°C) and humidity (%) over time.
+- **Devices Chart**: Step chart displaying binary states for fan, humidifier, and heater.
+- **Control Loop Chart**: Binary chart for control loop on/off state.
+
+All charts:
+
+- Use `ResponsiveContainer` for adaptive sizing.
+- Share query parameters from `Charts` context.
+- Include subtitles and responsive elements (e.g., smaller icons on mobile).
+- Wrapped in `GraphTab` molecule for consistent styling.
+
+### State Management
+
+- **Charts Context**: Provides `useCharts()` hook for shared query state.
+- **React Query**: Handles data fetching, caching, and loading states.
+- **Local State**: Form components manage their own state for immediate UI feedback.
+
+### Responsiveness
+
+- **Mobile Optimizations**: Charts adjust height, icon sizes, and column layouts using MUI `useMediaQuery`.
+- **Breakpoints**: Uses MUI theme breakpoints for consistent responsive behavior.
+- **Touch-Friendly**: Larger touch targets and simplified layouts on small screens.
+
+### Key UI Components
+
+- `PageTitle`: Reusable title component with optional actions.
+- `GraphTab`: Molecule for chart panel styling with subtitle support.
+- `TimeWindowSelect`: Custom floating selector with improved UX (centered, titled, no extra spacing).
