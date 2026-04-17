@@ -8,7 +8,7 @@ export function updateItemInAllPages(
   updater: (item: PicoUnit) => PicoUnit,
 ) {
   qc.getQueryCache()
-    .findAll(['picoUnits'])
+    .findAll()
     .forEach((entry) => {
       try {
         const current = qc.getQueryData<PicoUnitListResponseDto>(entry.queryKey as any);
@@ -25,9 +25,8 @@ export function updateItemInAllPages(
 }
 
 export function prependItemToFirstPage(qc: QueryClient, newItem: PicoUnit) {
-  const key = ['picoUnits', 1, undefined, undefined];
   qc.getQueryCache()
-    .findAll(['picoUnits'])
+    .findAll()
     .forEach((entry) => {
       try {
         const cur = qc.getQueryData<PicoUnitListResponseDto>(entry.queryKey as any);

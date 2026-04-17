@@ -1,6 +1,5 @@
 import { omit } from 'lodash';
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import type { ReactNode } from 'react';
 
 import type {
   PicoUnitsApiPicoUnitsControllerListRequest as ListPicoUnitsParams,
@@ -51,7 +50,7 @@ export const PicoUnitsProvider = ({
     [units],
   );
 
-  const updateLocal = useCallback((unit: PicoUnit) => {
+  const updateLocal = useCallback((_unit: PicoUnit) => {
     // This now updates React Query's cache directly instead of maintaining separate state.
     // The mutation helpers in PicoUnit context handle optimistic updates via createOptimisticMutation,
     // which manages the cache lifecycle. updateLocal is kept for backwards compatibility.

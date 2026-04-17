@@ -15,7 +15,6 @@ export function useListPicoUnits(
   const page = params?.page ?? 1;
   const limit = params?.limit ?? 20;
   const enabled = params?.enabled ?? true;
-  const q = params?.q;
 
   // mark as readonly tuple to satisfy queryKey typing
   const queryKey = picoUnitsKeys.list(params);

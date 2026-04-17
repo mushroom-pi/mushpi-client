@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Button, Grid, Typography } from '@mui/material';
 
 import { Error, Loading, PageTitle } from '~components';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
