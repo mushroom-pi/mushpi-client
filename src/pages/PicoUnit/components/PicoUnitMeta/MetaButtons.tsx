@@ -1,9 +1,11 @@
+import React from 'react';
+
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
-import { Button, IconButton, Stack, Tooltip } from '@mui/material';
+import { Box, Button, IconButton, Stack, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import { usePicoUnitContext } from '~ctx/PicoUnit';
@@ -28,7 +30,9 @@ export const MetaButtons: React.FC<MetaButtonsProps> = ({ setDeleteOpen, setEdit
       </Tooltip>
 
       <Button variant="outlined" startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)}>
-        Back
+        <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+          Back
+        </Box>
       </Button>
 
       <Button
@@ -37,7 +41,9 @@ export const MetaButtons: React.FC<MetaButtonsProps> = ({ setDeleteOpen, setEdit
         startIcon={<ShowChartIcon />}
         onClick={() => navigate('/readings')}
       >
-        Readings
+        <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+          Readings
+        </Box>
       </Button>
 
       <Button

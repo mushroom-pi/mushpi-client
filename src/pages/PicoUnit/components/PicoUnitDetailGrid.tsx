@@ -13,20 +13,22 @@ import { PicoUnitTechnicalDetails as TechnicalDetails } from './PicoUnitTechnica
 
 export const PicoUnitDetailGrid: React.FC<OptionalPicoUnitProps> = () => (
   <Grid container spacing={2}>
-    <Grid size={4}>
+    <Grid size={{ xs: 12, md: 4 }}>
       <Overview />
     </Grid>
-    <Grid size={8}>
+    <Grid size={{ xs: 12, md: 8 }}>
       <TechnicalDetails />
     </Grid>
-    <Grid size={6}>
+    <Grid size={{ xs: 12, sm: 6 }}>
       <Resources />
     </Grid>
-    <Grid size={6}>
+    <Grid size={{ xs: 12, sm: 6 }}>
       <Performance />
     </Grid>
-    {[<Controls />, <Devices />, <Mapping />].map((comp) => (
-      <Grid size={4}>{comp}</Grid>
+    {[<Controls />, <Devices />, <Mapping />].map((comp, idx) => (
+      <Grid key={idx} size={{ xs: 12, sm: 6, md: 4 }}>
+        {comp}
+      </Grid>
     ))}
   </Grid>
 );

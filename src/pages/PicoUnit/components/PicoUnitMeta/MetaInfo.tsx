@@ -25,7 +25,7 @@ export const MetaInfo: React.FC<MetaInfoProps> = ({
 
   return (
     <Box>
-      <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, justifyContent: { xs: 'flex-start', sm: 'space-between' }, gap: { xs: 1.5, sm: 0 }, mb: 2 }}>
         <Box>
           <Typography variant="h4" sx={{ wordBreak: 'break-word' }}>
             {pico.name ?? 'No name'}

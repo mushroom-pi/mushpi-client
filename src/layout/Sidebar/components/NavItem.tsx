@@ -7,14 +7,16 @@ type NavItemProps = {
   label: string;
   icon: React.ReactNode;
   end?: boolean;
+  onClick?: () => void;
 };
 
-export function NavItem({ to, label, icon, end }: NavItemProps) {
+export function NavItem({ to, label, icon, end, onClick }: NavItemProps) {
   return (
     <ListItemButton
       component={NavLink}
       to={to}
       end={end}
+      onClick={onClick}
       sx={{
         borderRadius: 1.25,
         px: 1.5,

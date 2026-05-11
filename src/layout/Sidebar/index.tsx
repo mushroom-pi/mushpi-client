@@ -1,3 +1,4 @@
+import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
 import {
   AppBar,
@@ -57,13 +58,25 @@ export default function Sidebar() {
         <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main', fontSize: 18 }}>
           MushPi
         </Typography>
+
+        {/* Close button — only shown on mobile */}
+        {!mdUp && (
+          <IconButton
+            onClick={() => setMobileOpen(false)}
+            aria-label="close drawer"
+            size="small"
+            sx={{ ml: 'auto', color: 'text.secondary' }}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        )}
       </Box>
 
       {/* Navigation */}
       <Box component="nav" sx={{ mt: 0.75 }}>
         <List sx={{ p: 0 }}>
           {navItems.map((it) => (
-            <NavItem key={it.to} {...it} />
+            <NavItem key={it.to} {...it} onClick={() => setMobileOpen(false)} />
           ))}
         </List>
       </Box>
@@ -144,8 +157,7 @@ export default function Sidebar() {
           PaperProps={{
             sx: {
               width: drawerWidth,
-              background:
-                'linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01))',
+              bgcolor: 'background.paper',
               borderRight: '1px solid rgba(255,255,255,0.03)',
             },
           }}

@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import { Route, Routes } from 'react-router-dom';
 
 import Sidebar from './layout/Sidebar';
@@ -7,11 +8,20 @@ import PicoUnits from './pages/PicoUnits';
 import { ReadingsPage } from './pages/Readings';
 import { Server } from './pages/Server';
 
+const drawerWidth = 260;
+
 export default function App() {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh' }}>
+    <Box sx={{ display: { xs: 'block', md: 'flex' }, minHeight: '100vh' }}>
       <Sidebar />
-      <main style={{ flex: 1, padding: 20 }}>
+      <Box
+        component="main"
+        sx={{
+          flex: 1,
+          padding: '20px',
+          marginLeft: { xs: 0, md: `${drawerWidth}px` },
+        }}
+      >
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/pico-units" element={<PicoUnits />} />
@@ -19,7 +29,7 @@ export default function App() {
           <Route path="/readings" element={<ReadingsPage />} />
           <Route path="/server" element={<Server />} />
         </Routes>
-      </main>
-    </div>
+      </Box>
+    </Box>
   );
 }

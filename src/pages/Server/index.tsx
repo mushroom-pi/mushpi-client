@@ -35,7 +35,7 @@ export const Server: FC = () => {
           </Stack>
 
           <Grid container spacing={2}>
-            <Grid size={4}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <InfoCard title="Overview" subtitle="General status" icon={<ThermostatIcon />}>
                 <InfoField label="App version">
                   <BigDisplay content={serverHealth.server?.appVersion} />
@@ -46,7 +46,7 @@ export const Server: FC = () => {
               </InfoCard>
             </Grid>
 
-            <Grid size={4}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }}>
               <InfoCard title="Resources" subtitle="Capacity usage" icon={<DataUsageIcon />}>
                 <InfoField label="Uptime">
                   <ReadableTime seconds={serverHealth.server?.upTime.seconds} variant="body1" />
