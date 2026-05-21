@@ -26,7 +26,7 @@ interface ChartsContextProps {
   initialParams: ListPicoUnitReadingsParams;
 }
 
-const ChartsContext = createContext<ChartsContextValue | undefined>(undefined);
+export const ChartsContext = createContext<ChartsContextValue | undefined>(undefined);
 
 export const ChartsProvider = ({
   children,

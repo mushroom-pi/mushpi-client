@@ -3,6 +3,7 @@ import type React from 'react';
 
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 
+import { PicoUnitBatches as Batches } from './PicoUnitBatches';
 import { PicoUnitControls as Controls } from './PicoUnitControls';
 import { PicoUnitDevices as Devices } from './PicoUnitDevices';
 import { PicoUnitMappingInfo as Mapping } from './PicoUnitMappingInfo';
@@ -30,5 +31,8 @@ export const PicoUnitDetailGrid: React.FC<OptionalPicoUnitProps> = () => (
         {comp}
       </Grid>
     ))}
+    <Grid size={{ xs: 12 }}>
+      <Batches />
+    </Grid>
   </Grid>
 );

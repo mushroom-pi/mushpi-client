@@ -1,0 +1,75 @@
+import { useQuery } from '@tanstack/react-query';
+import { useCallback } from 'react';
+
+import { unwrap } from '~api/adapter';
+import { Readings } from '~api/client';
+import type {
+  ReadingsApiBatchIdReadingsControllerExportCsvForUnitRequest as ExportBatchReadingsParams,
+  ReadingsApiBatchIdReadingsControllerListForBatchRequest as ListBatchReadingsParams,
+  ReadingsListResponseDto,
+} from '~api/generated';
+import { batchKeys } from '~api/queryKeys';
+
+export const useListBatchReadings = (
+  { batchId, start, end, page = 1, limit = 500 }: Partial<ListBatchReadingsParams>,
+  enabled: boolean = true,
+) => {
+  const queryKey = batchKeys.readings(batchId ?? 0, start, end, page, limit);
+
+  return useQuery<ReadingsListResponseDto, unknown, ReadingsListResponseDto>({
+    queryKey,
+    queryFn: async () => {
+      const apiParams: ListBatchReadingsParams = {
+        batchId: batchId!,
+        page,
+        limit,
+        ...(start
+          ? { start: typeof start === 'string' ? start : new Date(start).toISOString() }
+          : {}),
+        ...(end ? { end: typeof end === 'string' ? end : new Date(end).toISOString() } : {}),
+      };
+
+      const resp = await unwrap<ReadingsListResponseDto>(
+        Readings.batchIdReadingsControllerListForBatch(apiParams),
+      );
+      return resp;
+    },
+    enabled: batchId != null && enabled,
+  });
+};
+
+/**
+ * Imperative command to export batch readings as CSV.
+ * Usage:
+ *   const exportCsv = useExportBatchReadingsCmd();
+ *   const blob = await exportCsv({ batchId: 1, start, end });
+ */
+export const useExportBatchReadingsCmd = () => {
+  return useCallback(async (params: Partial<ExportBatchReadingsParams>): Promise<Blob> => {
+    const { batchId, start, end } = params;
+    if (!batchId) throw new Error('batchId is required');
+
+    const apiParams: ExportBatchReadingsParams = {
+      batchId,
+      ...(start
+        ? { start: typeof start === 'string' ? start : new Date(start).toISOString() }
+        : {}),
+      ...(end ? { end: typeof end === 'string' ? end : new Date(end).toISOString() } : {}),
+    };
+
+    const resp = (await unwrap(
+      Readings.batchIdReadingsControllerExportCsvForUnit(apiParams, { responseType: 'blob' }),
+    )) as unknown;
+
+    if (resp instanceof Blob) return resp;
+    if (resp instanceof File) return resp;
+
+    if (resp && typeof resp === 'object' && 'data' in (resp as object)) {
+      const data = (resp as { data: unknown }).data;
+      if (data instanceof Blob || data instanceof File) return data;
+      return new Blob([String(data ?? '')], { type: 'text/csv' });
+    }
+
+    return new Blob([String(resp ?? '')], { type: 'text/csv' });
+  }, []);
+};
