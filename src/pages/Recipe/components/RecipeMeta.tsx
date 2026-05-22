@@ -9,6 +9,7 @@ import {
   IconButton,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import dayjs from 'dayjs';
@@ -30,6 +31,7 @@ type RecipeFormValues = {
 };
 
 type RecipeFormErrors = Partial<Record<keyof RecipeFormValues, string>>;
+type RecipeFormTouched = Partial<Record<keyof RecipeFormValues, boolean>>;
 
 function formatTimestamp(value: string) {
   return dayjs(value).format('DD MMM YYYY HH:mm');
@@ -54,22 +56,23 @@ function validate(values: RecipeFormValues): RecipeFormErrors {
 
   if (!values.name.trim()) errors.name = 'Name is required';
   if (!values.species.trim()) errors.species = 'Species is required';
+
   if (!values.temperature_target.trim()) {
     errors.temperature_target = 'Temperature target is required';
   } else if (Number.isNaN(temperature) || temperature < 0 || temperature > 50) {
-    errors.temperature_target = 'Temperature target must be between 0 and 50';
+    errors.temperature_target = 'Must be between 0 and 50 °C';
   }
 
   if (!values.humidity_target.trim()) {
     errors.humidity_target = 'Humidity target is required';
   } else if (Number.isNaN(humidity) || humidity < 20 || humidity > 90) {
-    errors.humidity_target = 'Humidity target must be between 20 and 90';
+    errors.humidity_target = 'Must be between 20 and 90 %';
   }
 
   if (!values.duration_days.trim()) {
     errors.duration_days = 'Duration is required';
-  } else if (Number.isNaN(duration) || duration < 1) {
-    errors.duration_days = 'Duration must be at least 1 day';
+  } else if (Number.isNaN(duration) || !Number.isInteger(duration) || duration < 1) {
+    errors.duration_days = 'Must be a whole number ≥ 1';
   }
 
   return errors;
@@ -83,6 +86,7 @@ export function RecipeMeta() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [values, setValues] = useState<RecipeFormValues | null>(null);
   const [errors, setErrors] = useState<RecipeFormErrors>({});
+  const [touched, setTouched] = useState<RecipeFormTouched>({});
 
   const initialValues = useMemo(() => (recipe ? toFormValues(recipe) : null), [recipe]);
   const hasChanges = useMemo(() => {
@@ -96,6 +100,7 @@ export function RecipeMeta() {
     if (!editOpen || !recipe) return;
     setValues(toFormValues(recipe));
     setErrors({});
+    setTouched({});
   }, [editOpen, recipe]);
 
   if (!recipe) return null;
@@ -104,18 +109,37 @@ export function RecipeMeta() {
 
   function updateField<K extends keyof RecipeFormValues>(field: K, value: RecipeFormValues[K]) {
     setValues((current) => (current ? { ...current, [field]: value } : current));
-    setErrors((current) => ({ ...current, [field]: undefined }));
+    // Re-validate only touched fields on change
+    setErrors((current) => {
+      if (!touched[field]) return current;
+      const next = values ? validate({ ...values, [field]: value }) : {};
+      return { ...current, [field]: next[field] };
+    });
+  }
+
+  function touchField(field: keyof RecipeFormValues) {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    if (!values) return;
+    const next = validate(values);
+    setErrors((prev) => ({ ...prev, [field]: next[field] }));
   }
 
   function closeEditDialog() {
     setEditOpen(false);
     setValues(initialValues);
     setErrors({});
+    setTouched({});
   }
 
   async function handleSave(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!values) return;
+
+    // Touch all fields to show any remaining errors
+    const allTouched: RecipeFormTouched = Object.fromEntries(
+      Object.keys(values).map((k) => [k, true]),
+    ) as RecipeFormTouched;
+    setTouched(allTouched);
 
     const nextErrors = validate(values);
     setErrors(nextErrors);
@@ -150,45 +174,47 @@ export function RecipeMeta() {
 
   return (
     <>
-      <Stack position="relative">
-        <EditableInfoCard
-          title="Recipe details"
-          subtitle={`Updated ${formatTimestamp(recipe.updated_at)}`}
-          onClickEdit={() => setEditOpen(true)}
-        >
-          <InfoField label="Name">
-            <Typography>{recipe.name}</Typography>
-          </InfoField>
-          <InfoField label="Species">
-            <Typography>{recipe.species}</Typography>
-          </InfoField>
-          <InfoField label="Temperature target">
-            <Typography>{recipe.temperature_target} °C</Typography>
-          </InfoField>
-          <InfoField label="Humidity target">
-            <Typography>{recipe.humidity_target}%</Typography>
-          </InfoField>
-          <InfoField label="Duration">
-            <Typography>{recipe.duration_days} days</Typography>
-          </InfoField>
-          <InfoField label="Notes">
-            <Typography>{recipe.notes || '—'}</Typography>
-          </InfoField>
-          <InfoField label="Created">
-            <Typography>{formatTimestamp(recipe.created_at)}</Typography>
-          </InfoField>
-        </EditableInfoCard>
+      <EditableInfoCard
+        title="Recipe details"
+        subtitle={`Updated ${formatTimestamp(recipe.updated_at)}`}
+        onClickEdit={() => setEditOpen(true)}
+        headerActions={
+          <Tooltip title="Delete recipe">
+            <IconButton
+              aria-label="delete recipe"
+              color="error"
+              size="small"
+              onClick={() => setDeleteOpen(true)}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        }
+      >
+        <InfoField label="Name">
+          <Typography>{recipe.name}</Typography>
+        </InfoField>
+        <InfoField label="Species">
+          <Typography>{recipe.species}</Typography>
+        </InfoField>
+        <InfoField label="Temperature target">
+          <Typography>{recipe.temperature_target} °C</Typography>
+        </InfoField>
+        <InfoField label="Humidity target">
+          <Typography>{recipe.humidity_target}%</Typography>
+        </InfoField>
+        <InfoField label="Duration">
+          <Typography>{recipe.duration_days} days</Typography>
+        </InfoField>
+        <InfoField label="Notes">
+          <Typography>{recipe.notes || '—'}</Typography>
+        </InfoField>
+        <InfoField label="Created">
+          <Typography>{formatTimestamp(recipe.created_at)}</Typography>
+        </InfoField>
+      </EditableInfoCard>
 
-        <IconButton
-          aria-label="delete recipe"
-          color="error"
-          onClick={() => setDeleteOpen(true)}
-          sx={{ position: 'absolute', right: 56, top: 12 }}
-        >
-          <DeleteIcon fontSize="small" />
-        </IconButton>
-      </Stack>
-
+      {/* Edit dialog */}
       <Dialog
         open={editOpen}
         onClose={updateRecipe.isLoading ? undefined : closeEditDialog}
@@ -201,18 +227,20 @@ export function RecipeMeta() {
             <TextField
               label="Name"
               value={values?.name ?? ''}
-              onChange={(event) => updateField('name', event.target.value)}
+              onChange={(e) => updateField('name', e.target.value)}
+              onBlur={() => touchField('name')}
               error={!!errors.name}
-              helperText={errors.name}
+              helperText={errors.name ?? ' '}
               required
               fullWidth
             />
             <TextField
               label="Species"
               value={values?.species ?? ''}
-              onChange={(event) => updateField('species', event.target.value)}
+              onChange={(e) => updateField('species', e.target.value)}
+              onBlur={() => touchField('species')}
               error={!!errors.species}
-              helperText={errors.species}
+              helperText={errors.species ?? ' '}
               required
               fullWidth
             />
@@ -220,9 +248,10 @@ export function RecipeMeta() {
               label="Temperature target (°C)"
               type="number"
               value={values?.temperature_target ?? ''}
-              onChange={(event) => updateField('temperature_target', event.target.value)}
+              onChange={(e) => updateField('temperature_target', e.target.value)}
+              onBlur={() => touchField('temperature_target')}
               error={!!errors.temperature_target}
-              helperText={errors.temperature_target}
+              helperText={errors.temperature_target ?? '0–50 °C'}
               required
               fullWidth
               slotProps={{ input: { inputProps: { min: 0, max: 50, step: 0.1 } } }}
@@ -231,9 +260,10 @@ export function RecipeMeta() {
               label="Humidity target (%)"
               type="number"
               value={values?.humidity_target ?? ''}
-              onChange={(event) => updateField('humidity_target', event.target.value)}
+              onChange={(e) => updateField('humidity_target', e.target.value)}
+              onBlur={() => touchField('humidity_target')}
               error={!!errors.humidity_target}
-              helperText={errors.humidity_target}
+              helperText={errors.humidity_target ?? '20–90 %'}
               required
               fullWidth
               slotProps={{ input: { inputProps: { min: 20, max: 90, step: 0.1 } } }}
@@ -242,9 +272,10 @@ export function RecipeMeta() {
               label="Duration (days)"
               type="number"
               value={values?.duration_days ?? ''}
-              onChange={(event) => updateField('duration_days', event.target.value)}
+              onChange={(e) => updateField('duration_days', e.target.value)}
+              onBlur={() => touchField('duration_days')}
               error={!!errors.duration_days}
-              helperText={errors.duration_days}
+              helperText={errors.duration_days ?? 'Minimum 1 day'}
               required
               fullWidth
               slotProps={{ input: { inputProps: { min: 1, step: 1 } } }}
@@ -252,7 +283,7 @@ export function RecipeMeta() {
             <TextField
               label="Notes"
               value={values?.notes ?? ''}
-              onChange={(event) => updateField('notes', event.target.value)}
+              onChange={(e) => updateField('notes', e.target.value)}
               fullWidth
               multiline
               minRows={3}
@@ -274,6 +305,7 @@ export function RecipeMeta() {
         </DialogActions>
       </Dialog>
 
+      {/* Delete dialog */}
       <Dialog
         open={deleteOpen}
         onClose={deleteRecipe.isLoading ? undefined : () => setDeleteOpen(false)}
