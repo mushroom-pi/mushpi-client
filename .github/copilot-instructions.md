@@ -13,7 +13,7 @@ src/
 ├── api/
 │   ├── client.ts           # axios instance (baseURL from VITE_API_BASE_URL)
 │   ├── adapter.ts          # instantiates generated API classes with the axios client
-│   ├── queryKeys.ts        # React Query key factories
+│   ├── queryKeys.ts        # React Query key factories (recipeKeys, batchKeys included)
 │   └── generated/api.ts    # AUTO-GENERATED — never edit manually
 ├── components/ui/
 │   ├── atoms/              # Stateless presentational (Card, InfoField, OnOffInfo, etc.)
@@ -23,9 +23,18 @@ src/
 │   ├── PicoUnit/           # Context + hooks + mutations for a single unit
 │   │   └── mutations/      # controlLoop, delete, outputs, setPoints, update (one file each)
 │   ├── PicoUnits/          # Context + hooks for the units list
+│   ├── Recipe/             # Context + hooks + mutations for a single recipe
+│   │   └── mutations/      # create, delete, update (one file each)
+│   ├── Recipes/            # Context + hooks for the recipes list
+│   ├── Batch/              # Context + hooks + mutations for a single batch
+│   │   └── mutations/      # create, delete, update, createRecipeFromBatch (one file each)
+│   ├── Batches/            # Context + hooks for the batches list
 │   └── Charts/             # Shared chart query state (unit, date range, limit)
+│       ├── provider.tsx    # ChartsProvider for unit readings
+│       └── batchProvider.tsx  # BatchChartsProvider — sources data from a specific batch
 ├── hooks/
 │   ├── useReadings.ts      # Fetch + transform readings for charts
+│   ├── useBatchReadings.ts # Fetch + transform readings for a specific batch
 │   ├── useServerHealth.ts  # Server monitoring/health
 │   └── useAsyncWithToast.ts
 ├── layout/
@@ -34,9 +43,13 @@ src/
 ├── pages/
 │   ├── Dashboard.tsx       # Overview of all units
 │   ├── PicoUnits/          # Units list page
-│   ├── PicoUnit/           # Detail page: meta, controls, setpoints, outputs, readings, devices
-│   │   └── components/     # PicoUnitMeta, PicoUnitControls, PicoUnitDevices, PicoUnitOverview, …
+│   ├── PicoUnit/           # Detail page: meta, controls, setpoints, outputs, readings, devices, batches
+│   │   └── components/     # PicoUnitMeta, PicoUnitControls, PicoUnitDevices, PicoUnitBatches, …
 │   ├── Readings/           # Chart page: query builder + TempHum / Devices / ControlLoop charts
+│   ├── Recipes/            # Recipes list page (sortable table + create dialog)
+│   ├── Recipe/             # Recipe detail page (meta + batches started from this recipe)
+│   ├── Batches/            # Batches list page (status filter + create dialog)
+│   ├── Batch/              # Batch detail page (meta + chart tabs via BatchChartsProvider)
 │   └── Server/             # Server health page
 ├── theme/mushroomTheme.ts  # Custom MUI theme
 ├── types/charts.ts
@@ -57,9 +70,9 @@ Always regenerate after any `mushpi-server` endpoint change.
 ## State Management
 
 - Use **React Query** for all server state — no `useEffect` + `useState` for fetched data.
-- Query keys live in `src/api/queryKeys.ts`.
-- Consume context hooks (`usePicoUnit()`, `usePicoUnits()`, `useCharts()`) — avoid prop-drilling.
-- Mutations live in `src/contexts/PicoUnit/mutations/` (one file per concern).
+- Query keys live in `src/api/queryKeys.ts` (`picoUnitKeys`, `recipeKeys`, `batchKeys`).
+- Consume context hooks (`usePicoUnit()`, `usePicoUnits()`, `useRecipe()`, `useRecipes()`, `useBatch()`, `useBatches()`, `useCharts()`) — avoid prop-drilling.
+- Mutations live in the entity's `mutations/` folder (one file per concern).
 
 ## Routing
 
@@ -69,6 +82,10 @@ Always regenerate after any `mushpi-server` endpoint change.
 | `/pico-units`     | Units list    |
 | `/pico-units/:id` | Unit detail   |
 | `/readings`       | Charts        |
+| `/recipes`        | Recipes list  |
+| `/recipes/:id`    | Recipe detail |
+| `/batches`        | Batches list  |
+| `/batches/:id`    | Batch detail  |
 | `/server`         | Server health |
 
 ## Component Conventions
@@ -76,20 +93,41 @@ Always regenerate after any `mushpi-server` endpoint change.
 - **Atoms**: stateless, props only.
 - **Molecules**: may connect to context/hooks.
 - Use **MUI components** over raw HTML; use `sx` prop for one-off styles.
-- Use `ModalDialog` for all confirmation/edit dialogs.
+- Use `ModalDialog` for dialogs **only within PicoUnit pages** — it is coupled to `usePicoUnitContext()`. All other pages (Recipes, Batches) use MUI `Dialog` directly.
 - Use `OnOffInfo` / `OnOffInput` for boolean device states.
-- Use `EditableInfoCard` for display + inline edit.
+- Use `EditableInfoCard` for display + inline edit. The `headerActions` prop renders extra icon buttons (e.g., delete) to the left of the edit button in the card header.
 - `mushroomTheme.ts` for global theme overrides.
 
 ## Charts
 
-Three Recharts cards in `/readings`:
+Three Recharts tabs in `/readings` and `/batches/:id`:
 
-- `TempHumCard` — temperature + humidity line chart.
-- `DevicesCard` — binary on/off for fan, humidifier, heater.
-- `ControlLoopCard` — binary on/off for control loop.
+- `TempHumTab` — temperature + humidity line chart.
+- `DevicesTab` — binary on/off for fan, humidifier, heater.
+- `ControlLoopTab` — binary on/off for control loop.
 
-Shared query params (unit, date range, limit) come from `Charts` context.
+For unit readings (`/readings`), shared query params come from `ChartsProvider` (`useCharts()`).
+For batch readings (`/batches/:id`), `BatchChartsProvider` sources data from `useBatchReadings` and provides the same `ChartsContextValue` shape — the chart tabs work unchanged for both contexts.
+
+## Recipes
+
+The Recipes section (`/recipes`, `/recipes/:id`) manages reusable grow condition templates.
+
+- **List page** (`src/pages/Recipes/`): sortable table (name, species, temperature, duration, created date), default sort alphabetically by name, create-recipe dialog.
+- **Detail page** (`src/pages/Recipe/`): `RecipeMeta` card (view + inline edit + delete via `headerActions`), `RecipeBatches` table listing all batches that used this recipe.
+- **Context**: `RecipeProvider` / `useRecipeContext()` from `~ctx/Recipe`; list hooks from `~ctx/Recipes`.
+- **Validation pattern**: blur-based field validation with `touched` state; hint text in `helperText` when no error (e.g., "0–50 °C"); on submit all fields are force-touched.
+
+## Batches
+
+The Batches section (`/batches`, `/batches/:id`) represents fixed-period growing runs tied to a Pico unit.
+
+- **List page** (`src/pages/Batches/`): table with status filter (in-progress / finished / all), create-batch dialog.
+- **Detail page** (`src/pages/Batch/`): `BatchMeta` card (view + edit + delete; "Save as Recipe" shown only when batch is finished), chart tabs (`TempHumTab`, `DevicesTab`, `ControlLoopTab`) driven by `BatchChartsProvider`.
+- **Unit detail page** (`/pico-units/:id`): `PicoUnitBatches` section shows the unit's batches with the current in-progress batch highlighted; "New Batch" button inline.
+- **Context**: `BatchProvider` / `useBatchContext()` from `~ctx/Batch`; list hooks from `~ctx/Batches`.
+- **`finish_at` semantics**: `null` → in-progress; set → finished. "Save as Recipe" only shown when finished.
+- **Known quirk**: `picoUnitIdBatchesControllerGetCurrent` requires a `batchId` param (generator bug — not in the URL). Pass `batchId: 0`; it is ignored.
 
 ## Environment
 
