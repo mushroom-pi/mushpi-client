@@ -4,6 +4,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   TextField,
 } from '@mui/material';
@@ -13,8 +17,11 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { unwrap } from '~api/adapter';
 import { Batches } from '~api/client';
-import type { Batch, CreateBatchDto } from '~api/generated';
+import { BatchesControllerListStatusEnum, type Batch, type CreateBatchDto } from '~api/generated';
 import { batchKeys } from '~api/queryKeys';
+import { useListBatches } from '~ctx/Batches';
+import { useListPicoUnits } from '~ctx/PicoUnits';
+import { useListRecipes } from '~ctx/Recipes';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 
 const toDateTimeLocal = (value?: string | null) =>
@@ -45,6 +52,24 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
   const [notes, setNotes] = useState('');
   const [recipeId, setRecipeId] = useState('');
 
+  const { data: picoUnitsData } = useListPicoUnits({ limit: 100 }, { enabled: open });
+  const { data: recipesData } = useListRecipes({ limit: 100 }, { enabled: open });
+  const { data: activeBatchesData } = useListBatches(
+    { status: BatchesControllerListStatusEnum.InProgress, limit: 100 },
+    { enabled: open },
+  );
+
+  const picoUnits = picoUnitsData?.items ?? [];
+  const recipes = recipesData?.items ?? [];
+
+  const busyUnitIds = useMemo(() => {
+    const ids = new Set<number>();
+    for (const batch of activeBatchesData?.items ?? []) {
+      ids.add(batch.pico_unit_id);
+    }
+    return ids;
+  }, [activeBatchesData]);
+
   useEffect(() => {
     if (!open) return;
 
@@ -61,6 +86,16 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
     setNotes('');
     setRecipeId(defaultValues?.recipeId != null ? String(defaultValues.recipeId) : '');
   }, [defaultValues, open]);
+
+  function handleRecipeChange(newRecipeId: string) {
+    setRecipeId(newRecipeId);
+    if (!newRecipeId) return;
+    const recipe = recipes.find((r) => String(r.id) === newRecipeId);
+    if (!recipe) return;
+    setSpecies(recipe.species);
+    setTemperatureTarget(String(recipe.temperature_target));
+    setHumidityTarget(String(recipe.humidity_target));
+  }
 
   const mutation = useMutation<Batch, unknown, CreateBatchDto>({
     mutationFn: async (createBatchDto) => {
@@ -99,14 +134,42 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
       <DialogTitle>New Batch</DialogTitle>
       <DialogContent dividers>
         <Stack spacing={2} mt={0.5}>
-          <TextField
-            label="Pico Unit ID"
-            type="number"
-            value={picoUnitId}
-            onChange={(event) => setPicoUnitId(event.target.value)}
-            required
-            fullWidth
-          />
+          <FormControl fullWidth required>
+            <InputLabel id="create-batch-unit-label">Pico Unit</InputLabel>
+            <Select
+              labelId="create-batch-unit-label"
+              value={picoUnitId}
+              onChange={(e) => setPicoUnitId(e.target.value)}
+              label="Pico Unit"
+            >
+              {picoUnits.map((unit) => (
+                <MenuItem key={unit.id} value={String(unit.id)} disabled={busyUnitIds.has(unit.id)}>
+                  {unit.name ?? unit.handle}
+                  {busyUnitIds.has(unit.id) ? ' — active batch in progress' : ''}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth>
+            <InputLabel id="create-batch-recipe-label">Recipe</InputLabel>
+            <Select
+              labelId="create-batch-recipe-label"
+              value={recipeId}
+              onChange={(e) => handleRecipeChange(e.target.value)}
+              label="Recipe"
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {recipes.map((recipe) => (
+                <MenuItem key={recipe.id} value={String(recipe.id)}>
+                  {recipe.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <TextField
             label="Start"
             type="datetime-local"
@@ -150,13 +213,6 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
             fullWidth
             multiline
             minRows={3}
-          />
-          <TextField
-            label="Recipe ID"
-            type="number"
-            value={recipeId}
-            onChange={(event) => setRecipeId(event.target.value)}
-            fullWidth
           />
         </Stack>
       </DialogContent>
