@@ -87,6 +87,10 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
     setRecipeId(defaultValues?.recipeId != null ? String(defaultValues.recipeId) : '');
   }, [defaultValues, open]);
 
+  function computeFinishAt(start: string, durationDays: number) {
+    return dayjs(start).add(durationDays, 'day').format('YYYY-MM-DDTHH:mm');
+  }
+
   function handleRecipeChange(newRecipeId: string) {
     setRecipeId(newRecipeId);
     if (!newRecipeId) return;
@@ -95,6 +99,15 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
     setSpecies(recipe.species);
     setTemperatureTarget(String(recipe.temperature_target));
     setHumidityTarget(String(recipe.humidity_target));
+    setFinishAt(computeFinishAt(startAt, recipe.duration_days));
+  }
+
+  function handleStartAtChange(newStartAt: string) {
+    setStartAt(newStartAt);
+    if (!recipeId) return;
+    const recipe = recipes.find((r) => String(r.id) === recipeId);
+    if (!recipe) return;
+    setFinishAt(computeFinishAt(newStartAt, recipe.duration_days));
   }
 
   const mutation = useMutation<Batch, unknown, CreateBatchDto>({
@@ -174,7 +187,7 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
             label="Start"
             type="datetime-local"
             value={startAt}
-            onChange={(event) => setStartAt(event.target.value)}
+            onChange={(event) => handleStartAtChange(event.target.value)}
             fullWidth
             slotProps={{ inputLabel: { shrink: true } }}
           />
