@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -10,6 +11,7 @@ import {
   Select,
   Stack,
   TextField,
+  Typography,
 } from '@mui/material';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
@@ -64,13 +66,28 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
   const picoUnits = picoUnitsData?.items ?? [];
   const recipes = recipesData?.items ?? [];
 
-  const busyUnitIds = useMemo(() => {
-    const ids = new Set<number>();
+  const activeBatchByUnitId = useMemo(() => {
+    const map = new Map<number, Batch>();
     for (const batch of activeBatchesData?.items ?? []) {
-      ids.add(batch.pico_unit_id);
+      map.set(batch.pico_unit_id, batch);
     }
-    return ids;
+    return map;
   }, [activeBatchesData]);
+
+  const busyUnitIds = useMemo(() => new Set(activeBatchByUnitId.keys()), [activeBatchByUnitId]);
+
+  const activeBatch = picoUnitId ? activeBatchByUnitId.get(Number(picoUnitId)) : undefined;
+
+  const startAtConflict = useMemo(() => {
+    if (!activeBatch) return null;
+    if (!activeBatch.finish_at) {
+      return 'This unit has an active batch with no scheduled end — future batches cannot be planned.';
+    }
+    if (!dayjs(startAt).isAfter(dayjs(activeBatch.finish_at))) {
+      return `Start must be after the active batch ends (${toDateTimeLocal(activeBatch.finish_at)}).`;
+    }
+    return null;
+  }, [activeBatch, startAt]);
 
   useEffect(() => {
     if (!open) return;
@@ -89,6 +106,24 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
     setNotes('');
     setRecipeId(defaultValues?.recipeId != null ? String(defaultValues.recipeId) : '');
   }, [defaultValues, open]);
+
+  // When active-batch data loads after dialog is already open, auto-adjust startAt if it conflicts.
+  // recipeId and recipes are intentionally read from the closure at effect-run time (not in deps)
+  // to avoid re-running on every keystroke in the Start field.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!open || !picoUnitId) return;
+    const active = activeBatchByUnitId.get(Number(picoUnitId));
+    if (!active?.finish_at) return;
+    if (dayjs(startAt).isAfter(dayjs(active.finish_at))) return;
+    const newStartAt = dayjs(active.finish_at).add(1, 'minute').format('YYYY-MM-DDTHH:mm');
+    setStartAt(newStartAt);
+    if (recipeId) {
+      const recipe = recipes.find((r) => String(r.id) === recipeId);
+      if (recipe) setFinishAt(dayjs(newStartAt).add(recipe.duration_days, 'day').format('YYYY-MM-DDTHH:mm'));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, picoUnitId, activeBatchByUnitId]);
 
   function computeFinishAt(start: string, durationDays: number) {
     return dayjs(start).add(durationDays, 'day').format('YYYY-MM-DDTHH:mm');
@@ -113,6 +148,19 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
     setFinishAt(computeFinishAt(newStartAt, recipe.duration_days));
   }
 
+  function handleUnitChange(newUnitId: string) {
+    setPicoUnitId(newUnitId);
+    const active = newUnitId ? activeBatchByUnitId.get(Number(newUnitId)) : undefined;
+    if (!active?.finish_at) return;
+    if (dayjs(startAt).isAfter(dayjs(active.finish_at))) return;
+    const newStartAt = dayjs(active.finish_at).add(1, 'minute').format('YYYY-MM-DDTHH:mm');
+    setStartAt(newStartAt);
+    if (recipeId) {
+      const recipe = recipes.find((r) => String(r.id) === recipeId);
+      if (recipe) setFinishAt(computeFinishAt(newStartAt, recipe.duration_days));
+    }
+  }
+
   const mutation = useMutation<Batch, unknown, CreateBatchDto>({
     mutationFn: async (createBatchDto) => {
       return unwrap<Batch>(Batches.batchesControllerCreate({ createBatchDto }));
@@ -123,8 +171,8 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
   });
 
   const canSubmit = useMemo(() => {
-    return picoUnitId.trim() !== '' && startAt.trim() !== '';
-  }, [picoUnitId, startAt]);
+    return picoUnitId.trim() !== '' && startAt.trim() !== '' && !startAtConflict;
+  }, [picoUnitId, startAt, startAtConflict]);
 
   const handleCreate = async () => {
     const dto: CreateBatchDto = {
@@ -156,15 +204,26 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
             <Select
               labelId="create-batch-unit-label"
               value={picoUnitId}
-              onChange={(e) => setPicoUnitId(e.target.value)}
+              onChange={(e) => handleUnitChange(e.target.value)}
               label="Pico Unit"
             >
-              {picoUnits.map((unit) => (
-                <MenuItem key={unit.id} value={String(unit.id)} disabled={busyUnitIds.has(unit.id)}>
-                  {unit.name ?? unit.handle}
-                  {busyUnitIds.has(unit.id) ? ' — active batch in progress' : ''}
-                </MenuItem>
-              ))}
+              {picoUnits.map((unit) => {
+                const isBusy = busyUnitIds.has(unit.id);
+                return (
+                  <MenuItem
+                    key={unit.id}
+                    value={String(unit.id)}
+                    sx={{ flexDirection: 'column', alignItems: 'flex-start' }}
+                  >
+                    <Box>{unit.name ?? unit.handle}</Box>
+                    {isBusy && (
+                      <Typography variant="caption" color="warning.main">
+                        ⚠ Active batch — future start only
+                      </Typography>
+                    )}
+                  </MenuItem>
+                );
+              })}
             </Select>
           </FormControl>
 
@@ -202,6 +261,8 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
             onChange={(event) => handleStartAtChange(event.target.value)}
             fullWidth
             slotProps={{ inputLabel: { shrink: true } }}
+            error={!!startAtConflict}
+            helperText={startAtConflict ?? undefined}
           />
           <TextField
             label="Finish"
