@@ -11,3 +11,5 @@ export { DataTable } from './DataTable';
 export type { DataTableColumn, DataTableProps } from './DataTable';
 export { BatchForm } from './BatchForm';
 export type { BatchFormProps } from './BatchForm';
+export { RecipeForm } from './RecipeForm';
+export type { RecipeFormProps } from './RecipeForm';
