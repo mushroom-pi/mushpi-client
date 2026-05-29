@@ -53,8 +53,10 @@ src/
 │   └── Server/             # Server health page
 ├── theme/mushroomTheme.ts  # Custom MUI theme
 ├── types/charts.ts
-└── utils/methods.ts
+└── utils/methods.ts        # Shared pure helpers (toDateTimeLocal, downsampleChartPoints, …)
 ```
+
+Path aliases (`vite.config.ts` + `tsconfig.app.json`): `~api`, `~ctx`, `~hook`, `~type`, `~comp`, `~components`, `~layout`, `~utils`.
 
 ## API Client
 
@@ -97,6 +99,31 @@ Always regenerate after any `mushpi-server` endpoint change.
 - Use `OnOffInfo` / `OnOffInput` for boolean device states.
 - Use `EditableInfoCard` for display + inline edit. The `headerActions` prop renders extra icon buttons (e.g., delete) to the left of the edit button in the card header.
 - `mushroomTheme.ts` for global theme overrides.
+
+## Complex Component Folders
+
+When a component grows beyond a simple render — especially dialogs and forms with significant state, effects, handlers, or mutations — convert it from a single `.tsx` file into a **folder** of the same name. The folder structure is:
+
+```
+ComponentName/
+├── index.tsx         # Pure JSX only — no logic, no state. Destructures from the hook and renders.
+├── useComponentForm.ts  # Custom hook: all useState, useEffect, useMemo, useMutation, handlers.
+├── interfaces.ts     # TypeScript interfaces/types specific to this component.
+└── methods.ts        # Pure helper functions specific to this component (not generic enough for ~utils/methods).
+```
+
+**Rules:**
+- `index.tsx` is declarative only — it calls the hook, destructures everything it needs, and returns JSX.
+- `useXxxForm.ts` owns the entire "brain": field state, derived state (`useMemo`), effects, event handlers, the mutation, and the submit function. It returns a flat object grouped by category (field state / setters / data / validation / handlers / mutation).
+- `interfaces.ts` holds the props interface and any other types used across files in the folder.
+- `methods.ts` holds pure, component-scoped helpers (e.g., date formatting specific to this form). Functions that are reused across multiple components belong in `~utils/methods` instead.
+- The folder resolves transparently to consumers — `import { X } from './components/ComponentName'` continues to work unchanged.
+
+**Example** — `CreateBatchDialog/`:
+- `index.tsx`: renders the MUI `<Dialog>` and its fields; no `useState` or logic.
+- `useCreateBatchForm.ts`: all state, active-batch conflict detection, auto-adjust effects, recipe-change handler, mutation.
+- `interfaces.ts`: `CreateBatchDialogProps`.
+- `methods.ts`: `computeFinishAt`, `nowDateTimeLocal`.
 
 ## Charts
 

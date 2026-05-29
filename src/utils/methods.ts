@@ -1,4 +1,10 @@
+import dayjs from 'dayjs';
+
 import type { ChartPoint } from '~type/charts';
+
+/** Formats an ISO date string for use in a datetime-local input. Returns '' for null/undefined. */
+export const toDateTimeLocal = (value?: string | null): string =>
+  value ? dayjs(value).format('YYYY-MM-DDTHH:mm') : '';
 
 type OnOffChartKey = 'fan' | 'heater' | 'humidifier' | 'control_loop';
 

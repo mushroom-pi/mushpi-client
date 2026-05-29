@@ -35,7 +35,8 @@
       "~type/*": ["src/types/*"],
       "~comp/*": ["src/components/*"],
       "~components": ["src/components/index.ts"],
-      "~layout/*": ["src/layout/*"]
+      "~layout/*": ["src/layout/*"],
+      "~utils/*": ["src/utils/*"]
     }
   },
   "include": ["."]

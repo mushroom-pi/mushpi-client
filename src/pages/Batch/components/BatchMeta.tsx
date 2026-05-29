@@ -22,14 +22,12 @@ import type { BatchStatusEnum, UpdateBatchDto } from '~api/generated';
 import { EditableInfoCard, InfoField, PageTitle } from '~components';
 import { useBatchContext } from '~ctx/Batch';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
+import { toDateTimeLocal } from '~utils/methods';
 
 const formatDateTime = (value?: string | null) => {
   if (!value) return 'In progress';
   return dayjs(value).format('DD MMM YYYY HH:mm');
 };
-
-const toDateTimeLocal = (value?: string | null) =>
-  value ? dayjs(value).format('YYYY-MM-DDTHH:mm') : '';
 
 export const BatchMeta = () => {
   const navigate = useNavigate();

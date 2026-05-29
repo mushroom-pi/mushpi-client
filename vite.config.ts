@@ -17,6 +17,7 @@ export default defineConfig({
       { find: '~comp', replacement: path.resolve(__dirname, 'src/components') },
       { find: '~components', replacement: path.resolve(__dirname, 'src/components/index.ts') },
       { find: '~layout', replacement: path.resolve(__dirname, 'src/layout') },
+      { find: '~utils', replacement: path.resolve(__dirname, 'src/utils') },
     ],
   },
 });
