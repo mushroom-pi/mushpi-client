@@ -3,10 +3,9 @@ import { Button, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import {
-  type BatchesControllerListStatusEnum as BatchStatus,
-  BatchesControllerListStatusEnum,
-} from '~api/generated';
+import { BatchesControllerListStatusEnum } from '~api/generated';
+
+type BatchStatus = (typeof BatchesControllerListStatusEnum)[keyof typeof BatchesControllerListStatusEnum];
 import { Error, Loading, PageTitle } from '~components';
 import { useListBatches } from '~ctx/Batches';
 import { Page } from '~layout/Page';
@@ -63,6 +62,7 @@ export default function BatchesPage() {
           aria-label="Batch status filter"
         >
           <ToggleButton value="all">All</ToggleButton>
+          <ToggleButton value={BatchesControllerListStatusEnum.Planned}>Planned</ToggleButton>
           <ToggleButton value={BatchesControllerListStatusEnum.InProgress}>
             In Progress
           </ToggleButton>

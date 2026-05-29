@@ -13,7 +13,7 @@ import { batchKeys } from '~api/queryKeys';
 
 export function useListBatches(
   params?: Partial<ListBatchesParams>,
-  queryOptions?: UseQueryOptions<BatchListResponseDto, unknown, BatchListResponseDto>,
+  queryOptions?: Omit<UseQueryOptions<BatchListResponseDto, unknown, BatchListResponseDto>, 'queryKey' | 'queryFn'>,
 ) {
   const page = params?.page ?? 1;
   const limit = params?.limit ?? 20;

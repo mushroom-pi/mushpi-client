@@ -33,6 +33,7 @@ interface CreateBatchDialogProps {
   defaultValues?: {
     picoUnitId?: number;
     recipeId?: number;
+    description?: string;
     species?: string;
     temperatureTarget?: number;
     humidityTarget?: number;
@@ -46,6 +47,7 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
   const [picoUnitId, setPicoUnitId] = useState('');
   const [startAt, setStartAt] = useState(toDateTimeLocal());
   const [finishAt, setFinishAt] = useState('');
+  const [description, setDescription] = useState('');
   const [species, setSpecies] = useState('');
   const [temperatureTarget, setTemperatureTarget] = useState('');
   const [humidityTarget, setHumidityTarget] = useState('');
@@ -76,6 +78,7 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
     setPicoUnitId(defaultValues?.picoUnitId != null ? String(defaultValues.picoUnitId) : '');
     setStartAt(toDateTimeLocal());
     setFinishAt('');
+    setDescription(defaultValues?.description ?? '');
     setSpecies(defaultValues?.species ?? '');
     setTemperatureTarget(
       defaultValues?.temperatureTarget != null ? String(defaultValues.temperatureTarget) : '',
@@ -128,6 +131,7 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
       pico_unit_id: Number(picoUnitId),
       start_at: dayjs(startAt).toISOString(),
       finish_at: finishAt ? dayjs(finishAt).toISOString() : null,
+      description: description.trim() || undefined,
       species: species.trim() || undefined,
       temperature_target: temperatureTarget === '' ? undefined : Number(temperatureTarget),
       humidity_target: humidityTarget === '' ? undefined : Number(humidityTarget),
@@ -182,6 +186,14 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
               ))}
             </Select>
           </FormControl>
+
+          <TextField
+            label="Description"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            fullWidth
+            placeholder="Optional name or label for this batch"
+          />
 
           <TextField
             label="Start"

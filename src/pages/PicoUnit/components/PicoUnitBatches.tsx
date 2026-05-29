@@ -27,7 +27,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { unwrap } from '~api/adapter';
 import { Batches } from '~api/client';
-import type { Batch, CreateBatchDto } from '~api/generated';
+import type { Batch, BatchStatusEnum, CreateBatchDto } from '~api/generated';
 import { batchKeys } from '~api/queryKeys';
 import { usePicoUnitBatches, usePicoUnitCurrentBatch } from '~ctx/Batches';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
@@ -39,11 +39,20 @@ function formatDate(iso?: string | null) {
 }
 
 function StatusChip({ batch }: { batch: Batch }) {
-  const isFinished = !!batch.finish_at;
+  const STATUS_LABEL: Record<BatchStatusEnum, string> = {
+    planned: 'Planned',
+    'in-progress': 'In progress',
+    finished: 'Finished',
+  };
+  const STATUS_COLOR: Record<BatchStatusEnum, 'info' | 'warning' | 'success'> = {
+    planned: 'info',
+    'in-progress': 'warning',
+    finished: 'success',
+  };
   return (
     <Chip
-      label={isFinished ? 'Finished' : 'In progress'}
-      color={isFinished ? 'success' : 'warning'}
+      label={STATUS_LABEL[batch.status]}
+      color={STATUS_COLOR[batch.status]}
       size="small"
     />
   );

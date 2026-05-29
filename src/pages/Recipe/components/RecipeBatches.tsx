@@ -26,7 +26,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { unwrap } from '~api/adapter';
 import { Batches } from '~api/client';
-import type { Batch, CreateBatchDto, Recipe } from '~api/generated';
+import type { Batch, BatchStatusEnum, CreateBatchDto, Recipe } from '~api/generated';
 import { batchKeys, recipeKeys } from '~api/queryKeys';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { useRecipeContext } from '~ctx/Recipe';
@@ -43,12 +43,20 @@ function formatDate(iso?: string | null) {
 }
 
 function StatusChip({ batch }: { batch: Batch }) {
-  const isFinished = !!batch.finish_at;
-
+  const STATUS_LABEL: Record<BatchStatusEnum, string> = {
+    planned: 'Planned',
+    'in-progress': 'In progress',
+    finished: 'Finished',
+  };
+  const STATUS_COLOR: Record<BatchStatusEnum, 'info' | 'warning' | 'success'> = {
+    planned: 'info',
+    'in-progress': 'warning',
+    finished: 'success',
+  };
   return (
     <Chip
-      label={isFinished ? 'Finished' : 'In progress'}
-      color={isFinished ? 'success' : 'warning'}
+      label={STATUS_LABEL[batch.status]}
+      color={STATUS_COLOR[batch.status]}
       size="small"
     />
   );
@@ -248,9 +256,7 @@ export function RecipeBatches() {
                     <TableCell>{batch.pico_unit.name ?? batch.pico_unit.handle}</TableCell>
                     <TableCell>{batch.species ?? '—'}</TableCell>
                     <TableCell>{formatDate(batch.start_at)}</TableCell>
-                    <TableCell>
-                      {batch.finish_at ? formatDate(batch.finish_at) : 'In progress'}
-                    </TableCell>
+                    <TableCell>{formatDate(batch.finish_at) || (batch.status === 'planned' ? 'Planned' : 'In progress')}</TableCell>
                     <TableCell>
                       <StatusChip batch={batch} />
                     </TableCell>

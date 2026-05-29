@@ -18,7 +18,7 @@ import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import type { UpdateBatchDto } from '~api/generated';
+import type { BatchStatusEnum, UpdateBatchDto } from '~api/generated';
 import { EditableInfoCard, InfoField, PageTitle } from '~components';
 import { useBatchContext } from '~ctx/Batch';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
@@ -40,6 +40,7 @@ export const BatchMeta = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [saveRecipeOpen, setSaveRecipeOpen] = useState(false);
 
+  const [description, setDescription] = useState('');
   const [species, setSpecies] = useState('');
   const [temperatureTarget, setTemperatureTarget] = useState('');
   const [humidityTarget, setHumidityTarget] = useState('');
@@ -53,6 +54,7 @@ export const BatchMeta = () => {
   useEffect(() => {
     if (!editOpen || !batch) return;
 
+    setDescription(batch.description ?? '');
     setSpecies(batch.species ?? '');
     setTemperatureTarget(batch.temperature_target != null ? String(batch.temperature_target) : '');
     setHumidityTarget(batch.humidity_target != null ? String(batch.humidity_target) : '');
@@ -69,16 +71,19 @@ export const BatchMeta = () => {
   }, [batch, saveRecipeOpen]);
 
   const statusChip = useMemo(() => {
-    const isFinished = Boolean(batch?.finish_at);
-
-    return (
-      <Chip
-        label={isFinished ? 'Finished' : 'In progress'}
-        color={isFinished ? 'success' : 'warning'}
-        size="small"
-      />
-    );
-  }, [batch?.finish_at]);
+    const STATUS_LABEL: Record<BatchStatusEnum, string> = {
+      planned: 'Planned',
+      'in-progress': 'In progress',
+      finished: 'Finished',
+    };
+    const STATUS_COLOR: Record<BatchStatusEnum, 'info' | 'warning' | 'success'> = {
+      planned: 'info',
+      'in-progress': 'warning',
+      finished: 'success',
+    };
+    const status = batch?.status ?? 'in-progress';
+    return <Chip label={STATUS_LABEL[status]} color={STATUS_COLOR[status]} size="small" />;
+  }, [batch?.status]);
 
   if (!batch) {
     return null;
@@ -87,20 +92,58 @@ export const BatchMeta = () => {
   const hasRecipeName = recipeName.trim().length > 0;
 
   const handleUpdate = async () => {
-    const body: UpdateBatchDto = {
-      species: species.trim() || undefined,
-      temperature_target: temperatureTarget === '' ? undefined : Number(temperatureTarget),
-      humidity_target: humidityTarget === '' ? undefined : Number(humidityTarget),
-      start_at: dayjs(startAt).toISOString(),
-      finish_at: finishAt ? dayjs(finishAt).toISOString() : null,
-      notes,
-    };
+    const body: UpdateBatchDto = {};
 
-    await run(() => updateBatch.mutateAsync({ batchId: batch.id, body }), {
-      successMessage: 'Batch updated successfully',
-      fallbackErrorMessage: 'Failed to update batch',
-      onSuccess: () => setEditOpen(false),
-    });
+    const newDescription = description.trim() || null;
+    if (newDescription !== (batch.description ?? null)) {
+      body.description = newDescription;
+    }
+
+    const newSpecies = species.trim() || undefined;
+    const oldSpecies = batch.species?.trim() || undefined;
+    if (newSpecies !== oldSpecies) {
+      body.species = newSpecies;
+    }
+
+    const newTempTarget = temperatureTarget === '' ? undefined : Number(temperatureTarget);
+    const oldTempTarget = batch.temperature_target ?? undefined;
+    if (newTempTarget !== oldTempTarget) {
+      body.temperature_target = newTempTarget;
+    }
+
+    const newHumTarget = humidityTarget === '' ? undefined : Number(humidityTarget);
+    const oldHumTarget = batch.humidity_target ?? undefined;
+    if (newHumTarget !== oldHumTarget) {
+      body.humidity_target = newHumTarget;
+    }
+
+    // Compare using datetime-local strings to avoid sub-minute precision false positives
+    if (startAt !== toDateTimeLocal(batch.start_at)) {
+      body.start_at = dayjs(startAt).toISOString();
+    }
+
+    if (finishAt !== toDateTimeLocal(batch.finish_at)) {
+      body.finish_at = finishAt ? dayjs(finishAt).toISOString() : null;
+    }
+
+    if (notes !== (batch.notes ?? '')) {
+      body.notes = notes;
+    }
+
+    if (Object.keys(body).length === 0) {
+      setEditOpen(false);
+      return;
+    }
+
+    try {
+      await run(() => updateBatch.mutateAsync({ batchId: batch.id, body }), {
+        successMessage: 'Batch updated successfully',
+        fallbackErrorMessage: 'Failed to update batch',
+        onSuccess: () => setEditOpen(false),
+      });
+    } catch {
+      // Error already displayed via toast by run()
+    }
   };
 
   const handleDelete = async () => {
@@ -136,7 +179,7 @@ export const BatchMeta = () => {
         mb={2}
         actions={
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-            {batch.finish_at ? (
+            {batch.status === 'finished' ? (
               <Button
                 variant="outlined"
                 startIcon={<SaveIcon />}
@@ -157,7 +200,7 @@ export const BatchMeta = () => {
         }
       >
         <Box display="flex" alignItems="center" gap={1.5} flexWrap="wrap">
-          <span>{`Batch #${batch.id}`}</span>
+          <span>{batch.description ?? `Batch #${batch.id}`}</span>
           {statusChip}
         </Box>
       </PageTitle>
@@ -171,6 +214,9 @@ export const BatchMeta = () => {
           <Link to={`/pico-units/${batch.pico_unit_id}`}>
             {batch.pico_unit.name ?? batch.pico_unit.handle ?? `Pico Unit #${batch.pico_unit_id}`}
           </Link>
+        </InfoField>
+        <InfoField label="Description">
+          <Typography variant="body1">{batch.description || '—'}</Typography>
         </InfoField>
         <InfoField label="Species">
           <Typography variant="body1">{batch.species ?? '—'}</Typography>
@@ -208,6 +254,13 @@ export const BatchMeta = () => {
         <DialogTitle>Edit Batch</DialogTitle>
         <DialogContent dividers>
           <Stack spacing={2} mt={0.5}>
+            <TextField
+              label="Description"
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+              fullWidth
+              placeholder="Optional name or label for this batch"
+            />
             <TextField
               label="Species"
               value={species}

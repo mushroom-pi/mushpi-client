@@ -10,7 +10,7 @@ import { recipeKeys } from '~api/queryKeys';
 
 export function useListRecipes(
   params?: Partial<ListRecipesParams>,
-  queryOptions?: UseQueryOptions<RecipeListResponseDto, unknown, RecipeListResponseDto>,
+  queryOptions?: Omit<UseQueryOptions<RecipeListResponseDto, unknown, RecipeListResponseDto>, 'queryKey' | 'queryFn'>,
 ) {
   const page = params?.page ?? 1;
   const limit = params?.limit ?? 20;

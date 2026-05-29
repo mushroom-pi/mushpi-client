@@ -10,7 +10,7 @@ import { picoUnitsKeys } from '~api/queryKeys';
 
 export function useListPicoUnits(
   params?: ListPicoUnitsParams,
-  queryOptions?: UseQueryOptions<PicoUnitListResponseDto, unknown, PicoUnitListResponseDto>,
+  queryOptions?: Omit<UseQueryOptions<PicoUnitListResponseDto, unknown, PicoUnitListResponseDto>, 'queryKey' | 'queryFn'>,
 ) {
   const page = params?.page ?? 1;
   const limit = params?.limit ?? 20;
