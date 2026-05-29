@@ -45,6 +45,8 @@ interface BatchesTableProps {
   batches: Batch[];
   onRowClick: (id: number) => void;
   hideUnitColumn?: boolean;
+  hideSpeciesColumn?: boolean;
+  hideRecipeColumn?: boolean;
   activeId?: number;
   disablePaper?: boolean;
 }
@@ -53,10 +55,16 @@ export const BatchesTable = ({
   batches,
   onRowClick,
   hideUnitColumn,
+  hideSpeciesColumn,
+  hideRecipeColumn,
   activeId,
   disablePaper,
 }: BatchesTableProps) => {
-  const columnCount = hideUnitColumn ? 6 : 7;
+  const columnCount =
+    7 -
+    (hideUnitColumn ? 1 : 0) -
+    (hideSpeciesColumn ? 1 : 0) -
+    (hideRecipeColumn ? 1 : 0);
 
   return (
     <TableContainer component={disablePaper ? 'div' : Paper}>
@@ -65,10 +73,10 @@ export const BatchesTable = ({
           <TableRow>
             {!hideUnitColumn && <TableCell>Unit</TableCell>}
             <TableCell>Description</TableCell>
-            <TableCell>Species</TableCell>
+            {!hideSpeciesColumn && <TableCell>Species</TableCell>}
             <TableCell>Start</TableCell>
             <TableCell>Finish</TableCell>
-            <TableCell>Recipe</TableCell>
+            {!hideRecipeColumn && <TableCell>Recipe</TableCell>}
             <TableCell>Status</TableCell>
           </TableRow>
         </TableHead>
@@ -96,14 +104,14 @@ export const BatchesTable = ({
                   <TableCell>{batch.pico_unit.name ?? batch.pico_unit.handle}</TableCell>
                 )}
                 <TableCell>{batch.description ?? '—'}</TableCell>
-                <TableCell>{batch.species ?? '—'}</TableCell>
+                {!hideSpeciesColumn && <TableCell>{batch.species ?? '—'}</TableCell>}
                 <TableCell>
                   <DateTimeCell value={batch.start_at} status={batch.status} />
                 </TableCell>
                 <TableCell>
                   <DateTimeCell value={batch.finish_at} status={batch.status} />
                 </TableCell>
-                <TableCell>{batch.recipe?.name ?? '—'}</TableCell>
+                {!hideRecipeColumn && <TableCell>{batch.recipe?.name ?? '—'}</TableCell>}
                 <TableCell>
                   <StatusChip status={batch.status} />
                 </TableCell>

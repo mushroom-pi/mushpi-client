@@ -15,7 +15,7 @@ import { toDateTimeLocal } from '~utils/methods';
 import type { CreateBatchDialogProps } from './interfaces';
 import { computeFinishAt, nowDateTimeLocal } from './methods';
 
-export function useCreateBatchForm({ open, onClose, defaultValues }: CreateBatchDialogProps) {
+export function useCreateBatchForm({ open, onClose, onSuccess, defaultValues }: CreateBatchDialogProps) {
   const queryClient = useQueryClient();
   const { run } = useAsyncWithToast();
 
@@ -102,6 +102,18 @@ export function useCreateBatchForm({ open, onClose, defaultValues }: CreateBatch
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, picoUnitId, activeBatchByUnitId]);
 
+  // When recipe data loads after the dialog is already open with a pre-selected recipe,
+  // compute finishAt if the user hasn't set it yet. startAt and finishAt are read from the
+  // closure at effect-run time (not in deps) to avoid re-running on every field change.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!open || !recipeId || finishAt) return;
+    const recipe = recipes.find((r) => String(r.id) === recipeId);
+    if (!recipe) return;
+    setFinishAt(computeFinishAt(startAt, recipe.duration_days));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, recipeId, recipesData]);
+
   function handleUnitChange(newUnitId: string) {
     setPicoUnitId(newUnitId);
     const active = newUnitId ? activeBatchByUnitId.get(Number(newUnitId)) : undefined;
@@ -158,7 +170,10 @@ export function useCreateBatchForm({ open, onClose, defaultValues }: CreateBatch
     await run(() => mutation.mutateAsync(dto), {
       successMessage: 'Batch created successfully',
       fallbackErrorMessage: 'Failed to create batch',
-      onSuccess: () => onClose(),
+      onSuccess: async () => {
+        await onSuccess?.();
+        onClose();
+      },
     });
   };
 
