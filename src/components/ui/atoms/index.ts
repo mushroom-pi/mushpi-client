@@ -1,19 +1,10 @@
-// Barrel for small, reusable UI atoms. Exports components from this folder
+// Barrel for small, reusable UI atoms.
 export { BigDisplay } from './BigDisplay';
 export { Loading } from './Loading';
 export { Card } from './Card';
 export { InfoField } from './InfoField';
 export { FieldRow } from './FieldRow';
-export { OnOffInput } from '../molecules/OnOffInput';
 export { ReadableTime } from './ReadableTime';
 export { DateTimeField } from './DateTimeField';
 export { HeaderAndIcon } from './HeaderAndIcon';
-export { ModalForm } from './ModalForm';
 export { PageTitle } from './PageTitle';
-// Composite components (molecules) are implemented in ../molecules
-export { InfoCard } from '../molecules/InfoCard';
-export { EditableInfoCard } from '../molecules/EditableInfoCard';
-export { OnOffInfo } from '../molecules/OnOffInfo';
-
-export { Invalid } from '../molecules/Invalid';
-export { Error } from '../molecules/Error';

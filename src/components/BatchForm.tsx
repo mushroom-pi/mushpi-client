@@ -1,7 +1,7 @@
 import { TextField } from '@mui/material';
 import type { ReactNode } from 'react';
 
-import { ModalForm } from '../atoms/ModalForm';
+import { ModalForm } from './ui/molecules/ModalForm';
 
 export interface BatchFormProps {
   // Dialog control
