@@ -4,8 +4,8 @@ import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import type { Batch, BatchStatusEnum } from '~api/generated';
-import { DataTable } from '~components';
 import type { DataTableColumn } from '~components';
+import { DataTable } from '~components';
 import { ReadableTime } from '~components';
 import { StatusChip } from '~pages/Batches/components/StatusChip';
 

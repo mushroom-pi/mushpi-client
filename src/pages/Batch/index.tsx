@@ -5,8 +5,8 @@ import { Error, Invalid, Loading, PageTitle } from '~components';
 import { BatchProvider, useBatchContext } from '~ctx/Batch';
 import { BatchChartsProvider } from '~ctx/Charts';
 import { Page } from '~layout/Page';
+import { ChartsTabs } from '~pages/Readings/components/ChartsTabs';
 
-import { ChartsTabs } from '../Readings/components/ChartsTabs/ChartsTabs';
 import { BatchMeta } from './components/BatchMeta';
 
 function BatchDetailInner() {
