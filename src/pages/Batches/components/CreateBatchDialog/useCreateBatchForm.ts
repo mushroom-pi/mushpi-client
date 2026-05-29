@@ -1,11 +1,9 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
 
-import { unwrap } from '~api/adapter';
-import { Batches } from '~api/client';
 import { type Batch, BatchesControllerListStatusEnum, type CreateBatchDto } from '~api/generated';
-import { batchKeys } from '~api/queryKeys';
+import { createBatchMutation } from '~ctx/Batch';
 import { useListBatches } from '~ctx/Batches';
 import { useListPicoUnits } from '~ctx/PicoUnits';
 import { useListRecipes } from '~ctx/Recipes';
@@ -151,14 +149,7 @@ export function useCreateBatchForm({
     handleStartAtChange(startAt, { recipeId: newRecipeId, recipes });
   }
 
-  const mutation = useMutation<Batch, unknown, CreateBatchDto>({
-    mutationFn: async (createBatchDto) => {
-      return unwrap<Batch>(Batches.batchesControllerCreate({ createBatchDto }));
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: batchKeys.all });
-    },
-  });
+  const mutation = createBatchMutation(queryClient);
 
   const handleCreate = async () => {
     const dto: CreateBatchDto = {
