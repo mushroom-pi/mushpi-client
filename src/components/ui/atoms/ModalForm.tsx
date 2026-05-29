@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 export interface ModalFormProps {
   open: boolean;
   onClose: () => void;
-  title: string;
+  title: ReactNode;
   submitLabel: string;
   pendingLabel: string;
   onSubmit: () => void;

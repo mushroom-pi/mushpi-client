@@ -3,7 +3,7 @@ import { Alert, Box, Grid, Slider, Stack, Typography } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import type { ChangeSetPointsDto, ControlLoopDto } from '~api/generated';
-import { HeaderAndIcon, ModalDialog, OnOffInput } from '~components';
+import { HeaderAndIcon, OnOffInput, PicoUnitForm } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 import type { DialogProps } from '~int/dialogProps';
@@ -94,14 +94,13 @@ export const ControlsDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSa
 
   return (
     open && (
-      <ModalDialog
+      <PicoUnitForm
         open={open}
-        onClose={onClose}
-        doSaveChanges={doSaveChanges}
-        handleCancel={handleCancel}
-        hasChanges={hasChanges}
-        isSaving={isSaving}
-        headerAndIcon={<HeaderAndIcon title="Controls" icon={<TuneIcon />} />}
+        onClose={handleCancel}
+        onSubmit={doSaveChanges}
+        canSubmit={hasChanges}
+        isPending={isSaving}
+        title={<HeaderAndIcon title="Controls" icon={<TuneIcon />} />}
       >
         <Alert
           severity={enabled ? 'info' : 'warning'}
@@ -181,7 +180,7 @@ export const ControlsDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSa
             </Grid>
           </Grid>
         </Stack>
-      </ModalDialog>
+      </PicoUnitForm>
     )
   );
 };

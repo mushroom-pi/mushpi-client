@@ -2,7 +2,7 @@ import { Box, Stack, Switch, TextField, Typography } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import type { UpdatePicoUnitDto } from '~api/generated';
-import { HeaderAndIcon, ModalDialog } from '~components';
+import { HeaderAndIcon, PicoUnitForm } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 
@@ -83,14 +83,13 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
 
   return (
     open && (
-      <ModalDialog
+      <PicoUnitForm
         open={open}
-        hasChanges={hasChanges}
-        isSaving={updateMutation.isLoading}
-        onClose={onClose}
-        doSaveChanges={doSaveEdits}
-        handleCancel={handleCancel}
-        headerAndIcon={<HeaderAndIcon title="Edit Pico Details" />}
+        canSubmit={hasChanges}
+        isPending={updateMutation.isLoading}
+        onClose={handleCancel}
+        onSubmit={doSaveEdits}
+        title={<HeaderAndIcon title="Edit Pico Details" />}
       >
         <Stack spacing={2} sx={{ width: '100%', mt: 0.5 }}>
           <TextField
@@ -118,7 +117,7 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
             />
           </Box>
         </Stack>
-      </ModalDialog>
+      </PicoUnitForm>
     )
   );
 };

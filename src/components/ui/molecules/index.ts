@@ -2,7 +2,8 @@
 export { InfoCard } from './InfoCard';
 export { EditableInfoCard } from './EditableInfoCard';
 export { OnOffInfo } from './OnOffInfo';
-export { ModalDialog } from './ModalDialog';
+export { PicoUnitForm } from './PicoUnitForm';
+export type { PicoUnitFormProps } from './PicoUnitForm';
 export { ModalForm } from '../atoms/ModalForm';
 export type { ModalFormProps } from '../atoms/ModalForm';
 export { OnOffInput } from './OnOffInput';

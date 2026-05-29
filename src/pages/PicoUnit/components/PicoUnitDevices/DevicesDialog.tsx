@@ -4,7 +4,7 @@ import type React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import type { ChangeOutputsDto } from '~api/generated';
-import { HeaderAndIcon, ModalDialog, OnOffInput } from '~components';
+import { HeaderAndIcon, OnOffInput, PicoUnitForm } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 import type { DialogProps } from '~int/dialogProps';
@@ -70,14 +70,13 @@ export const DevicesDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSav
 
   return (
     open && (
-      <ModalDialog
+      <PicoUnitForm
         open={open}
-        onClose={onClose}
-        doSaveChanges={doSaveChanges}
-        handleCancel={handleCancel}
-        hasChanges={hasChanges}
-        isSaving={changeOutputs?.isLoading}
-        headerAndIcon={<HeaderAndIcon title="Devices" icon={<FanIcon />} />}
+        onClose={handleCancel}
+        onSubmit={doSaveChanges}
+        canSubmit={hasChanges}
+        isPending={changeOutputs?.isLoading}
+        title={<HeaderAndIcon title="Devices" icon={<FanIcon />} />}
       >
         <Alert
           severity={lr.control_loop_enabled ? 'warning' : 'info'}
@@ -108,7 +107,7 @@ export const DevicesDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSav
             disabled={lr.control_loop_enabled}
           />
         </Stack>
-      </ModalDialog>
+      </PicoUnitForm>
     )
   );
 };

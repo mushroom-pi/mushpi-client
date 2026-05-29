@@ -14,6 +14,6 @@ export { PageTitle } from './PageTitle';
 export { InfoCard } from '../molecules/InfoCard';
 export { EditableInfoCard } from '../molecules/EditableInfoCard';
 export { OnOffInfo } from '../molecules/OnOffInfo';
-export { ModalDialog } from '../molecules/ModalDialog';
+
 export { Invalid } from '../molecules/Invalid';
 export { Error } from '../molecules/Error';

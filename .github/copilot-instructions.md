@@ -17,7 +17,7 @@ src/
 │   └── generated/api.ts    # AUTO-GENERATED — never edit manually
 ├── components/ui/
 │   ├── atoms/              # Stateless presentational (Card, InfoField, OnOffInfo, etc.)
-│   ├── molecules/          # Composed components (InfoCard, EditableInfoCard, ModalDialog, etc.)
+│   ├── molecules/          # Composed components (InfoCard, EditableInfoCard, PicoUnitForm, etc.)
 │   └── index.ts            # Barrel export
 ├── contexts/
 │   ├── PicoUnit/           # Context + hooks + mutations for a single unit
@@ -95,7 +95,7 @@ Always regenerate after any `mushpi-server` endpoint change.
 - **Atoms**: stateless, props only.
 - **Molecules**: may connect to context/hooks.
 - Use **MUI components** over raw HTML; use `sx` prop for one-off styles.
-- Use `ModalDialog` for dialogs **only within PicoUnit pages** — it is coupled to `usePicoUnitContext()`. All other pages (Recipes, Batches) use MUI `Dialog` directly.
+- Use `PicoUnitForm` for dialogs **only within PicoUnit pages** — it is coupled to `usePicoUnitContext()`. All other pages (Recipes, Batches) use MUI `Dialog` directly.
 - Use `OnOffInfo` / `OnOffInput` for boolean device states.
 - Use `EditableInfoCard` for display + inline edit. The `headerActions` prop renders extra icon buttons (e.g., delete) to the left of the edit button in the card header.
 - `mushroomTheme.ts` for global theme overrides.
