@@ -3,8 +3,8 @@ import { useEffect, useMemo } from 'react';
 
 import type { UpdateBatchDto } from '~api/generated';
 import { useBatchContext } from '~ctx/Batch';
+import { useBatchFormFields } from '~hook/BatchForm/useBatchFormFields';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
-import { useBatchFormFields } from '~hook/BatchDialog/useBatchFormFields';
 import { toDateTimeLocal } from '~utils/methods';
 
 import type { EditBatchDialogProps } from './interfaces';

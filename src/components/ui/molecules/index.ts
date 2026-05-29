@@ -9,3 +9,5 @@ export { Invalid } from './Invalid';
 export { GraphTab } from './GraphTab';
 export { DataTable } from './DataTable';
 export type { DataTableColumn, DataTableProps } from './DataTable';
+export { BatchForm } from './BatchForm';
+export type { BatchFormProps } from './BatchForm';

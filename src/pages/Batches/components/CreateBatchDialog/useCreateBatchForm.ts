@@ -9,8 +9,8 @@ import { batchKeys } from '~api/queryKeys';
 import { useListBatches } from '~ctx/Batches';
 import { useListPicoUnits } from '~ctx/PicoUnits';
 import { useListRecipes } from '~ctx/Recipes';
-import { nowDateTimeLocal } from '~hook/BatchDialog/methods';
-import { useBatchFormFields } from '~hook/BatchDialog/useBatchFormFields';
+import { nowDateTimeLocal } from '~hook/BatchForm/methods';
+import { useBatchFormFields } from '~hook/BatchForm/useBatchFormFields';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 import { toDateTimeLocal } from '~utils/methods';
 
