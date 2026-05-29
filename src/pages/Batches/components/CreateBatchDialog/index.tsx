@@ -14,7 +14,8 @@ import {
   Typography,
 } from '@mui/material';
 
-import { type CreateBatchDialogProps, useCreateBatchForm } from './useCreateBatchForm';
+import { type CreateBatchDialogProps } from './interfaces';
+import { useCreateBatchForm } from './useCreateBatchForm';
 
 export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchDialogProps) => {
   const {

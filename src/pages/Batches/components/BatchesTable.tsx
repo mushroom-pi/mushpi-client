@@ -1,5 +1,4 @@
 import {
-  Chip,
   Paper,
   Stack,
   Table,
@@ -14,27 +13,12 @@ import dayjs from 'dayjs';
 
 import type { Batch, BatchStatusEnum } from '~api/generated';
 import { ReadableTime } from '~components';
+import { StatusChip } from '~pages/Batches/components/StatusChip';
 
 const formatDateTime = (value?: string | null) => {
   if (!value) return '—';
   return dayjs(value).format('DD MMM YYYY HH:mm');
 };
-
-const STATUS_LABEL: Record<BatchStatusEnum, string> = {
-  planned: 'Planned',
-  'in-progress': 'In progress',
-  finished: 'Finished',
-};
-
-const STATUS_COLOR: Record<BatchStatusEnum, 'info' | 'warning' | 'success'> = {
-  planned: 'info',
-  'in-progress': 'warning',
-  finished: 'success',
-};
-
-const StatusChip = ({ status }: { status: BatchStatusEnum }) => (
-  <Chip label={STATUS_LABEL[status] ?? status} color={STATUS_COLOR[status] ?? 'default'} size="small" />
-);
 
 const DateTimeCell = ({ value, status }: { value?: string | null; status: BatchStatusEnum }) => {
   if (!value) {
@@ -60,15 +44,26 @@ const DateTimeCell = ({ value, status }: { value?: string | null; status: BatchS
 interface BatchesTableProps {
   batches: Batch[];
   onRowClick: (id: number) => void;
+  hideUnitColumn?: boolean;
+  activeId?: number;
+  disablePaper?: boolean;
 }
 
-export const BatchesTable = ({ batches, onRowClick }: BatchesTableProps) => {
+export const BatchesTable = ({
+  batches,
+  onRowClick,
+  hideUnitColumn,
+  activeId,
+  disablePaper,
+}: BatchesTableProps) => {
+  const columnCount = hideUnitColumn ? 6 : 7;
+
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={disablePaper ? 'div' : Paper}>
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Unit</TableCell>
+            {!hideUnitColumn && <TableCell>Unit</TableCell>}
             <TableCell>Description</TableCell>
             <TableCell>Species</TableCell>
             <TableCell>Start</TableCell>
@@ -80,7 +75,7 @@ export const BatchesTable = ({ batches, onRowClick }: BatchesTableProps) => {
         <TableBody>
           {batches.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7}>
+              <TableCell colSpan={columnCount}>
                 <Typography variant="body2" color="text.secondary">
                   No batches found.
                 </Typography>
@@ -92,9 +87,14 @@ export const BatchesTable = ({ batches, onRowClick }: BatchesTableProps) => {
                 key={batch.id}
                 hover
                 onClick={() => onRowClick(batch.id)}
-                sx={{ cursor: 'pointer' }}
+                sx={{
+                  cursor: 'pointer',
+                  bgcolor: activeId === batch.id ? 'action.selected' : undefined,
+                }}
               >
-                <TableCell>{batch.pico_unit.name ?? batch.pico_unit.handle}</TableCell>
+                {!hideUnitColumn && (
+                  <TableCell>{batch.pico_unit.name ?? batch.pico_unit.handle}</TableCell>
+                )}
                 <TableCell>{batch.description ?? '—'}</TableCell>
                 <TableCell>{batch.species ?? '—'}</TableCell>
                 <TableCell>
