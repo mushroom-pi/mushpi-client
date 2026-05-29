@@ -8,6 +8,7 @@ export { OnOffInput } from '../molecules/OnOffInput';
 export { ReadableTime } from './ReadableTime';
 export { DateTimeField } from './DateTimeField';
 export { HeaderAndIcon } from './HeaderAndIcon';
+export { ModalForm } from './ModalForm';
 export { PageTitle } from './PageTitle';
 // Composite components (molecules) are implemented in ../molecules
 export { InfoCard } from '../molecules/InfoCard';

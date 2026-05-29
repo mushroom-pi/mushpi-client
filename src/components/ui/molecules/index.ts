@@ -3,6 +3,8 @@ export { InfoCard } from './InfoCard';
 export { EditableInfoCard } from './EditableInfoCard';
 export { OnOffInfo } from './OnOffInfo';
 export { ModalDialog } from './ModalDialog';
+export { ModalForm } from '../atoms/ModalForm';
+export type { ModalFormProps } from '../atoms/ModalForm';
 export { OnOffInput } from './OnOffInput';
 export { Error } from './Error';
 export { Invalid } from './Invalid';

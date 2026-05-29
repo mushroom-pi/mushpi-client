@@ -1,13 +1,7 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Stack,
-  TextField,
-} from '@mui/material';
+import { TextField } from '@mui/material';
 import type { ReactNode } from 'react';
+
+import { ModalForm } from '../atoms/ModalForm';
 
 export interface BatchFormProps {
   // Dialog control
@@ -71,76 +65,72 @@ export function BatchForm({
   topSlot,
 }: BatchFormProps) {
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>{title}</DialogTitle>
-      <DialogContent dividers>
-        <Stack spacing={2} mt={0.5}>
-          {topSlot}
-          <TextField
-            label="Description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            fullWidth
-            placeholder="Optional name or label for this batch"
-          />
-          <TextField
-            label="Start"
-            type="datetime-local"
-            value={startAt}
-            onChange={(e) => onStartAtChange(e.target.value)}
-            fullWidth
-            slotProps={{ inputLabel: { shrink: true } }}
-            error={!!startAtError}
-            helperText={startAtError ?? undefined}
-          />
-          <TextField
-            label="Finish"
-            type="datetime-local"
-            value={finishAt}
-            onChange={(e) => setFinishAt(e.target.value)}
-            fullWidth
-            slotProps={{ inputLabel: { shrink: true } }}
-            error={!!finishBeforeStartError}
-            helperText={finishBeforeStartError ?? undefined}
-          />
-          <TextField
-            label="Species"
-            value={species}
-            onChange={(e) => setSpecies(e.target.value)}
-            fullWidth
-          />
-          <TextField
-            label="Temperature Target (°C)"
-            type="number"
-            value={temperatureTarget}
-            onChange={(e) => setTemperatureTarget(e.target.value)}
-            fullWidth
-          />
-          <TextField
-            label="Humidity Target (%)"
-            type="number"
-            value={humidityTarget}
-            onChange={(e) => setHumidityTarget(e.target.value)}
-            fullWidth
-          />
-          <TextField
-            label="Notes"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            fullWidth
-            multiline
-            minRows={3}
-          />
-        </Stack>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} disabled={isPending}>
-          Cancel
-        </Button>
-        <Button variant="contained" onClick={onSubmit} disabled={!canSubmit || isPending}>
-          {isPending ? pendingLabel : submitLabel}
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <ModalForm
+      open={open}
+      onClose={onClose}
+      title={title}
+      submitLabel={submitLabel}
+      pendingLabel={pendingLabel}
+      onSubmit={onSubmit}
+      canSubmit={canSubmit}
+      isPending={isPending}
+    >
+      {topSlot}
+      <TextField
+        label="Description"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        fullWidth
+        placeholder="Optional name or label for this batch"
+      />
+      <TextField
+        label="Start"
+        type="datetime-local"
+        value={startAt}
+        onChange={(e) => onStartAtChange(e.target.value)}
+        fullWidth
+        slotProps={{ inputLabel: { shrink: true } }}
+        error={!!startAtError}
+        helperText={startAtError ?? undefined}
+      />
+      <TextField
+        label="Finish"
+        type="datetime-local"
+        value={finishAt}
+        onChange={(e) => setFinishAt(e.target.value)}
+        fullWidth
+        slotProps={{ inputLabel: { shrink: true } }}
+        error={!!finishBeforeStartError}
+        helperText={finishBeforeStartError ?? undefined}
+      />
+      <TextField
+        label="Species"
+        value={species}
+        onChange={(e) => setSpecies(e.target.value)}
+        fullWidth
+      />
+      <TextField
+        label="Temperature Target (°C)"
+        type="number"
+        value={temperatureTarget}
+        onChange={(e) => setTemperatureTarget(e.target.value)}
+        fullWidth
+      />
+      <TextField
+        label="Humidity Target (%)"
+        type="number"
+        value={humidityTarget}
+        onChange={(e) => setHumidityTarget(e.target.value)}
+        fullWidth
+      />
+      <TextField
+        label="Notes"
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        fullWidth
+        multiline
+        minRows={3}
+      />
+    </ModalForm>
   );
 }
