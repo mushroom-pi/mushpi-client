@@ -9,25 +9,43 @@ import { batchKeys } from '~api/queryKeys';
 import { useListBatches } from '~ctx/Batches';
 import { useListPicoUnits } from '~ctx/PicoUnits';
 import { useListRecipes } from '~ctx/Recipes';
+import { nowDateTimeLocal } from '~hook/BatchDialog/methods';
+import { useBatchFormFields } from '~hook/BatchDialog/useBatchFormFields';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 import { toDateTimeLocal } from '~utils/methods';
 
 import type { CreateBatchDialogProps } from './interfaces';
-import { computeFinishAt, nowDateTimeLocal } from './methods';
 
-export function useCreateBatchForm({ open, onClose, onSuccess, defaultValues }: CreateBatchDialogProps) {
+export function useCreateBatchForm({
+  open,
+  onClose,
+  onSuccess,
+  defaultValues,
+}: CreateBatchDialogProps) {
   const queryClient = useQueryClient();
   const { run } = useAsyncWithToast();
 
   const [picoUnitId, setPicoUnitId] = useState('');
-  const [startAt, setStartAt] = useState(nowDateTimeLocal());
-  const [finishAt, setFinishAt] = useState('');
-  const [description, setDescription] = useState('');
-  const [species, setSpecies] = useState('');
-  const [temperatureTarget, setTemperatureTarget] = useState('');
-  const [humidityTarget, setHumidityTarget] = useState('');
-  const [notes, setNotes] = useState('');
   const [recipeId, setRecipeId] = useState('');
+
+  const {
+    description,
+    setDescription,
+    species,
+    setSpecies,
+    temperatureTarget,
+    setTemperatureTarget,
+    humidityTarget,
+    setHumidityTarget,
+    startAt,
+    finishAt,
+    setFinishAt,
+    notes,
+    setNotes,
+    finishBeforeStartError,
+    handleStartAtChange,
+    resetFields,
+  } = useBatchFormFields();
 
   const { data: picoUnitsData } = useListPicoUnits({ limit: 100 }, { enabled: open });
   const { data: recipesData } = useListRecipes({ limit: 100 }, { enabled: open });
@@ -63,26 +81,31 @@ export function useCreateBatchForm({ open, onClose, onSuccess, defaultValues }: 
   }, [activeBatch, startAt]);
 
   const canSubmit = useMemo(() => {
-    return picoUnitId.trim() !== '' && startAt.trim() !== '' && !startAtConflict;
-  }, [picoUnitId, startAt, startAtConflict]);
+    return (
+      picoUnitId.trim() !== '' &&
+      startAt.trim() !== '' &&
+      !startAtConflict &&
+      !finishBeforeStartError
+    );
+  }, [picoUnitId, startAt, startAtConflict, finishBeforeStartError]);
 
   // Reset all fields when the dialog opens.
   useEffect(() => {
     if (!open) return;
     setPicoUnitId(defaultValues?.picoUnitId != null ? String(defaultValues.picoUnitId) : '');
-    setStartAt(nowDateTimeLocal());
-    setFinishAt('');
-    setDescription(defaultValues?.description ?? '');
-    setSpecies(defaultValues?.species ?? '');
-    setTemperatureTarget(
-      defaultValues?.temperatureTarget != null ? String(defaultValues.temperatureTarget) : '',
-    );
-    setHumidityTarget(
-      defaultValues?.humidityTarget != null ? String(defaultValues.humidityTarget) : '',
-    );
-    setNotes('');
     setRecipeId(defaultValues?.recipeId != null ? String(defaultValues.recipeId) : '');
-  }, [defaultValues, open]);
+    resetFields({
+      startAt: nowDateTimeLocal(),
+      description: defaultValues?.description ?? '',
+      species: defaultValues?.species ?? '',
+      temperatureTarget:
+        defaultValues?.temperatureTarget != null ? String(defaultValues.temperatureTarget) : '',
+      humidityTarget:
+        defaultValues?.humidityTarget != null ? String(defaultValues.humidityTarget) : '',
+      finishAt: '',
+      notes: '',
+    });
+  }, [defaultValues, open, resetFields]);
 
   // When active-batch data loads after the dialog is already open, auto-adjust startAt if it
   // conflicts with the selected unit's active batch. recipeId and recipes are intentionally read
@@ -94,11 +117,7 @@ export function useCreateBatchForm({ open, onClose, onSuccess, defaultValues }: 
     if (!active?.finish_at) return;
     if (dayjs(startAt).isAfter(dayjs(active.finish_at))) return;
     const newStartAt = dayjs(active.finish_at).add(1, 'minute').format('YYYY-MM-DDTHH:mm');
-    setStartAt(newStartAt);
-    if (recipeId) {
-      const recipe = recipes.find((r) => String(r.id) === recipeId);
-      if (recipe) setFinishAt(computeFinishAt(newStartAt, recipe.duration_days));
-    }
+    handleStartAtChange(newStartAt, { recipeId, recipes });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, picoUnitId, activeBatchByUnitId]);
 
@@ -108,9 +127,7 @@ export function useCreateBatchForm({ open, onClose, onSuccess, defaultValues }: 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!open || !recipeId || finishAt) return;
-    const recipe = recipes.find((r) => String(r.id) === recipeId);
-    if (!recipe) return;
-    setFinishAt(computeFinishAt(startAt, recipe.duration_days));
+    handleStartAtChange(startAt, { recipeId, recipes });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, recipeId, recipesData]);
 
@@ -120,11 +137,7 @@ export function useCreateBatchForm({ open, onClose, onSuccess, defaultValues }: 
     if (!active?.finish_at) return;
     if (dayjs(startAt).isAfter(dayjs(active.finish_at))) return;
     const newStartAt = dayjs(active.finish_at).add(1, 'minute').format('YYYY-MM-DDTHH:mm');
-    setStartAt(newStartAt);
-    if (recipeId) {
-      const recipe = recipes.find((r) => String(r.id) === recipeId);
-      if (recipe) setFinishAt(computeFinishAt(newStartAt, recipe.duration_days));
-    }
+    handleStartAtChange(newStartAt, { recipeId, recipes });
   }
 
   function handleRecipeChange(newRecipeId: string) {
@@ -135,15 +148,7 @@ export function useCreateBatchForm({ open, onClose, onSuccess, defaultValues }: 
     setSpecies(recipe.species);
     setTemperatureTarget(String(recipe.temperature_target));
     setHumidityTarget(String(recipe.humidity_target));
-    setFinishAt(computeFinishAt(startAt, recipe.duration_days));
-  }
-
-  function handleStartAtChange(newStartAt: string) {
-    setStartAt(newStartAt);
-    if (!recipeId) return;
-    const recipe = recipes.find((r) => String(r.id) === recipeId);
-    if (!recipe) return;
-    setFinishAt(computeFinishAt(newStartAt, recipe.duration_days));
+    handleStartAtChange(startAt, { recipeId: newRecipeId, recipes });
   }
 
   const mutation = useMutation<Batch, unknown, CreateBatchDto>({
@@ -201,11 +206,13 @@ export function useCreateBatchForm({ open, onClose, onSuccess, defaultValues }: 
     busyUnitIds,
     // validation
     startAtConflict,
+    finishBeforeStartError,
     canSubmit,
     // handlers
     handleUnitChange,
     handleRecipeChange,
-    handleStartAtChange,
+    handleStartAtChange: (newStartAt: string) =>
+      handleStartAtChange(newStartAt, { recipeId, recipes }),
     handleCreate,
     // mutation
     isPending: mutation.isPending,

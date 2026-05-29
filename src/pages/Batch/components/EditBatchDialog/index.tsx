@@ -22,11 +22,12 @@ export const EditBatchDialog = ({ open, onClose }: EditBatchDialogProps) => {
     humidityTarget,
     setHumidityTarget,
     startAt,
-    setStartAt,
+    handleStartAtChange,
     finishAt,
     setFinishAt,
     notes,
     setNotes,
+    finishBeforeStartError,
     canSubmit,
     handleUpdate,
     isPending,
@@ -68,7 +69,7 @@ export const EditBatchDialog = ({ open, onClose }: EditBatchDialogProps) => {
             label="Start"
             type="datetime-local"
             value={startAt}
-            onChange={(e) => setStartAt(e.target.value)}
+            onChange={(e) => handleStartAtChange(e.target.value)}
             fullWidth
             slotProps={{ inputLabel: { shrink: true } }}
           />
@@ -79,6 +80,8 @@ export const EditBatchDialog = ({ open, onClose }: EditBatchDialogProps) => {
             onChange={(e) => setFinishAt(e.target.value)}
             fullWidth
             slotProps={{ inputLabel: { shrink: true } }}
+            error={!!finishBeforeStartError}
+            helperText={finishBeforeStartError ?? undefined}
           />
           <TextField
             label="Notes"

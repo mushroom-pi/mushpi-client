@@ -1,7 +1,2 @@
-import dayjs from 'dayjs';
-
-export const nowDateTimeLocal = () => dayjs().format('YYYY-MM-DDTHH:mm');
-
-export function computeFinishAt(start: string, durationDays: number) {
-  return dayjs(start).add(durationDays, 'day').format('YYYY-MM-DDTHH:mm');
-}
+// Re-exported from shared BatchDialog utilities
+export { computeFinishAt, nowDateTimeLocal } from '~hook/BatchDialog/methods';

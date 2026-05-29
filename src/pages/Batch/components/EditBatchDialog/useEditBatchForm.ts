@@ -1,9 +1,10 @@
 import dayjs from 'dayjs';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import type { UpdateBatchDto } from '~api/generated';
 import { useBatchContext } from '~ctx/Batch';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
+import { useBatchFormFields } from '~hook/BatchDialog/useBatchFormFields';
 import { toDateTimeLocal } from '~utils/methods';
 
 import type { EditBatchDialogProps } from './interfaces';
@@ -12,26 +13,42 @@ export function useEditBatchForm({ open, onClose }: EditBatchDialogProps) {
   const { run } = useAsyncWithToast();
   const { batch, updateBatch } = useBatchContext();
 
-  const [description, setDescription] = useState('');
-  const [species, setSpecies] = useState('');
-  const [temperatureTarget, setTemperatureTarget] = useState('');
-  const [humidityTarget, setHumidityTarget] = useState('');
-  const [startAt, setStartAt] = useState('');
-  const [finishAt, setFinishAt] = useState('');
-  const [notes, setNotes] = useState('');
+  const {
+    description,
+    setDescription,
+    species,
+    setSpecies,
+    temperatureTarget,
+    setTemperatureTarget,
+    humidityTarget,
+    setHumidityTarget,
+    startAt,
+    finishAt,
+    setFinishAt,
+    notes,
+    setNotes,
+    finishBeforeStartError,
+    handleStartAtChange,
+    resetFields,
+  } = useBatchFormFields();
 
   useEffect(() => {
     if (!open || !batch) return;
-    setDescription(batch.description ?? '');
-    setSpecies(batch.species ?? '');
-    setTemperatureTarget(batch.temperature_target != null ? String(batch.temperature_target) : '');
-    setHumidityTarget(batch.humidity_target != null ? String(batch.humidity_target) : '');
-    setStartAt(toDateTimeLocal(batch.start_at));
-    setFinishAt(toDateTimeLocal(batch.finish_at));
-    setNotes(batch.notes ?? '');
-  }, [batch, open]);
+    resetFields({
+      description: batch.description ?? '',
+      species: batch.species ?? '',
+      temperatureTarget: batch.temperature_target != null ? String(batch.temperature_target) : '',
+      humidityTarget: batch.humidity_target != null ? String(batch.humidity_target) : '',
+      startAt: toDateTimeLocal(batch.start_at),
+      finishAt: toDateTimeLocal(batch.finish_at),
+      notes: batch.notes ?? '',
+    });
+  }, [batch, open, resetFields]);
 
-  const canSubmit = useMemo(() => startAt.trim() !== '', [startAt]);
+  const canSubmit = useMemo(
+    () => startAt.trim() !== '' && !finishBeforeStartError,
+    [startAt, finishBeforeStartError],
+  );
 
   const handleUpdate = async () => {
     if (!batch) return;
@@ -86,11 +103,12 @@ export function useEditBatchForm({ open, onClose }: EditBatchDialogProps) {
     humidityTarget,
     setHumidityTarget,
     startAt,
-    setStartAt,
+    handleStartAtChange,
     finishAt,
     setFinishAt,
     notes,
     setNotes,
+    finishBeforeStartError,
     canSubmit,
     handleUpdate,
     isPending: updateBatch.isLoading,

@@ -38,6 +38,7 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
     recipes,
     busyUnitIds,
     startAtConflict,
+    finishBeforeStartError,
     canSubmit,
     handleUnitChange,
     handleRecipeChange,
@@ -123,6 +124,8 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
             onChange={(e) => setFinishAt(e.target.value)}
             fullWidth
             slotProps={{ inputLabel: { shrink: true } }}
+            error={!!finishBeforeStartError}
+            helperText={finishBeforeStartError ?? undefined}
           />
           <TextField
             label="Species"
