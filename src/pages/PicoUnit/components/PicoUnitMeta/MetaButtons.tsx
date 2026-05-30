@@ -1,13 +1,12 @@
 import React from 'react';
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import { Box, Button, IconButton, Stack, Tooltip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
+import { DeleteButton, EditButton } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 
 type MetaButtonsProps = {
@@ -46,23 +45,8 @@ export const MetaButtons: React.FC<MetaButtonsProps> = ({ setDeleteOpen, setEdit
         </Box>
       </Button>
 
-      <Button
-        color="secondary"
-        variant="contained"
-        startIcon={<EditIcon />}
-        onClick={() => setEditOpen(true)}
-      >
-        Edit
-      </Button>
-
-      <Button
-        color="error"
-        variant="contained"
-        startIcon={<DeleteIcon />}
-        onClick={() => setDeleteOpen(true)}
-      >
-        Delete
-      </Button>
+      <EditButton onClick={() => setEditOpen(true)} />
+      <DeleteButton onClick={() => setDeleteOpen(true)} />
     </Stack>
   );
 };

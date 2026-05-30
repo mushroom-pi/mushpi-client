@@ -1,11 +1,9 @@
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import { Box, Button, Stack } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { Error, Invalid, ItemPage, Loading, PageTitle } from '~components';
+import { DeleteButton, EditButton, Error, Invalid, ItemPage, Loading, PageTitle } from '~components';
 import { BatchProvider, useBatchContext } from '~ctx/Batch';
 import { BatchChartsProvider } from '~ctx/Charts';
 import { StatusChip } from '~pages/Batches/components/StatusChip';
@@ -46,22 +44,8 @@ function BatchDetailInner() {
               Save as Recipe
             </Button>
           )}
-          <Button
-            color="secondary"
-            variant="contained"
-            startIcon={<EditIcon />}
-            onClick={() => setEditOpen(true)}
-          >
-            Edit
-          </Button>
-          <Button
-            color="error"
-            variant="contained"
-            startIcon={<DeleteIcon />}
-            onClick={() => setDeleteOpen(true)}
-          >
-            Delete
-          </Button>
+          <EditButton onClick={() => setEditOpen(true)} />
+          <DeleteButton onClick={() => setDeleteOpen(true)} />
         </Stack>
       }
     >

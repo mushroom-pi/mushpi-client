@@ -1,10 +1,8 @@
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import { Button, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { Error, Invalid, ItemPage, Loading } from '~components';
+import { DeleteButton, EditButton, Error, Invalid, ItemPage, Loading } from '~components';
 import { RecipeProvider, useRecipeContext } from '~ctx/Recipe';
 
 import { DeleteRecipeDialog } from './components/DeleteRecipeDialog';
@@ -25,22 +23,8 @@ function RecipeDetailInner() {
       title={recipe.name}
       actions={
         <Stack direction="row" spacing={1}>
-          <Button
-            color="secondary"
-            variant="contained"
-            startIcon={<EditIcon />}
-            onClick={() => setEditOpen(true)}
-          >
-            Edit
-          </Button>
-          <Button
-            color="error"
-            variant="contained"
-            startIcon={<DeleteIcon />}
-            onClick={() => setDeleteOpen(true)}
-          >
-            Delete
-          </Button>
+          <EditButton onClick={() => setEditOpen(true)} />
+          <DeleteButton onClick={() => setDeleteOpen(true)} />
         </Stack>
       }
     >

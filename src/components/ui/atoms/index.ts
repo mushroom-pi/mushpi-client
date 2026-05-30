@@ -8,3 +8,5 @@ export { ReadableTime } from './ReadableTime';
 export { DateTimeField } from './DateTimeField';
 export { HeaderAndIcon } from './HeaderAndIcon';
 export { PageTitle } from './PageTitle';
+export { EditButton } from './EditButton';
+export { DeleteButton } from './DeleteButton';
