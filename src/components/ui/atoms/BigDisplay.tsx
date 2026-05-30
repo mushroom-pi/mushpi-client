@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import type React from 'react';
 
-import { prettyDate } from 'src/utils/methods';
+import { prettyDate } from '~utils/methods';
 
 interface BigDisplayProps {
   content?: string | number;

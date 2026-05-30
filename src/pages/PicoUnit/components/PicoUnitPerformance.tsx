@@ -2,11 +2,10 @@ import SpeedIcon from '@mui/icons-material/Speed';
 import { Chip } from '@mui/material';
 import React from 'react';
 
-import { chipColorForFailedCalls } from 'src/utils/methods';
-
 import { InfoCard, InfoField, Loading } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
+import { chipColorForFailedCalls } from '~utils/methods';
 
 function chipColorForResponse(ms?: number | null) {
   if (typeof ms !== 'number') return 'default';

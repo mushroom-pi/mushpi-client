@@ -1,10 +1,10 @@
 import { omit } from 'lodash';
 import React, { useMemo, useState } from 'react';
 
-import { useListBatchReadings } from '~hook/useBatchReadings';
-
-import { smartSampleChartPoints } from 'src/utils/methods';
 import type { Batch } from '~api/generated';
+import { useListBatchReadings } from '~hook/useBatchReadings';
+import { smartSampleChartPoints } from '~utils/methods';
+
 import { toChartPoints } from './hooks';
 import { ChartsContext, type ChartsContextValue } from './provider';
 
@@ -51,10 +51,7 @@ export const BatchChartsProvider: React.FC<React.PropsWithChildren<BatchChartsPr
     return ticks;
   }, [labels]);
 
-  const queryData = useMemo(
-    () => (query.data ? omit(query.data, 'items') : null),
-    [query.data],
-  );
+  const queryData = useMemo(() => (query.data ? omit(query.data, 'items') : null), [query.data]);
 
   const value = useMemo<ChartsContextValue>(
     () => ({
@@ -71,7 +68,17 @@ export const BatchChartsProvider: React.FC<React.PropsWithChildren<BatchChartsPr
       displayPoints,
       setDisplayPoints,
     }),
-    [chartsData, labels, commonTicks, query.isLoading, query.isFetching, query.isError, query.error, queryData, displayPoints],
+    [
+      chartsData,
+      labels,
+      commonTicks,
+      query.isLoading,
+      query.isFetching,
+      query.isError,
+      query.error,
+      queryData,
+      displayPoints,
+    ],
   );
 
   return <ChartsContext.Provider value={value}>{children}</ChartsContext.Provider>;

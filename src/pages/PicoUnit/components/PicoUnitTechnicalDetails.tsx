@@ -1,11 +1,10 @@
 import MemoryIcon from '@mui/icons-material/Memory';
 import React, { useMemo } from 'react';
 
-import { bytesToMB } from 'src/utils/methods';
-
 import { BigDisplay, InfoCard, InfoField, Loading } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
+import { bytesToMB } from '~utils/methods';
 
 export const PicoUnitTechnicalDetails: React.FC<OptionalPicoUnitProps> = ({ pico: dataProp }) => {
   const ctx = usePicoUnitContext();
