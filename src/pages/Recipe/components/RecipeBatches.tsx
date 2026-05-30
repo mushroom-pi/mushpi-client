@@ -1,19 +1,12 @@
 import AddIcon from '@mui/icons-material/Add';
-import {
-  Box,
-  Card,
-  CardContent,
-  CircularProgress,
-  IconButton,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Box, CircularProgress, IconButton } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { recipeKeys } from '~api/queryKeys';
+import { InfoCard } from '~components';
 import { useRecipeContext } from '~ctx/Recipe';
 import { BatchesTable } from '~pages/Batches/components/BatchesTable';
 import { CreateBatchDialog } from '~pages/Batches/components/CreateBatchDialog';
@@ -32,30 +25,28 @@ export function RecipeBatches() {
 
   return (
     <>
-      <Card>
-        <CardContent>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1.5}>
-            <Typography variant="h6">Batches using this recipe</Typography>
-            <IconButton size="small" onClick={() => setCreateOpen(true)} title="New batch">
-              <AddIcon fontSize="small" />
-            </IconButton>
-          </Stack>
-
-          {isBatchesLoading ? (
-            <Box display="flex" justifyContent="center" py={2}>
-              <CircularProgress size={24} />
-            </Box>
-          ) : (
-            <BatchesTable
-              batches={batches}
-              onRowClick={(id) => navigate(`/batches/${id}`)}
-              hideSpeciesColumn
-              hideRecipeColumn
-              disablePaper
-            />
-          )}
-        </CardContent>
-      </Card>
+      <InfoCard
+        title="Batches using this recipe"
+        headerAction={
+          <IconButton size="small" onClick={() => setCreateOpen(true)} title="New batch">
+            <AddIcon fontSize="small" />
+          </IconButton>
+        }
+      >
+        {isBatchesLoading ? (
+          <Box display="flex" justifyContent="center" py={2}>
+            <CircularProgress size={24} />
+          </Box>
+        ) : (
+          <BatchesTable
+            batches={batches}
+            onRowClick={(id) => navigate(`/batches/${id}`)}
+            hideSpeciesColumn
+            hideRecipeColumn
+            disablePaper
+          />
+        )}
+      </InfoCard>
 
       <CreateBatchDialog
         open={createOpen}
