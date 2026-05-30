@@ -1,5 +1,6 @@
 import { useTheme } from '@mui/material';
 import type React from 'react';
+import { useMemo } from 'react';
 import {
   Brush,
   CartesianGrid,
@@ -70,6 +71,18 @@ export const ReadingsTargetChart: React.FC<ReadingsTargetChartProps> = ({
   const chartHeight = baseHeight + (showBrush ? BRUSH_COMPENSATION : 0);
   const colors = getLineColors(actualKey, palette);
 
+  const yDomain = useMemo((): [number, number] | ['auto', 'auto'] => {
+    if (!data.length) return ['auto', 'auto'];
+    const values = data
+      .flatMap((p) => [
+        p[actualKey] as number | undefined,
+        p[targetKey] as number | undefined,
+      ])
+      .filter((v): v is number => v != null && isFinite(v));
+    if (!values.length) return ['auto', 'auto'];
+    return [Math.min(...values) - 3, Math.max(...values) + 3];
+  }, [data, actualKey, targetKey]);
+
   return (
     <FallbackChart item={label}>
       <ResponsiveContainer width="100%" height={chartHeight}>
@@ -86,10 +99,9 @@ export const ReadingsTargetChart: React.FC<ReadingsTargetChartProps> = ({
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="label" hide={!showXAxis} ticks={commonTicks} />
           <YAxis
-            dataKey={actualKey}
             unit={unit}
             tickCount={5}
-            domain={['dataMin-3', 'dataMax+3']}
+            domain={yDomain}
           />
           <Tooltip />
           <Line
