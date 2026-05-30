@@ -1,13 +1,12 @@
 import { useMemo } from 'react';
 
-import { bytesToMB, downsampleChartPoints, rleDeduplicateOnOffPoints } from 'src/utils/methods';
-
 import type {
   ReadingsApiPicoUnitIdReadingsControllerListForUnitRequest as ListPicoUnitReadingsParams,
   Readings,
 } from '~api/generated';
 import { useListPicoUnitReadings } from '~hook/useReadings';
 import type { ChartPoint } from '~type/charts';
+import { bytesToMB, smartSampleChartPoints } from '~utils/methods';
 
 export const fmtTsShort = (iso?: string) => {
   if (!iso) return '';
@@ -36,9 +35,12 @@ export const toChartPoints = (items: Readings[]): ChartPoint[] =>
   }));
 
 const SAMPLE_TICK_COUNT = 5;
-const MAX_DISPLAY_POINTS = 100;
 
-export function useCharts(params: ListPicoUnitReadingsParams, enabled: boolean = true) {
+export function useCharts(
+  params: ListPicoUnitReadingsParams,
+  enabled: boolean = true,
+  displayPoints: number = 50,
+) {
   const { picoUnitId, start, end, page = 1, limit = 500 } = params;
 
   const query = useListPicoUnitReadings(
@@ -54,12 +56,9 @@ export function useCharts(params: ListPicoUnitReadingsParams, enabled: boolean =
 
   const chartsData = useMemo<ChartPoint[]>(() => {
     if (!query.data) return [];
-
     const points = toChartPoints(query.data.items);
-    const withStateTransitions = rleDeduplicateOnOffPoints(points);
-
-    return downsampleChartPoints(withStateTransitions, MAX_DISPLAY_POINTS);
-  }, [query.data]);
+    return smartSampleChartPoints(points, displayPoints);
+  }, [query.data, displayPoints]);
 
   const labels = useMemo(() => chartsData.map((d) => d.label ?? ''), [chartsData]);
 

@@ -60,6 +60,45 @@ export const downsampleChartPoints = (
   return sampled;
 };
 
+/**
+ * Smart chart downsampler that preserves on/off state transitions while
+ * filling the remaining budget with uniformly-spaced points for continuous
+ * charts (temperature, humidity). Never returns more than `maxPoints` points.
+ *
+ * When data is sparse (points.length <= maxPoints) all points are returned.
+ * When there are more transitions than the cap, falls back to uniform sampling.
+ */
+export const smartSampleChartPoints = (
+  points: ChartPoint[],
+  maxPoints: number = 50,
+): ChartPoint[] => {
+  if (maxPoints < 2 || points.length <= maxPoints) return points;
+
+  const keepIndices = new Set<number>([0, points.length - 1]);
+
+  for (const key of DEFAULT_ON_OFF_KEYS) {
+    for (let i = 1; i < points.length; i += 1) {
+      if (points[i][key] !== points[i - 1][key]) {
+        keepIndices.add(i - 1);
+        keepIndices.add(i);
+      }
+    }
+  }
+
+  if (keepIndices.size >= maxPoints) {
+    return downsampleChartPoints(points, maxPoints);
+  }
+
+  // Fill remaining budget with evenly-spaced indices (total never exceeds maxPoints)
+  const remaining = maxPoints - keepIndices.size;
+  const stride = points.length / (remaining + 1);
+  for (let i = 1; i <= remaining; i += 1) {
+    keepIndices.add(Math.round(i * stride));
+  }
+
+  return [...keepIndices].sort((a, b) => a - b).map((idx) => points[idx]);
+};
+
 export const rleDeduplicateOnOffPoints = (
   points: ChartPoint[],
   keys: OnOffChartKey[] = DEFAULT_ON_OFF_KEYS,

@@ -10,7 +10,7 @@ import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { useExportPicoUnitReadingsCmd } from '~hook/useReadings';
 
 import { AlignedButton } from './AlignedButton';
-import { LimitSelect } from './LimitSelect';
+import { DisplayPointsSelect } from './DisplayPointsSelect';
 import { PicoUnitSelect } from './PicoUnitSelect';
 import { TimeWindowSelect } from './TimeWindowSelect';
 
@@ -71,7 +71,7 @@ const buildInitialLocalParams = (params?: ListPicoUnitReadingsParams): LocalPara
 
 export const BuildQueryForm: React.FC = () => {
   const { units: picoUnits = [] } = usePicoUnitsContext();
-  const { params, setParams } = useChartsContext();
+  const { params, setParams, displayPoints, setDisplayPoints } = useChartsContext();
 
   // Local params: keep start/end strictly Dayjs | null when used in the UI
   const [localParams, setLocalParams] = useState<LocalParams>(() =>
@@ -101,7 +101,6 @@ export const BuildQueryForm: React.FC = () => {
 
   /* UI values */
   const currentPicoUnitValue = String(localParams?.picoUnitId ?? params?.picoUnitId ?? '');
-  const currentLimitValue = String(localParams?.limit ?? params?.limit ?? 500);
   const currentStartValue: Dayjs | null = start;
   const currentEndValue: Dayjs | null = end;
 
@@ -194,9 +193,9 @@ export const BuildQueryForm: React.FC = () => {
           height={SELECTORS_HEIGHT}
         />
 
-        <LimitSelect
-          value={currentLimitValue}
-          onChange={(n) => setLocalParams((prev) => ({ ...prev, limit: n }))}
+        <DisplayPointsSelect
+          value={displayPoints}
+          onChange={setDisplayPoints}
           height={SELECTORS_HEIGHT}
           sx={controlSx}
         />

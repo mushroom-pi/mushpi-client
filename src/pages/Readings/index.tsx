@@ -27,7 +27,7 @@ export const ReadingsPage = () => {
   }
 
   return (
-    <ChartsProvider initialParams={{ picoUnitId: selectedId, page: 1, limit: 250 }}>
+    <ChartsProvider initialParams={{ picoUnitId: selectedId, page: 1, limit: 500 }}>
       <Page>
         <PageTitle mb={2.5}>Readings</PageTitle>
         <BuildQueryForm />

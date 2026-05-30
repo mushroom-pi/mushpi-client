@@ -9,23 +9,25 @@ import {
   type Theme,
 } from '@mui/material';
 
-export const LimitSelect = ({
+const DISPLAY_POINT_OPTIONS = [25, 50, 100, 200];
+
+export const DisplayPointsSelect = ({
   value,
   onChange,
   height,
   sx,
 }: {
-  value: string;
+  value: number;
   onChange: (n: number) => void;
   height?: number;
   sx?: SxProps<Theme>;
 }) => (
   <FormControl sx={{ minWidth: 140, ...sx }} size="medium">
-    <InputLabel id="limit-label">Limit</InputLabel>
+    <InputLabel id="display-points-label">Display points</InputLabel>
     <Select
-      labelId="limit-label"
-      value={value}
-      label="Limit"
+      labelId="display-points-label"
+      value={String(value)}
+      label="Display points"
       size="medium"
       onChange={(e: SelectChangeEvent) => onChange(Number(e.target.value))}
       sx={{
@@ -38,7 +40,7 @@ export const LimitSelect = ({
         },
       }}
     >
-      {[25, 50, 100, 250, 500].map((n) => (
+      {DISPLAY_POINT_OPTIONS.map((n) => (
         <MenuItem key={n} value={String(n)}>
           {n}
         </MenuItem>

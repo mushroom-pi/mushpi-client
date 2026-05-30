@@ -1,14 +1,14 @@
 import { omit } from 'lodash';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { useListBatchReadings } from '~hook/useBatchReadings';
 
-import { downsampleChartPoints, rleDeduplicateOnOffPoints } from 'src/utils/methods';
+import { smartSampleChartPoints } from 'src/utils/methods';
 import type { Batch } from '~api/generated';
 import { toChartPoints } from './hooks';
 import { ChartsContext, type ChartsContextValue } from './provider';
 
-const MAX_DISPLAY_POINTS = 100;
+const DEFAULT_DISPLAY_POINTS = 100;
 const SAMPLE_TICK_COUNT = 5;
 
 interface BatchChartsProviderProps {
@@ -21,6 +21,8 @@ export const BatchChartsProvider: React.FC<React.PropsWithChildren<BatchChartsPr
   batch,
   children,
 }) => {
+  const [displayPoints, setDisplayPoints] = useState(DEFAULT_DISPLAY_POINTS);
+
   const query = useListBatchReadings({
     batchId,
     start: batch.start_at,
@@ -32,8 +34,8 @@ export const BatchChartsProvider: React.FC<React.PropsWithChildren<BatchChartsPr
   const chartsData = useMemo(() => {
     if (!query.data) return [];
     const points = toChartPoints(query.data.items);
-    return downsampleChartPoints(rleDeduplicateOnOffPoints(points), MAX_DISPLAY_POINTS);
-  }, [query.data]);
+    return smartSampleChartPoints(points, displayPoints);
+  }, [query.data, displayPoints]);
 
   const labels = useMemo(() => chartsData.map((d) => d.label ?? ''), [chartsData]);
 
@@ -66,8 +68,10 @@ export const BatchChartsProvider: React.FC<React.PropsWithChildren<BatchChartsPr
       queryData: queryData ?? null,
       params: undefined,
       setParams: () => {},
+      displayPoints,
+      setDisplayPoints,
     }),
-    [chartsData, labels, commonTicks, query.isLoading, query.isFetching, query.isError, query.error, queryData],
+    [chartsData, labels, commonTicks, query.isLoading, query.isFetching, query.isError, query.error, queryData, displayPoints],
   );
 
   return <ChartsContext.Provider value={value}>{children}</ChartsContext.Provider>;

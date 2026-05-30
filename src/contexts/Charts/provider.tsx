@@ -20,6 +20,8 @@ export type ChartsContextValue = {
   params?: ListPicoUnitReadingsParams;
   setParams: (p: ListPicoUnitReadingsParams) => void;
   queryData: Omit<ReadingsListResponseDto, 'items'> | null;
+  displayPoints: number;
+  setDisplayPoints: (n: number) => void;
 };
 
 interface ChartsContextProps {
@@ -33,6 +35,7 @@ export const ChartsProvider = ({
   initialParams,
 }: React.PropsWithChildren<ChartsContextProps>) => {
   const [params, setParams] = useState<ListPicoUnitReadingsParams>(initialParams);
+  const [displayPoints, setDisplayPoints] = useState(50);
 
   useEffect(() => {
     if (initialParams?.picoUnitId != null && initialParams.picoUnitId !== params.picoUnitId) {
@@ -40,9 +43,8 @@ export const ChartsProvider = ({
     }
   }, [initialParams?.picoUnitId]);
 
-  const query = useCharts(params);
-  const { raw, labels, commonTicks, isLoading, isFetching, isError, error } = query;
-  const chartsData = useMemo(() => query.chartsData, [raw]);
+  const query = useCharts(params, true, displayPoints);
+  const { chartsData, raw, labels, commonTicks, isLoading, isFetching, isError, error } = query;
   const queryData = useMemo(() => omit(raw, 'items'), [raw]);
 
   const contextValue: ChartsContextValue = useMemo(
@@ -57,8 +59,10 @@ export const ChartsProvider = ({
       queryData,
       params,
       setParams,
+      displayPoints,
+      setDisplayPoints,
     }),
-    [chartsData, labels, commonTicks, isLoading, isFetching, isError, error, queryData, params],
+    [chartsData, labels, commonTicks, isLoading, isFetching, isError, error, queryData, params, displayPoints],
   );
 
   return <ChartsContext.Provider value={contextValue}>{children}</ChartsContext.Provider>;
