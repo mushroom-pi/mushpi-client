@@ -16,8 +16,8 @@ src/
 │   ├── queryKeys.ts        # React Query key factories (recipeKeys, batchKeys included)
 │   └── generated/api.ts    # AUTO-GENERATED — never edit manually
 ├── components/ui/
-│   ├── atoms/              # Stateless presentational (Card, InfoField, OnOffInfo, etc.)
-│   ├── molecules/          # Composed components (InfoCard, EditableInfoCard, PicoUnitForm, etc.)
+│   ├── atoms/              # Stateless presentational (EditButton, DeleteButton, InfoField, OnOffInfo, etc.)
+│   ├── molecules/          # Composed components (ItemPage, InfoCard, EditableInfoCard, ConfirmDialog, GraphTab, etc.)
 │   └── index.ts            # Barrel export
 ├── contexts/
 │   ├── PicoUnit/           # Context + hooks + mutations for a single unit
@@ -97,8 +97,84 @@ Always regenerate after any `mushpi-server` endpoint change.
 - Use **MUI components** over raw HTML; use `sx` prop for one-off styles.
 - Use `PicoUnitForm` for dialogs **only within PicoUnit pages** — it is coupled to `usePicoUnitContext()`. All other pages (Recipes, Batches) use MUI `Dialog` directly.
 - Use `OnOffInfo` / `OnOffInput` for boolean device states.
-- Use `EditableInfoCard` for display + inline edit. The `headerActions` prop renders extra icon buttons (e.g., delete) to the left of the edit button in the card header.
+- Use `EditableInfoCard` for display + inline edit cards. Use plain `InfoCard` when the card is display-only; its `headerAction` prop renders an action element (e.g. `<IconButton>`) to the right of the title.
 - `mushroomTheme.ts` for global theme overrides.
+
+## UI Patterns — DRY Principle
+
+**Before writing any new component or layout, check whether an existing atom or molecule already covers the need.** This codebase has gone through deliberate factorization; do not re-inline what has already been extracted.
+
+### Detail page layout — `ItemPage`
+
+All entity detail pages (PicoUnit, Recipe, Batch) use the `ItemPage` molecule:
+
+```tsx
+<ItemPage
+  title="…"
+  titleAdornment={<StatusChip />}   // optional chip/badge beside the title
+  actions={<><EditButton … /><DeleteButton … /></>}  // top-right action buttons
+  meta={…}                           // subtitle text, description, etc.
+>
+  {/* page body: cards, charts, tables */}
+</ItemPage>
+```
+
+- `actions` renders at the top-right of the page header — **never put Edit/Delete buttons inside a card**.
+- Dialog state (`editOpen`, `deleteOpen`, …) lives at the detail page's top-level inner component, not inside sub-components.
+
+### Action buttons — `EditButton` / `DeleteButton`
+
+Use the `EditButton` and `DeleteButton` atoms for all primary action buttons on detail pages. They carry consistent color, variant, and icon; only override when there is a genuine semantic reason.
+
+```tsx
+<EditButton onClick={() => setEditOpen(true)} />
+<DeleteButton onClick={() => setDeleteOpen(true)} />
+```
+
+### Delete confirmations — `ConfirmDialog`
+
+All destructive confirmations use the `ConfirmDialog` molecule. **Never write a raw `<Dialog>` for a delete flow.**
+
+```tsx
+<ConfirmDialog
+  open={open}
+  onClose={onClose}
+  title="Delete X"
+  confirmLabel="Delete permanently"
+  danger
+  isLoading={mutation.isLoading}
+  onConfirm={handleDelete}
+>
+  <DialogContentText>
+    <Alert severity="warning" variant="filled" sx={{ borderRadius: 2 }}>
+      Deleting this X is permanent and cannot be undone. Please confirm that you
+      want to permanently delete <strong>{item.name}</strong>.
+    </Alert>
+  </DialogContentText>
+</ConfirmDialog>
+```
+
+- Use `Alert severity="warning" variant="filled" sx={{ borderRadius: 2 }}` as the body for all delete dialogs — keep tone and structure consistent across the three entity types.
+- `isLoading` blocks the backdrop and disables both buttons automatically.
+
+### Cards with an action button — `InfoCard.headerAction`
+
+When a card needs an action button in its header (e.g. "New batch" `<IconButton>`), pass it via `headerAction` — do **not** wrap the card in a raw `<Card>` + `<CardContent>` just to build a custom header:
+
+```tsx
+<InfoCard title="Batches" headerAction={<IconButton …><AddIcon /></IconButton>}>
+  …
+</InfoCard>
+```
+
+### When to extract a new atom or molecule
+
+If you find yourself writing the same JSX structure (layout, dialog scaffold, button style) in two or more places, extract it before the second copy lands in the codebase. Specifically:
+
+- Identical or near-identical dialog scaffolds → molecule (like `ConfirmDialog`)
+- Repeated button with fixed color/variant/icon → atom (like `EditButton`)
+- Repeated page-level header + action layout → molecule (like `ItemPage`)
+- Repeated card-with-header pattern → use `InfoCard` / `EditableInfoCard` props instead of raw `<Card>`
 
 ## Complex Component Folders
 
@@ -141,7 +217,7 @@ For batch readings (`/batches/:id`), `BatchChartsProvider` sources data from `us
 The Recipes section (`/recipes`, `/recipes/:id`) manages reusable grow condition templates.
 
 - **List page** (`src/pages/Recipes/`): sortable table (name, species, temperature, duration, created date), default sort alphabetically by name, create-recipe dialog.
-- **Detail page** (`src/pages/Recipe/`): `RecipeMeta` card (view + inline edit + delete via `headerActions`), `RecipeBatches` table listing all batches that used this recipe.
+- **Detail page** (`src/pages/Recipe/`): `RecipeMeta` card (view via `InfoCard`, edit via `EditRecipeDialog`, delete via `DeleteRecipeDialog`), `RecipeBatches` table listing all batches that used this recipe.
 - **Context**: `RecipeProvider` / `useRecipeContext()` from `~ctx/Recipe`; list hooks from `~ctx/Recipes`.
 - **Validation pattern**: blur-based field validation with `touched` state; hint text in `helperText` when no error (e.g., "0–50 °C"); on submit all fields are force-touched.
 
@@ -150,7 +226,7 @@ The Recipes section (`/recipes`, `/recipes/:id`) manages reusable grow condition
 The Batches section (`/batches`, `/batches/:id`) represents fixed-period growing runs tied to a Pico unit.
 
 - **List page** (`src/pages/Batches/`): table with status filter (in-progress / finished / all), create-batch dialog.
-- **Detail page** (`src/pages/Batch/`): `BatchMeta` card (view + edit + delete; "Save as Recipe" shown only when batch is finished), chart tabs (`TempHumTab`, `DevicesTab`, `ControlLoopTab`) driven by `BatchChartsProvider`.
+- **Detail page** (`src/pages/Batch/`): `BatchMeta` card (view via `InfoCard`, edit via `EditBatchDialog`, delete via `DeleteBatchDialog`; "Save as Recipe" button shown only when batch is finished), chart tabs (`TempHumTab`, `DevicesTab`, `ControlLoopTab`) driven by `BatchChartsProvider`.
 - **Unit detail page** (`/pico-units/:id`): `PicoUnitBatches` section shows the unit's batches with the current in-progress batch highlighted; "New Batch" button inline.
 - **Context**: `BatchProvider` / `useBatchContext()` from `~ctx/Batch`; list hooks from `~ctx/Batches`.
 - **`finish_at` semantics**: `null` → in-progress; set → finished. "Save as Recipe" only shown when finished.
