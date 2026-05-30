@@ -1,4 +1,5 @@
 // Barrel for reusable UI molecules.
+export { ItemPage } from './ItemPage';
 export { InfoCard } from './InfoCard';
 export { EditableInfoCard } from './EditableInfoCard';
 export { OnOffInfo } from './OnOffInfo';

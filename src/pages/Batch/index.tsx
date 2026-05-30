@@ -1,16 +1,27 @@
-import { Box } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
+import { Box, Button, Stack } from '@mui/material';
+import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import { Error, Invalid, Loading, PageTitle } from '~components';
+import { Error, Invalid, ItemPage, Loading, PageTitle } from '~components';
 import { BatchProvider, useBatchContext } from '~ctx/Batch';
 import { BatchChartsProvider } from '~ctx/Charts';
-import { Page } from '~layout/Page';
+import { StatusChip } from '~pages/Batches/components/StatusChip';
 import { ChartsTabs } from '~pages/Readings/components/ChartsTabs';
 
 import { BatchMeta } from './components/BatchMeta';
+import { DeleteBatchDialog } from './components/DeleteBatchDialog';
+import { EditBatchDialog } from './components/EditBatchDialog';
+import { SaveAsRecipeDialog } from './components/SaveAsRecipeDialog';
 
 function BatchDetailInner() {
+  const navigate = useNavigate();
   const { batch, isLoading, isError, error, refetch } = useBatchContext();
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [saveRecipeOpen, setSaveRecipeOpen] = useState(false);
 
   if (isLoading) {
     return <Loading item="batch" />;
@@ -21,7 +32,39 @@ function BatchDetailInner() {
   }
 
   return (
-    <Page>
+    <ItemPage
+      title={batch.description ?? `Batch #${batch.id}`}
+      titleAdornment={<StatusChip status={batch.status} />}
+      actions={
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+          {batch.status === 'finished' && (
+            <Button
+              variant="outlined"
+              startIcon={<SaveIcon />}
+              onClick={() => setSaveRecipeOpen(true)}
+            >
+              Save as Recipe
+            </Button>
+          )}
+          <Button
+            color="secondary"
+            variant="contained"
+            startIcon={<EditIcon />}
+            onClick={() => setEditOpen(true)}
+          >
+            Edit
+          </Button>
+          <Button
+            color="error"
+            variant="contained"
+            startIcon={<DeleteIcon />}
+            onClick={() => setDeleteOpen(true)}
+          >
+            Delete
+          </Button>
+        </Stack>
+      }
+    >
       <BatchMeta />
       <Box mt={3}>
         <PageTitle mb={2}>Batch Readings</PageTitle>
@@ -29,7 +72,14 @@ function BatchDetailInner() {
           <ChartsTabs />
         </BatchChartsProvider>
       </Box>
-    </Page>
+      <EditBatchDialog open={editOpen} onClose={() => setEditOpen(false)} />
+      <DeleteBatchDialog
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onSuccess={() => navigate('/batches')}
+      />
+      <SaveAsRecipeDialog open={saveRecipeOpen} onClose={() => setSaveRecipeOpen(false)} />
+    </ItemPage>
   );
 }
 

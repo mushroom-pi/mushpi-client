@@ -1,25 +1,50 @@
-import { useEffect } from 'react';
+import { Box, Chip, Stack, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { Error, Invalid, Loading } from '~components';
+import { Error, Invalid, ItemPage, Loading } from '~components';
 import { PicoUnitProvider, usePicoUnitContext } from '~ctx/PicoUnit';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
-import { Page } from '~layout/Page';
 
 import { PicoUnitDetailGrid as DetailGrid } from './components/PicoUnitDetailGrid';
-import { PicoUnitMeta as Meta } from './components/PicoUnitMeta';
+import { DeleteDialog } from './components/PicoUnitMeta/DeleteDialog';
+import { EditMetaDialog } from './components/PicoUnitMeta/EditMetaDialog';
+import { MetaButtons } from './components/PicoUnitMeta/MetaButtons';
 
 function PicoUnitDetailInner() {
   const { pico, isLoading, isError, error, refetch } = usePicoUnitContext();
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   if (isLoading) return <Loading item="pico unit" />;
   if (isError || !pico) return <Error item="pico unit" refetch={refetch} error={error} />;
 
   return (
-    <Page>
-      <Meta pico={pico} />
+    <ItemPage
+      title={pico.name ?? 'No name'}
+      actions={<MetaButtons setEditOpen={setEditOpen} setDeleteOpen={setDeleteOpen} />}
+      meta={
+        <>
+          <Stack direction="row" spacing={2} alignItems="center" mb={2}>
+            <Chip
+              label={pico.enabled ? 'Enabled' : 'Disabled'}
+              color={pico.enabled ? 'info' : 'default'}
+              size="small"
+            />
+            <Typography variant="subtitle2" color="text.secondary">
+              {pico.handle ?? ''}
+            </Typography>
+          </Stack>
+          <Box mb={3}>
+            <Typography variant="body2">{pico.description ?? 'No description'}</Typography>
+          </Box>
+        </>
+      }
+    >
       <DetailGrid pico={pico} />
-    </Page>
+      <EditMetaDialog open={editOpen} onClose={() => setEditOpen(false)} />
+      <DeleteDialog open={deleteOpen} onClose={() => setDeleteOpen(false)} />
+    </ItemPage>
   );
 }
 

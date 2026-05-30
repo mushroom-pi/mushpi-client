@@ -1,9 +1,8 @@
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
+import { ModalForm } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
-
-import { ModalForm } from '../atoms/ModalForm';
 
 export interface PicoUnitFormProps {
   open: boolean;

@@ -1,6 +1,6 @@
 import { TextField } from '@mui/material';
 
-import { ModalForm } from '../atoms/ModalForm';
+import { ModalForm } from '~components';
 import type { RecipeFormErrors, RecipeFormValues } from '~hook/RecipeForm/interfaces';
 
 export interface RecipeFormProps {
