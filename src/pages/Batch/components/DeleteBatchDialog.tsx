@@ -1,13 +1,6 @@
-import {
-  Alert,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from '@mui/material';
+import { Alert, DialogContentText } from '@mui/material';
 
+import { ConfirmDialog } from '~components';
 import { useBatchContext } from '~ctx/Batch';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 
@@ -34,29 +27,22 @@ export const DeleteBatchDialog = ({ open, onClose, onSuccess }: DeleteBatchDialo
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Delete Batch</DialogTitle>
-      <DialogContent dividers>
-        <DialogContentText component="div">
-          <Alert severity="warning" sx={{ mb: 2 }}>
-            This action permanently deletes batch #{batch?.id}. This cannot be undone.
-          </Alert>
-          Are you sure you want to delete this batch?
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} disabled={deleteBatch.isLoading}>
-          Cancel
-        </Button>
-        <Button
-          color="error"
-          variant="contained"
-          onClick={handleDelete}
-          disabled={deleteBatch.isLoading}
-        >
-          {deleteBatch.isLoading ? 'Deleting…' : 'Delete'}
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <ConfirmDialog
+      open={open}
+      onClose={onClose}
+      title="Delete Batch"
+      confirmLabel="Delete permanently"
+      danger
+      isLoading={deleteBatch.isLoading}
+      onConfirm={handleDelete}
+    >
+      <DialogContentText>
+        <Alert severity="warning" variant="filled" sx={{ borderRadius: 2 }}>
+          Deleting this batch is permanent and cannot be undone. All associated readings will be
+          removed. Please confirm that you want to permanently delete batch{' '}
+          <strong>#{batch?.id}</strong>.
+        </Alert>
+      </DialogContentText>
+    </ConfirmDialog>
   );
 };

@@ -7,7 +7,7 @@ import { PicoUnitProvider, usePicoUnitContext } from '~ctx/PicoUnit';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 
 import { PicoUnitDetailGrid as DetailGrid } from './components/PicoUnitDetailGrid';
-import { DeleteDialog } from './components/PicoUnitMeta/DeleteDialog';
+import { DeletePicoUnit } from './components/PicoUnitMeta/DeletePicoUnit';
 import { EditMetaDialog } from './components/PicoUnitMeta/EditMetaDialog';
 import { MetaButtons } from './components/PicoUnitMeta/MetaButtons';
 
@@ -43,7 +43,7 @@ function PicoUnitDetailInner() {
     >
       <DetailGrid pico={pico} />
       <EditMetaDialog open={editOpen} onClose={() => setEditOpen(false)} />
-      <DeleteDialog open={deleteOpen} onClose={() => setDeleteOpen(false)} />
+      <DeletePicoUnit open={deleteOpen} onClose={() => setDeleteOpen(false)} />
     </ItemPage>
   );
 }

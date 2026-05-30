@@ -1,13 +1,7 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from '@mui/material';
+import { Alert, DialogContentText } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
+import { ConfirmDialog } from '~components';
 import { useRecipeContext } from '~ctx/Recipe';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 
@@ -34,31 +28,21 @@ export function DeleteRecipeDialog({ open, onClose }: DeleteRecipeDialogProps) {
   }
 
   return (
-    <Dialog
+    <ConfirmDialog
       open={open}
-      onClose={deleteRecipe.isLoading ? undefined : onClose}
-      fullWidth
-      maxWidth="sm"
+      onClose={onClose}
+      title="Delete Recipe"
+      confirmLabel="Delete permanently"
+      danger
+      isLoading={deleteRecipe.isLoading}
+      onConfirm={handleDelete}
     >
-      <DialogTitle>Delete recipe</DialogTitle>
-      <DialogContent dividers>
-        <DialogContentText>
-          Deleting <strong>{recipe?.name}</strong> is permanent and cannot be undone.
-        </DialogContentText>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} disabled={deleteRecipe.isLoading}>
-          Cancel
-        </Button>
-        <Button
-          color="error"
-          variant="contained"
-          onClick={handleDelete}
-          disabled={deleteRecipe.isLoading}
-        >
-          {deleteRecipe.isLoading ? 'Deleting…' : 'Delete'}
-        </Button>
-      </DialogActions>
-    </Dialog>
+      <DialogContentText>
+        <Alert severity="warning" variant="filled" sx={{ borderRadius: 2 }}>
+          Deleting this recipe is permanent and cannot be undone. Please confirm that you want to
+          permanently delete <strong>{recipe?.name}</strong>.
+        </Alert>
+      </DialogContentText>
+    </ConfirmDialog>
   );
 }

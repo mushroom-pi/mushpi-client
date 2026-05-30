@@ -2,6 +2,8 @@
 export { ItemPage } from './ItemPage';
 export { InfoCard } from './InfoCard';
 export { EditableInfoCard } from './EditableInfoCard';
+export { ConfirmDialog } from './ConfirmDialog';
+export type { ConfirmDialogProps } from './ConfirmDialog';
 export { OnOffInfo } from './OnOffInfo';
 export { OnOffInput } from './OnOffInput';
 export { Error } from './Error';
