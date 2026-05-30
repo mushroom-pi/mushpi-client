@@ -1,7 +1,9 @@
-import { Box, Tooltip, useMediaQuery, useTheme } from '@mui/material';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
 import React from 'react';
 import { FaHotjar as HeaterIcon, FaCloudRain as HumidifierIcon } from 'react-icons/fa';
 import { PiFanFill as FanIcon } from 'react-icons/pi';
+
+import { IconChartRow } from '~components';
 
 import { OnOffChart } from './Charts/OnOffChart';
 
@@ -25,42 +27,30 @@ export const DevicesTab: React.FC = () => {
 
   return (
     <Box display="flex" flexDirection="column" gap={1}>
-      <Box display="flex" alignItems="center" width="100%" gap={1}>
-        <Box width={iconColWidth} display="flex" justifyContent="center" flexShrink={0}>
-          <Tooltip title="Humidifier">
-            <HumidifierIcon size={iconSize} />
-          </Tooltip>
-        </Box>
-        <Box flex={1} minWidth={0}>
-          <OnOffChart dataKey="humidifier" height={panelHeight} />
-        </Box>
-      </Box>
-      <Box display="flex" alignItems="center" width="100%" gap={1}>
-        <Box width={iconColWidth} display="flex" justifyContent="center" flexShrink={0}>
-          <Tooltip title="Fan">
-            <FanIcon size={iconSize} />
-          </Tooltip>
-        </Box>
-        <Box flex={1} minWidth={0}>
-          <OnOffChart dataKey="fan" height={panelHeight} />
-        </Box>
-      </Box>
-      <Box display="flex" alignItems="center" width="100%" gap={1}>
-        <Box
-          width={iconColWidth}
-          display="flex"
-          justifyContent="center"
-          flexShrink={0}
-          sx={{ transform: `translateY(${iconOffset}px)` }}
-        >
-          <Tooltip title="Heater">
-            <HeaterIcon size={iconSize} />
-          </Tooltip>
-        </Box>
-        <Box flex={1} minWidth={0}>
-          <OnOffChart dataKey="heater" showXAxis showBrush height={panelHeight} />
-        </Box>
-      </Box>
+      <IconChartRow
+        tooltip="Humidifier"
+        icon={<HumidifierIcon size={iconSize} />}
+        iconColWidth={iconColWidth}
+      >
+        <OnOffChart dataKey="humidifier" height={panelHeight} />
+      </IconChartRow>
+
+      <IconChartRow
+        tooltip="Fan"
+        icon={<FanIcon size={iconSize} />}
+        iconColWidth={iconColWidth}
+      >
+        <OnOffChart dataKey="fan" height={panelHeight} />
+      </IconChartRow>
+
+      <IconChartRow
+        tooltip="Heater"
+        icon={<HeaterIcon size={iconSize} />}
+        iconColWidth={iconColWidth}
+        iconOffset={iconOffset}
+      >
+        <OnOffChart dataKey="heater" showXAxis showBrush height={panelHeight} />
+      </IconChartRow>
     </Box>
   );
 };

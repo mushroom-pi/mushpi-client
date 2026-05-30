@@ -1,7 +1,9 @@
-import { Box, Tooltip, useMediaQuery, useTheme } from '@mui/material';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
 import type React from 'react';
 import { FaTemperatureHigh as TemperatureIcon } from 'react-icons/fa';
 import { RiWaterPercentFill as HumidityIcon } from 'react-icons/ri';
+
+import { IconChartRow } from '~components';
 
 import { ReadingsTargetChart } from './Charts/ReadingsTargetChart';
 
@@ -25,46 +27,36 @@ export const TempHumTab: React.FC = () => {
 
   return (
     <Box display="flex" flexDirection="column" gap={1}>
-      <Box display="flex" alignItems="center" width="100%" gap={1}>
-        <Box width={iconColWidth} display="flex" justifyContent="center" flexShrink={0}>
-          <Tooltip title="Humidity">
-            <HumidityIcon size={iconSize} />
-          </Tooltip>
-        </Box>
-        <Box flex={1} minWidth={0}>
-          <ReadingsTargetChart
-            actualKey="humidity"
-            targetKey="humidity_target"
-            unit="%"
-            label="Humidity"
-            height={panelHeight}
-          />
-        </Box>
-      </Box>
-      <Box display="flex" alignItems="center" width="100%" gap={1}>
-        <Box
-          width={iconColWidth}
-          display="flex"
-          justifyContent="center"
-          flexShrink={0}
-          sx={{ transform: `translateY(${iconOffset}px)` }}
-        >
-          <Tooltip title="Temperature">
-            <TemperatureIcon size={iconSize} />
-          </Tooltip>
-        </Box>
-        <Box flex={1} minWidth={0}>
-          <ReadingsTargetChart
-            actualKey="temperature"
-            targetKey="temperature_target"
-            unit="°C"
-            label="Temperature"
-            showXAxis
-            showBrush
-            height={panelHeight}
-          />
-        </Box>
-      </Box>
+      <IconChartRow
+        tooltip="Humidity"
+        icon={<HumidityIcon size={iconSize} />}
+        iconColWidth={iconColWidth}
+      >
+        <ReadingsTargetChart
+          actualKey="humidity"
+          targetKey="humidity_target"
+          unit="%"
+          label="Humidity"
+          height={panelHeight}
+        />
+      </IconChartRow>
+
+      <IconChartRow
+        tooltip="Temperature"
+        icon={<TemperatureIcon size={iconSize} />}
+        iconColWidth={iconColWidth}
+        iconOffset={iconOffset}
+      >
+        <ReadingsTargetChart
+          actualKey="temperature"
+          targetKey="temperature_target"
+          unit="°C"
+          label="Temperature"
+          showXAxis
+          showBrush
+          height={panelHeight}
+        />
+      </IconChartRow>
     </Box>
   );
 };
