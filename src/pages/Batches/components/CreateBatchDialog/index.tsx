@@ -25,6 +25,7 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
     picoUnits,
     recipes,
     busyUnitIds,
+    errors,
     startAtConflict,
     finishBeforeStartError,
     canSubmit,
@@ -61,6 +62,10 @@ export const CreateBatchDialog = ({ open, onClose, defaultValues }: CreateBatchD
       finishBeforeStartError={finishBeforeStartError}
       notes={notes}
       setNotes={setNotes}
+      temperatureTargetError={errors.temperatureTarget}
+      humidityTargetError={errors.humidityTarget}
+      descriptionError={errors.description}
+      notesError={errors.notes}
       topSlot={
         <>
           <FormControl fullWidth required>

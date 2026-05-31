@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
 import { useCallback, useMemo, useState } from 'react';
 
-import type { BatchFormFieldValues, StartAtChangeOpts } from './interfaces';
-import { computeFinishAt } from './methods';
+import type { BatchFormErrors, BatchFormFieldValues, StartAtChangeOpts } from './interfaces';
+import { computeFinishAt, validate } from './methods';
 
 /**
  * Shared form-field state for both CreateBatchDialog and EditBatchDialog.
@@ -22,6 +22,11 @@ export function useBatchFormFields() {
     if (!finishAt || !startAt) return null;
     return dayjs(finishAt).isBefore(dayjs(startAt)) ? 'Finish must be after start' : null;
   }, [startAt, finishAt]);
+
+  const errors = useMemo<BatchFormErrors>(
+    () => validate({ description, species, temperatureTarget, humidityTarget, startAt, finishAt, notes }),
+    [description, species, temperatureTarget, humidityTarget, startAt, finishAt, notes],
+  );
 
   /** Sets startAt and, if recipe context is provided, recomputes finishAt. */
   const handleStartAtChange = useCallback((newStart: string, opts?: StartAtChangeOpts) => {
@@ -58,6 +63,7 @@ export function useBatchFormFields() {
     setFinishAt,
     notes,
     setNotes,
+    errors,
     finishBeforeStartError,
     handleStartAtChange,
     resetFields,

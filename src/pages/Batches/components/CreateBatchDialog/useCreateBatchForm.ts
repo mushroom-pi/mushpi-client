@@ -40,6 +40,7 @@ export function useCreateBatchForm({
     setFinishAt,
     notes,
     setNotes,
+    errors,
     finishBeforeStartError,
     handleStartAtChange,
     resetFields,
@@ -83,9 +84,10 @@ export function useCreateBatchForm({
       picoUnitId.trim() !== '' &&
       startAt.trim() !== '' &&
       !startAtConflict &&
-      !finishBeforeStartError
+      !finishBeforeStartError &&
+      !Object.values(errors).some(Boolean)
     );
-  }, [picoUnitId, startAt, startAtConflict, finishBeforeStartError]);
+  }, [picoUnitId, startAt, startAtConflict, finishBeforeStartError, errors]);
 
   // Reset all fields when the dialog opens.
   useEffect(() => {
@@ -196,6 +198,7 @@ export function useCreateBatchForm({
     recipes,
     busyUnitIds,
     // validation
+    errors,
     startAtConflict,
     finishBeforeStartError,
     canSubmit,

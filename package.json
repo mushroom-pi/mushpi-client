@@ -14,7 +14,10 @@
     "prepare": "husky",
     "gen:client": "openapi-generator-cli generate -i ${OPENAPI_SPEC:-./openapi.json} -g typescript-axios -o src/api/generated --skip-validate-spec --additional-properties=supportsES6=true,useSingleRequestParameter=true && npm run gen:dedup",
     "gen:client:remote": "OPENAPI_SPEC=http://localhost:3000/contract-json npm run gen:client",
-    "gen:dedup": "node scripts/dedup-generated.mjs"
+    "gen:dedup": "node scripts/dedup-generated.mjs",
+    "gen:schemas": "openapi-zod-client ${OPENAPI_SPEC:-./openapi.json} -o src/api/generated/schemas.ts  -p .prettierrc --export-schemas",
+    "gen:schemas:remote": "OPENAPI_SPEC=http://localhost:3000/contract-json yarn gen:schemas",
+    "gen:all:remote": "OPENAPI_SPEC=http://localhost:3000/contract-json yarn gen:client && yarn gen:schemas:remote"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -23,6 +26,7 @@
     "@mui/material": "^7.3.4",
     "@mui/x-date-pickers": "^8.16.0",
     "@tanstack/react-query": "^5.90.2",
+    "@zodios/core": "^10.9.6",
     "axios": "^1.12.2",
     "dayjs": "^1.11.19",
     "lodash": "^4.17.21",
@@ -30,7 +34,8 @@
     "react-dom": "^19.1.1",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.9.4",
-    "recharts": "^3.3.0"
+    "recharts": "^3.3.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",
@@ -56,6 +61,7 @@
     "globals": "^16.4.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.3",
+    "openapi-zod-client": "^1.18.3",
     "prettier": "^3.6.2",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.45.0",

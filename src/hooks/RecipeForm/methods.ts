@@ -1,6 +1,21 @@
 import type { Recipe } from '~api/generated';
+import { schemas } from '~api/generated/schemas';
 
 import type { RecipeFormErrors, RecipeFormValues } from './interfaces';
+
+/** Convert string form values to the types CreateRecipeDto expects.
+ *  Empty numeric fields become undefined so the schema reports "required". */
+function toDto(values: RecipeFormValues) {
+  const num = (v: string) => (v.trim() ? Number(v) : undefined);
+  return {
+    name: values.name.trim(),
+    species: values.species.trim(),
+    temperature_target: num(values.temperature_target),
+    humidity_target: num(values.humidity_target),
+    duration_days: num(values.duration_days),
+    notes: values.notes.trim() || undefined,
+  };
+}
 
 export const initialValues: RecipeFormValues = {
   name: '',
@@ -23,30 +38,20 @@ export function toFormValues(recipe: Recipe): RecipeFormValues {
 }
 
 export function validate(values: RecipeFormValues): RecipeFormErrors {
+  const result = schemas.CreateRecipeDto.safeParse(toDto(values));
+
   const errors: RecipeFormErrors = {};
-  const temp = Number(values.temperature_target);
-  const hum = Number(values.humidity_target);
-  const dur = Number(values.duration_days);
-
-  if (!values.name.trim()) errors.name = 'Name is required';
-  if (!values.species.trim()) errors.species = 'Species is required';
-
-  if (!values.temperature_target.trim()) {
-    errors.temperature_target = 'Temperature target is required';
-  } else if (Number.isNaN(temp) || temp < 0 || temp > 50) {
-    errors.temperature_target = 'Must be between 0 and 50 °C';
+  if (!result.success) {
+    for (const issue of result.error.issues) {
+      const field = issue.path[0] as keyof RecipeFormValues | undefined;
+      if (field && !errors[field]) errors[field] = issue.message;
+    }
   }
 
-  if (!values.humidity_target.trim()) {
-    errors.humidity_target = 'Humidity target is required';
-  } else if (Number.isNaN(hum) || hum < 20 || hum > 90) {
-    errors.humidity_target = 'Must be between 20 and 90 %';
-  }
-
-  if (!values.duration_days.trim()) {
-    errors.duration_days = 'Duration is required';
-  } else if (Number.isNaN(dur) || !Number.isInteger(dur) || dur < 1) {
-    errors.duration_days = 'Must be a whole number ≥ 1';
+  // The spec omits .int() on duration_days, but the UI requires whole days.
+  const dur = toDto(values).duration_days;
+  if (!errors.duration_days && dur !== undefined && !Number.isInteger(dur)) {
+    errors.duration_days = 'Must be a whole number';
   }
 
   return errors;

@@ -27,6 +27,7 @@ export function useEditBatchForm({ open, onClose }: EditBatchDialogProps) {
     setFinishAt,
     notes,
     setNotes,
+    errors,
     finishBeforeStartError,
     handleStartAtChange,
     resetFields,
@@ -46,8 +47,11 @@ export function useEditBatchForm({ open, onClose }: EditBatchDialogProps) {
   }, [batch, open, resetFields]);
 
   const canSubmit = useMemo(
-    () => startAt.trim() !== '' && !finishBeforeStartError,
-    [startAt, finishBeforeStartError],
+    () =>
+      startAt.trim() !== '' &&
+      !finishBeforeStartError &&
+      !Object.values(errors).some(Boolean),
+    [startAt, finishBeforeStartError, errors],
   );
 
   const handleUpdate = async () => {
@@ -108,6 +112,7 @@ export function useEditBatchForm({ open, onClose }: EditBatchDialogProps) {
     setFinishAt,
     notes,
     setNotes,
+    errors,
     finishBeforeStartError,
     canSubmit,
     handleUpdate,

@@ -2,6 +2,7 @@ import { Box, Stack, Switch, TextField, Typography } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import type { UpdatePicoUnitDto } from '~api/generated';
+import { schemas } from '~api/generated/schemas';
 import { HeaderAndIcon, PicoUnitForm } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
@@ -51,6 +52,20 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
     );
   }, [pico, editName, editDescription, editEnabled]);
 
+  const errors = useMemo(() => {
+    const result = schemas.UpdatePicoUnitDto.safeParse({
+      name: editName,
+      description: editDescription,
+    });
+    if (!result.success) {
+      return {
+        name: result.error.issues.find((i) => i.path[0] === 'name')?.message,
+        description: result.error.issues.find((i) => i.path[0] === 'description')?.message,
+      };
+    }
+    return {};
+  }, [editName, editDescription]);
+
   async function doSaveEdits() {
     if (!pico) return;
     const body: UpdatePicoUnitDto = {
@@ -85,7 +100,7 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
     open && (
       <PicoUnitForm
         open={open}
-        canSubmit={hasChanges}
+        canSubmit={hasChanges && !Object.values(errors).some(Boolean)}
         isPending={updateMutation.isLoading}
         onClose={handleCancel}
         onSubmit={doSaveEdits}
@@ -97,6 +112,8 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
             fullWidth
+            error={!!errors.name}
+            helperText={errors.name ?? undefined}
           />
 
           <TextField
@@ -106,6 +123,8 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
             fullWidth
             multiline
             minRows={3}
+            error={!!errors.description}
+            helperText={errors.description ?? undefined}
           />
 
           <Box display="flex" alignItems="center" gap={2}>

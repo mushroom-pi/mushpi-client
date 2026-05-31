@@ -41,6 +41,7 @@ export function useCreateRecipeForm({ onClose }: CreateRecipeDialogProps) {
   return {
     values,
     errors,
+    isValid: !Object.values(errors).some(Boolean),
     isPending: mutation.isPending,
     updateField,
     touchField,

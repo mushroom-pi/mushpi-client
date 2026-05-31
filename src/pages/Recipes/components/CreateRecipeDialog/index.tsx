@@ -4,7 +4,7 @@ import type { CreateRecipeDialogProps } from './interfaces';
 import { useCreateRecipeForm } from './useCreateRecipeForm';
 
 export function CreateRecipeDialog({ open, onClose }: CreateRecipeDialogProps) {
-  const { values, errors, isPending, updateField, touchField, resetAndClose, handleSubmit } =
+  const { values, errors, isValid, isPending, updateField, touchField, resetAndClose, handleSubmit } =
     useCreateRecipeForm({ open, onClose });
 
   return (
@@ -15,7 +15,7 @@ export function CreateRecipeDialog({ open, onClose }: CreateRecipeDialogProps) {
       submitLabel="Create"
       pendingLabel="Creating…"
       onSubmit={handleSubmit}
-      canSubmit={true}
+      canSubmit={isValid}
       isPending={isPending}
       values={values}
       errors={errors}

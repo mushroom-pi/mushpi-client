@@ -32,6 +32,10 @@ export interface BatchFormProps {
   finishBeforeStartError?: string | null;
   notes: string;
   setNotes: (v: string) => void;
+  temperatureTargetError?: string;
+  humidityTargetError?: string;
+  descriptionError?: string;
+  notesError?: string;
 
   /** Rendered above the shared fields (e.g. unit / recipe selects in CreateBatchDialog). */
   topSlot?: ReactNode;
@@ -62,6 +66,10 @@ export function BatchForm({
   finishBeforeStartError,
   notes,
   setNotes,
+  temperatureTargetError,
+  humidityTargetError,
+  descriptionError,
+  notesError,
   topSlot,
 }: BatchFormProps) {
   return (
@@ -82,6 +90,8 @@ export function BatchForm({
         onChange={(e) => setDescription(e.target.value)}
         fullWidth
         placeholder="Optional name or label for this batch"
+        error={!!descriptionError}
+        helperText={descriptionError ?? undefined}
       />
       <TextField
         label="Start"
@@ -115,6 +125,9 @@ export function BatchForm({
         value={temperatureTarget}
         onChange={(e) => setTemperatureTarget(e.target.value)}
         fullWidth
+        error={!!temperatureTargetError}
+        helperText={temperatureTargetError ?? '0–50 °C'}
+        slotProps={{ input: { inputProps: { min: 0, max: 50, step: 0.1 } } }}
       />
       <TextField
         label="Humidity Target (%)"
@@ -122,6 +135,9 @@ export function BatchForm({
         value={humidityTarget}
         onChange={(e) => setHumidityTarget(e.target.value)}
         fullWidth
+        error={!!humidityTargetError}
+        helperText={humidityTargetError ?? '20–90 %'}
+        slotProps={{ input: { inputProps: { min: 20, max: 90, step: 0.1 } } }}
       />
       <TextField
         label="Notes"
@@ -130,6 +146,8 @@ export function BatchForm({
         fullWidth
         multiline
         minRows={3}
+        error={!!notesError}
+        helperText={notesError ?? undefined}
       />
     </ModalForm>
   );

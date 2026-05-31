@@ -56,6 +56,7 @@ export function useEditRecipeForm({ open, onClose }: EditRecipeDialogProps) {
     values,
     errors,
     hasChanges,
+    isValid: !Object.values(errors).some(Boolean),
     isPending: updateRecipe.isLoading,
     updateField,
     touchField,

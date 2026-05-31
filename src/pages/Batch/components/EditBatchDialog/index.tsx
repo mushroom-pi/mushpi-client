@@ -19,6 +19,7 @@ export const EditBatchDialog = ({ open, onClose }: EditBatchDialogProps) => {
     setFinishAt,
     notes,
     setNotes,
+    errors,
     finishBeforeStartError,
     canSubmit,
     handleUpdate,
@@ -50,6 +51,10 @@ export const EditBatchDialog = ({ open, onClose }: EditBatchDialogProps) => {
       finishBeforeStartError={finishBeforeStartError}
       notes={notes}
       setNotes={setNotes}
+      temperatureTargetError={errors.temperatureTarget}
+      humidityTargetError={errors.humidityTarget}
+      descriptionError={errors.description}
+      notesError={errors.notes}
     />
   );
 };

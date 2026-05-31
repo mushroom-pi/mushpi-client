@@ -4,7 +4,7 @@ import type { EditRecipeDialogProps } from './interfaces';
 import { useEditRecipeForm } from './useEditRecipeForm';
 
 export function EditRecipeDialog({ open, onClose }: EditRecipeDialogProps) {
-  const { values, errors, hasChanges, isPending, updateField, touchField, closeDialog, handleSave } =
+  const { values, errors, hasChanges, isValid, isPending, updateField, touchField, closeDialog, handleSave } =
     useEditRecipeForm({ open, onClose });
 
   return (
@@ -15,7 +15,7 @@ export function EditRecipeDialog({ open, onClose }: EditRecipeDialogProps) {
       submitLabel="Save"
       pendingLabel="Saving…"
       onSubmit={handleSave}
-      canSubmit={hasChanges}
+      canSubmit={hasChanges && isValid}
       isPending={isPending}
       values={values}
       errors={errors}
