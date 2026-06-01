@@ -22,3 +22,5 @@ export const activeSx = (theme: Theme) => ({
     '& .MuiListItemIcon-root': { color: 'background.default' },
   },
 });
+
+export const drawerWidth = 200;

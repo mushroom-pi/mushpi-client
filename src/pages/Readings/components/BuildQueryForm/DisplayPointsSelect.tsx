@@ -22,7 +22,7 @@ export const DisplayPointsSelect = ({
   height?: number;
   sx?: SxProps<Theme>;
 }) => (
-  <FormControl sx={{ minWidth: 140, ...sx }} size="medium">
+  <FormControl sx={{ minWidth: 140, width: { xs: '100%', xl: 'auto' }, ...sx }} size="medium">
     <InputLabel id="display-points-label">Display points</InputLabel>
     <Select
       labelId="display-points-label"

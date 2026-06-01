@@ -2,6 +2,7 @@ import { Box } from '@mui/material';
 import { Route, Routes } from 'react-router-dom';
 
 import Sidebar from './layout/Sidebar';
+import { drawerWidth } from './layout/Sidebar/constants';
 import BatchDetail from './pages/Batch';
 import BatchesPage from './pages/Batches';
 import Dashboard from './pages/Dashboard';
@@ -11,8 +12,6 @@ import { ReadingsPage } from './pages/Readings';
 import RecipeDetail from './pages/Recipe';
 import RecipesPage from './pages/Recipes';
 import { Server } from './pages/Server';
-
-const drawerWidth = 260;
 
 export default function App() {
   return (

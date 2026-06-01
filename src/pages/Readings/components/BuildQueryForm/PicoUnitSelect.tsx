@@ -22,7 +22,7 @@ export const PicoUnitSelect = ({
   height?: number;
   sx?: SxProps<Theme>;
 }) => (
-  <FormControl sx={{ minWidth: 280, ...sx }} size="medium">
+  <FormControl sx={{ minWidth: 280, width: { xs: '100%', xl: 'auto' }, ...sx }} size="medium">
     <InputLabel id="pico-unit-selector-label">Pico Unit</InputLabel>
     <Select
       labelId="pico-unit-selector-label"

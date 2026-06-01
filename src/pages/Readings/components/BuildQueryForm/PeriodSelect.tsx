@@ -2,13 +2,17 @@ import {
   Box,
   FormControl,
   FormHelperText,
+  MenuItem,
   Paper,
   Popper,
+  Select,
   type SxProps,
   type Theme,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import dayjs, { type Dayjs } from 'dayjs';
 import React, { useRef } from 'react';
@@ -48,6 +52,15 @@ const buildPresetRange = (preset: Exclude<RangePreset, 'custom'>): PresetRange =
   };
 };
 
+const presetOptions = [
+  { value: 'recent', label: 'Most recent' },
+  { value: '1h', label: 'Last 1h' },
+  { value: '6h', label: 'Last 6h' },
+  { value: '24h', label: 'Last 24h' },
+  { value: '7d', label: 'Last 7d' },
+  { value: 'custom', label: 'Custom' },
+] as const;
+
 export const PeriodSelect = ({
   value,
   onSelect,
@@ -65,7 +78,10 @@ export const PeriodSelect = ({
   height?: number;
   sx?: SxProps<Theme>;
 }) => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('xl'));
   const customButtonRef = useRef<HTMLButtonElement | null>(null);
+  const selectRef = useRef<HTMLDivElement | null>(null);
 
   const onChange = (_: React.MouseEvent<HTMLElement>, nextValue: RangePreset | null) => {
     if (!nextValue) {
@@ -81,64 +97,124 @@ export const PeriodSelect = ({
     onSelect(nextValue, buildPresetRange(nextValue));
   };
 
-  return (
-    <FormControl sx={{ minWidth: 430, ...sx }} size="medium">
-      <ToggleButtonGroup
-        value={value}
-        exclusive
-        onChange={onChange}
-        aria-label="Quick time ranges"
-        size="small"
-        sx={{
-          flexWrap: 'wrap',
-          '& .MuiToggleButton-root': {
-            minHeight: height,
-            textTransform: 'none',
-            px: 1.5,
-            borderColor: 'divider',
-            color: 'text.primary',
-            display: 'flex',
-            alignItems: 'center',
-            boxSizing: 'border-box',
-          },
-          '& .MuiToggleButton-root.Mui-selected': {
-            backgroundColor: 'action.selected',
-            color: 'text.primary',
-          },
-        }}
-      >
-        <ToggleButton value="recent">Most recent</ToggleButton>
-        <ToggleButton value="1h">Last 1h</ToggleButton>
-        <ToggleButton value="6h">Last 6h</ToggleButton>
-        <ToggleButton value="24h">Last 24h</ToggleButton>
-        <ToggleButton value="7d">Last 7d</ToggleButton>
-        <ToggleButton value="custom" ref={customButtonRef}>
-          Custom
-        </ToggleButton>
-      </ToggleButtonGroup>
-      <FormHelperText sx={{ minHeight: '1.2em' }}> </FormHelperText>
+  const onSelectChange = (event: any) => {
+    const nextValue = event.target.value as RangePreset;
 
-      <Popper
-        open={isCustomOpen}
-        anchorEl={customButtonRef.current}
-        placement="bottom"
-        modifiers={[
-          {
-            name: 'offset',
-            options: {
-              offset: [0, 8],
-            },
-          },
-        ]}
-        sx={{ zIndex: (theme) => theme.zIndex.modal }}
-      >
-        <Paper elevation={4} sx={{ p: 2 }}>
-          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-            Select your time window
-          </Typography>
-          <Box sx={{ minWidth: { xs: 280, md: 'auto' } }}>{customContent}</Box>
-        </Paper>
-      </Popper>
+    if (nextValue === 'custom') {
+      onCustomToggle();
+      return;
+    }
+
+    onSelect(nextValue, buildPresetRange(nextValue));
+  };
+
+  return (
+    <FormControl sx={{ minWidth: { xs: 200, xl: 430 }, width: { xs: '100%', xl: 'auto' }, ...sx }} size="medium">
+      {isSmallScreen ? (
+        <>
+          <Select
+            value={value}
+            onChange={onSelectChange}
+            size="small"
+            ref={selectRef}
+            sx={{
+              minHeight: height,
+              '& .MuiInputBase-input': {
+                paddingTop: '10px',
+                paddingBottom: '10px',
+              },
+            }}
+          >
+            {presetOptions.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+          <FormHelperText sx={{ minHeight: '1.2em' }}> </FormHelperText>
+
+          <Popper
+            open={isCustomOpen}
+            anchorEl={selectRef.current}
+            placement="bottom"
+            modifiers={[
+              {
+                name: 'offset',
+                options: {
+                  offset: [0, 8],
+                },
+              },
+            ]}
+            sx={{ zIndex: (theme) => theme.zIndex.modal }}
+          >
+            <Paper elevation={4} sx={{ p: 2 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                Select your time window
+              </Typography>
+              <Box sx={{ minWidth: { xs: 280, md: 'auto' } }}>{customContent}</Box>
+            </Paper>
+          </Popper>
+        </>
+      ) : (
+        <>
+          <ToggleButtonGroup
+            value={value}
+            exclusive
+            onChange={onChange}
+            aria-label="Quick time ranges"
+            size="small"
+            sx={{
+              flexWrap: 'wrap',
+              '& .MuiToggleButton-root': {
+                minHeight: height,
+                textTransform: 'none',
+                px: 1.5,
+                borderColor: 'divider',
+                color: 'text.primary',
+                display: 'flex',
+                alignItems: 'center',
+                boxSizing: 'border-box',
+              },
+              '& .MuiToggleButton-root.Mui-selected': {
+                backgroundColor: 'action.selected',
+                color: 'text.primary',
+              },
+            }}
+          >
+            <ToggleButton value="recent">Most recent</ToggleButton>
+            <ToggleButton value="1h">Last 1h</ToggleButton>
+            <ToggleButton value="6h">Last 6h</ToggleButton>
+            <ToggleButton value="24h">Last 24h</ToggleButton>
+            <ToggleButton value="7d">Last 7d</ToggleButton>
+            <ToggleButton value="custom" ref={customButtonRef}>
+              Custom
+            </ToggleButton>
+          </ToggleButtonGroup>
+          <FormHelperText sx={{ minHeight: '1.2em' }}> </FormHelperText>
+
+          <Popper
+            open={isCustomOpen}
+            anchorEl={customButtonRef.current}
+            placement="bottom"
+            modifiers={[
+              {
+                name: 'offset',
+                options: {
+                  offset: [0, 8],
+                },
+              },
+            ]}
+            sx={{ zIndex: (theme) => theme.zIndex.modal }}
+          >
+            <Paper elevation={4} sx={{ p: 2 }}>
+              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                Select your time window
+              </Typography>
+              <Box sx={{ minWidth: { xs: 280, md: 'auto' } }}>{customContent}</Box>
+            </Paper>
+          </Popper>
+        </>
+      )}
     </FormControl>
   );
 };

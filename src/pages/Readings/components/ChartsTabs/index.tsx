@@ -38,13 +38,18 @@ export const ChartsTabs = () => {
   const [tab, setTab] = useState(0);
 
   return (
-    <Box>
+    <Box sx={{ mt: { xs: 2, md: 0 } }}>
       <Tabs
         value={tab}
         onChange={(_, nextTab: number) => setTab(nextTab)}
         variant="scrollable"
         scrollButtons="auto"
         aria-label="Readings charts tabs"
+        sx={{
+          '& .MuiTabs-scrollButtons': {
+            '&.Mui-disabled': { opacity: 0.3 },
+          },
+        }}
       >
         <Tab label="Temperature and Humidity" {...tabA11yProps(0)} />
         <Tab label="Devices" {...tabA11yProps(1)} />

@@ -15,9 +15,7 @@ import {
 import React from 'react';
 
 import { NavItem } from './components/NavItem';
-import { navItems } from './constants';
-
-const drawerWidth = 260;
+import { drawerWidth, navItems } from './constants';
 
 export default function Sidebar() {
   const theme = useTheme();
