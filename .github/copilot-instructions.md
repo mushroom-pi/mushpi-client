@@ -148,6 +148,26 @@ For single-file dialogs (like `EditMetaDialog`): `errors` is a `useMemo` inline 
 | `/batches/:id`    | Batch detail  |
 | `/server`         | Server health |
 
+### Navigation with dialog-auto-open state
+
+After a creation flow that should drop the user on the detail page with the edit dialog open, pass state via `navigate`:
+
+```ts
+navigate(`/pico-units/${id}`, { state: { openEditDialog: true } });
+```
+
+On the target page, read `useLocation().state` in a mount-only `useEffect` and clear it with `window.history.replaceState` to prevent re-trigger on back/forward:
+
+```ts
+const location = useLocation();
+useEffect(() => {
+  if ((location.state as { openEditDialog?: boolean })?.openEditDialog) {
+    setEditOpen(true);
+    window.history.replaceState({}, document.title);
+  }
+}, []);
+```
+
 ## Component Conventions
 
 - **Atoms**: stateless, props only.
@@ -179,6 +199,14 @@ All entity detail pages (PicoUnit, Recipe, Batch) use the `ItemPage` molecule:
 
 - `actions` renders at the top-right of the page header — **never put Edit/Delete buttons inside a card**.
 - Dialog state (`editOpen`, `deleteOpen`, …) lives at the detail page's top-level inner component, not inside sub-components.
+
+### "Create new" buttons — `AddNew`
+
+Use the `AddNew` atom (`variant="contained"` + `AddIcon`) for all "create new entity" buttons on list pages. Three pages use it: PicoUnits ("Add manually"), Batches ("New Batch"), Recipes ("New Recipe").
+
+```tsx
+<AddNew onClick={() => setCreateOpen(true)}>New Batch</AddNew>
+```
 
 ### Action buttons — `EditButton` / `DeleteButton`
 
@@ -259,6 +287,26 @@ ComponentName/
 - `interfaces.ts`: `CreateBatchDialogProps`.
 - `methods.ts`: `computeFinishAt`, `nowDateTimeLocal`.
 
+### Multi-step sequential API flows
+
+When a single button triggers a chain of dependent API calls (e.g., create → ping → poll → navigate), model the entire sequence in the hook using nested `try/catch`:
+
+```
+try:
+  1. POST /resource          (upsert)
+  try:
+    2. GET /resource/:id/ping   (validate reachable)
+  catch:
+    3. DELETE /resource/:id  (rollback)
+    return (early — stay on page, show warning, reset form)
+  4. GET /resource/:id/poll  (await readiness)
+  5. navigate to detail page with state
+catch:
+  (unexpected error — toast and reset)
+```
+
+**`AddPicoUnitDialog/`** (`src/pages/PicoUnits/components/AddPicoUnitDialog/`) is the canonical example. The hook (`useAddPicoUnitForm.ts`) uses `useState` for a `'idle' | 'searching'` step, calls raw API functions via `PicoUnits`/`Readings` from `~api/client` with `unwrap()`, and uses `useNavigate` + `useQueryClient` + `useToast` for side effects. The dialog uses `ModalForm` with `submitLabel="Search"` / `pendingLabel="Searching…"` instead of the usual Save/Saving.
+
 ## Charts
 
 Three Recharts tabs in `/readings` and `/batches/:id`:
@@ -298,7 +346,8 @@ VITE_API_BASE_URL=http://localhost:3000   # mushpi-server URL
 
 ## Build & Development
 
-- **Build Status**: ✅ `yarn build` works properly — builds to `dist/` with Vite
+- **Build Status**: ✅ `npx vite build` works properly — builds to `dist/`. `yarn build` (which runs `tsc -b` first) may fail if generated `schemas.ts` has TypeScript errors (see known issue below).
+- **Known generated‑file issue**: `src/api/generated/schemas.ts` sometimes uses bare `Array` without a type parameter (e.g., `readings?: Array`). Regenerate schemas (`yarn gen:schemas`) from a fixed server spec to resolve; do not edit the generated file by hand.
 - **Dev Server**: ✅ `yarn dev` works properly — runs on `http://localhost:5173/`
 - **Permissions**: Agent has full permission to execute `yarn build` and `yarn dev` scripts
 - **Build Config**: Fixed TypeScript config issues (removed `erasableSyntaxOnly` & invalid `ignoreDeprecations`)

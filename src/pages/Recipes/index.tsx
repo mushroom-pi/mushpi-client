@@ -1,9 +1,8 @@
-import AddIcon from '@mui/icons-material/Add';
-import { Button, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { Error, Loading, PageTitle } from '~components';
+import { AddNew, Error, Loading, PageTitle } from '~components';
 import { useListRecipes } from '~ctx/Recipes';
 import { Page } from '~layout/Page';
 
@@ -24,9 +23,9 @@ export default function RecipesPage() {
       <PageTitle
         mb={3}
         actions={
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setCreateOpen(true)}>
+          <AddNew onClick={() => setCreateOpen(true)}>
             New Recipe
-          </Button>
+          </AddNew>
         }
       >
         Recipes

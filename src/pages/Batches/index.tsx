@@ -1,10 +1,9 @@
-import AddIcon from '@mui/icons-material/Add';
-import { Button, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { BatchesControllerListStatusEnum } from '~api/generated';
-import { Error, Loading, PageTitle } from '~components';
+import { AddNew, Error, Loading, PageTitle } from '~components';
 import { useListBatches } from '~ctx/Batches';
 import { Page } from '~layout/Page';
 
@@ -40,9 +39,9 @@ export default function BatchesPage() {
       <PageTitle
         mb={1.5}
         actions={
-          <Button variant="contained" startIcon={<AddIcon />} onClick={() => setCreateOpen(true)}>
+          <AddNew onClick={() => setCreateOpen(true)}>
             New Batch
-          </Button>
+          </AddNew>
         }
       >
         Batches

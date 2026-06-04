@@ -1,13 +1,12 @@
-import AddIcon from '@mui/icons-material/Add';
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import { useState } from 'react';
 
-import { Error, Loading, PageTitle } from '~components';
+import { AddNew, Error, Loading, PageTitle } from '~components';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { Page } from '~layout/Page';
 
-import PicoUnitCard from './components/PicoUnitCard';
 import { AddPicoUnitDialog } from './components/AddPicoUnitDialog';
+import PicoUnitCard from './components/PicoUnitCard';
 
 export default function PicoUnitsPage() {
   const { units: items, isLoading, isError, error, refetch, queryData } = usePicoUnitsContext();
@@ -22,19 +21,9 @@ export default function PicoUnitsPage() {
         mb={3}
         actions={
           <>
-            <Button
-              variant="outlined"
-              startIcon={<AddIcon />}
-              onClick={() => setAddOpen(true)}
-              sx={{ mr: 1 }}
-            >
-              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
-                Add manually
-              </Box>
-            </Button>
-            <Button variant="contained" onClick={() => refetch()}>
-              Refresh
-            </Button>
+            <AddNew onClick={() => setAddOpen(true)} sx={{ mr: 1 }}>
+              Add manually
+            </AddNew>
           </>
         }
       >
