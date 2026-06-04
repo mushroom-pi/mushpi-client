@@ -20,7 +20,7 @@ export const PicoUnitOverview: React.FC<OptionalPicoUnitProps> = ({ pico: dataPr
             <BigDisplay content={pico.created_at} type="date" />
           </InfoField>
           <InfoField label="Host:Port">
-            <BigDisplay content={`${pico.host}:${pico.port}`} />
+            <BigDisplay content={`${pico.ip ?? pico.host}:${pico.port}`} />
           </InfoField>
         </>
       ) : (

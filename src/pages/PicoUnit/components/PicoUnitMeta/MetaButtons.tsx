@@ -1,9 +1,8 @@
-import React from 'react';
-
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import { Box, Button, IconButton, Stack, Tooltip } from '@mui/material';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { DeleteButton, EditButton } from '~components';
