@@ -4,14 +4,15 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { BatchesControllerListStatusEnum } from '~api/generated';
-
-type BatchStatus = (typeof BatchesControllerListStatusEnum)[keyof typeof BatchesControllerListStatusEnum];
 import { Error, Loading, PageTitle } from '~components';
 import { useListBatches } from '~ctx/Batches';
 import { Page } from '~layout/Page';
 
 import { BatchesTable } from './components/BatchesTable';
 import { CreateBatchDialog } from './components/CreateBatchDialog';
+
+type BatchStatus =
+  (typeof BatchesControllerListStatusEnum)[keyof typeof BatchesControllerListStatusEnum];
 
 type StatusFilter = 'all' | BatchStatus;
 

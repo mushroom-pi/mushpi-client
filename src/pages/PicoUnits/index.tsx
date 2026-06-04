@@ -1,13 +1,17 @@
-import { Button, Grid, Typography } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import { Box, Button, Grid, Typography } from '@mui/material';
+import { useState } from 'react';
 
 import { Error, Loading, PageTitle } from '~components';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { Page } from '~layout/Page';
 
 import PicoUnitCard from './components/PicoUnitCard';
+import { AddPicoUnitDialog } from './components/AddPicoUnitDialog';
 
 export default function PicoUnitsPage() {
   const { units: items, isLoading, isError, error, refetch, queryData } = usePicoUnitsContext();
+  const [addOpen, setAddOpen] = useState(false);
 
   if (isLoading) return <Loading item="pico units" />;
   if (isError) return <Error item="pico units" error={error} />;
@@ -17,9 +21,21 @@ export default function PicoUnitsPage() {
       <PageTitle
         mb={3}
         actions={
-          <Button variant="contained" onClick={() => refetch()}>
-            Refresh
-          </Button>
+          <>
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              onClick={() => setAddOpen(true)}
+              sx={{ mr: 1 }}
+            >
+              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                Add manually
+              </Box>
+            </Button>
+            <Button variant="contained" onClick={() => refetch()}>
+              Refresh
+            </Button>
+          </>
         }
       >
         Pico Units
@@ -42,6 +58,8 @@ export default function PicoUnitsPage() {
           ))
         )}
       </Grid>
+
+      <AddPicoUnitDialog open={addOpen} onClose={() => setAddOpen(false)} />
     </Page>
   );
 }

@@ -1,6 +1,6 @@
 import { Box, Chip, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 import { Error, Invalid, ItemPage, Loading } from '~components';
 import { PicoUnitProvider, usePicoUnitContext } from '~ctx/PicoUnit';
@@ -15,6 +15,14 @@ function PicoUnitDetailInner() {
   const { pico, isLoading, isError, error, refetch } = usePicoUnitContext();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    if ((location.state as { openEditDialog?: boolean })?.openEditDialog) {
+      setEditOpen(true);
+      window.history.replaceState({}, document.title);
+    }
+  }, []);
 
   if (isLoading) return <Loading item="pico unit" />;
   if (isError || !pico) return <Error item="pico unit" refetch={refetch} error={error} />;
