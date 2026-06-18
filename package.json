@@ -15,7 +15,8 @@
     "gen:client": "openapi-generator-cli generate -i ${OPENAPI_SPEC:-./openapi.json} -g typescript-axios -o src/api/generated --skip-validate-spec --additional-properties=supportsES6=true,useSingleRequestParameter=true && npm run gen:dedup",
     "gen:client:remote": "OPENAPI_SPEC=http://localhost:3000/contract-json npm run gen:client",
     "gen:dedup": "node scripts/dedup-generated.mjs",
-    "gen:schemas": "openapi-zod-client ${OPENAPI_SPEC:-./openapi.json} -o src/api/generated/schemas.ts  -p .prettierrc --export-schemas",
+    "gen:schemas": "openapi-zod-client ${OPENAPI_SPEC:-./openapi.json} -o src/api/generated/schemas.ts -t scripts/zod-schemas.hbs -p .prettierrc --export-schemas && yarn gen:fix-array-types",
+    "gen:fix-array-types": "node scripts/fix-array-types.mjs",
     "gen:schemas:remote": "OPENAPI_SPEC=http://localhost:3000/contract-json yarn gen:schemas",
     "gen:all:remote": "OPENAPI_SPEC=http://localhost:3000/contract-json yarn gen:client && yarn gen:schemas:remote"
   },
