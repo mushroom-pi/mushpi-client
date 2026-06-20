@@ -7,13 +7,7 @@ import { batchKeys } from '~api/queryKeys';
 
 export const createUpdateBatchMutation = (qc: ReturnType<typeof useQueryClient>) =>
   useMutation({
-    mutationFn: async ({
-      batchId,
-      body,
-    }: {
-      batchId: number;
-      body: Partial<UpdateBatchDto>;
-    }) => {
+    mutationFn: async ({ batchId, body }: { batchId: number; body: Partial<UpdateBatchDto> }) => {
       const res = await unwrap(
         Batches.batchIdControllerUpdate({ batchId, updateBatchDto: body as UpdateBatchDto }),
       );

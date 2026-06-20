@@ -115,10 +115,10 @@ if (!result.success) {
 
 ### Where the pattern is applied
 
-| Form hook / component | DTO schema used |
-| --- | --- |
-| `src/hooks/RecipeForm/methods.ts` | `schemas.CreateRecipeDto` |
-| `src/hooks/BatchForm/methods.ts` | `schemas.CreateBatchDto` |
+| Form hook / component                     | DTO schema used             |
+| ----------------------------------------- | --------------------------- |
+| `src/hooks/RecipeForm/methods.ts`         | `schemas.CreateRecipeDto`   |
+| `src/hooks/BatchForm/methods.ts`          | `schemas.CreateBatchDto`    |
 | `src/pages/PicoUnit/…/EditMetaDialog.tsx` | `schemas.UpdatePicoUnitDto` |
 
 For RecipeForm (blur-based validation): `validate()` is called in `useRecipeFormFields` on every `updateField` (if touched) and `touchField`. `isValid` is returned from the dialog hook and passed as `canSubmit`.
@@ -233,8 +233,8 @@ All destructive confirmations use the `ConfirmDialog` molecule. **Never write a 
 >
   <DialogContentText>
     <Alert severity="warning" variant="filled" sx={{ borderRadius: 2 }}>
-      Deleting this X is permanent and cannot be undone. Please confirm that you
-      want to permanently delete <strong>{item.name}</strong>.
+      Deleting this X is permanent and cannot be undone. Please confirm that you want to permanently
+      delete <strong>{item.name}</strong>.
     </Alert>
   </DialogContentText>
 </ConfirmDialog>
@@ -275,6 +275,7 @@ ComponentName/
 ```
 
 **Rules:**
+
 - `index.tsx` is declarative only — it calls the hook, destructures everything it needs, and returns JSX.
 - `useXxxForm.ts` owns the entire "brain": field state, derived state (`useMemo`), effects, event handlers, the mutation, and the submit function. It returns a flat object grouped by category (field state / setters / data / validation / handlers / mutation).
 - `interfaces.ts` holds the props interface and any other types used across files in the folder.
@@ -282,6 +283,7 @@ ComponentName/
 - The folder resolves transparently to consumers — `import { X } from './components/ComponentName'` continues to work unchanged.
 
 **Example** — `CreateBatchDialog/`:
+
 - `index.tsx`: renders the MUI `<Dialog>` and its fields; no `useState` or logic.
 - `useCreateBatchForm.ts`: all state, active-batch conflict detection, auto-adjust effects, recipe-change handler, mutation.
 - `interfaces.ts`: `CreateBatchDialogProps`.

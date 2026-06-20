@@ -5,15 +5,18 @@ import { Batches } from '~api/client';
 import type {
   Batch,
   BatchListResponseDto,
-  BatchesApiBatchesControllerListRequest as ListBatchesParams,
   BatchesControllerListStatusEnum,
+  BatchesApiBatchesControllerListRequest as ListBatchesParams,
   PicoUnitIdBatchesControllerListStatusEnum,
 } from '~api/generated';
 import { batchKeys } from '~api/queryKeys';
 
 export function useListBatches(
   params?: Partial<ListBatchesParams>,
-  queryOptions?: Omit<UseQueryOptions<BatchListResponseDto, unknown, BatchListResponseDto>, 'queryKey' | 'queryFn'>,
+  queryOptions?: Omit<
+    UseQueryOptions<BatchListResponseDto, unknown, BatchListResponseDto>,
+    'queryKey' | 'queryFn'
+  >,
 ) {
   const page = params?.page ?? 1;
   const limit = params?.limit ?? 20;

@@ -18,7 +18,11 @@ export type BatchCtx = {
   };
   createRecipeFromBatch: {
     mutate: (vars: { batchId: number; name: string; notes?: string }) => void;
-    mutateAsync: (vars: { batchId: number; name: string; notes?: string }) => Promise<import('~api/generated').Recipe>;
+    mutateAsync: (vars: {
+      batchId: number;
+      name: string;
+      notes?: string;
+    }) => Promise<import('~api/generated').Recipe>;
     isLoading: boolean;
   };
   createBatch?: {

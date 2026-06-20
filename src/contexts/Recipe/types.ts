@@ -16,6 +16,16 @@ export type RecipeCtx = {
     mutateAsync: (id: number) => Promise<void>;
     isLoading: boolean;
   };
+  uploadImage: {
+    mutate: (vars: { recipeId: number; file?: File; url?: string }) => void;
+    mutateAsync: (vars: { recipeId: number; file?: File; url?: string }) => Promise<Recipe>;
+    isLoading: boolean;
+  };
+  deleteImage: {
+    mutate: (recipeId: number) => void;
+    mutateAsync: (recipeId: number) => Promise<void>;
+    isLoading: boolean;
+  };
   recipeBatches?: Batch[];
   isBatchesLoading: boolean;
   createRecipe?: {

@@ -45,17 +45,17 @@ All Create/Edit dialogs validate against generated Zod schemas. **Never hardcode
 
 ## Routing
 
-| Path | Page |
-|------|------|
-| `/` | Dashboard |
-| `/pico-units` | Units list |
-| `/pico-units/:id` | Unit detail |
-| `/readings` | Charts |
-| `/recipes` | Recipes list |
-| `/recipes/:id` | Recipe detail |
-| `/batches` | Batches list |
-| `/batches/:id` | Batch detail |
-| `/server` | Server health |
+| Path              | Page          |
+| ----------------- | ------------- |
+| `/`               | Dashboard     |
+| `/pico-units`     | Units list    |
+| `/pico-units/:id` | Unit detail   |
+| `/readings`       | Charts        |
+| `/recipes`        | Recipes list  |
+| `/recipes/:id`    | Recipe detail |
+| `/batches`        | Batches list  |
+| `/batches/:id`    | Batch detail  |
+| `/server`         | Server health |
 
 Dialog-auto-open: `navigate('/path', { state: { openEditDialog: true } })`, read in mount-only `useEffect`, clear with `window.history.replaceState`.
 

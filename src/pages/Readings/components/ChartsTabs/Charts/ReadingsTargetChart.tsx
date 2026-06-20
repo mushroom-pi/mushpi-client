@@ -74,10 +74,7 @@ export const ReadingsTargetChart: React.FC<ReadingsTargetChartProps> = ({
   const yDomain = useMemo((): [number, number] | ['auto', 'auto'] => {
     if (!data.length) return ['auto', 'auto'];
     const values = data
-      .flatMap((p) => [
-        p[actualKey] as number | undefined,
-        p[targetKey] as number | undefined,
-      ])
+      .flatMap((p) => [p[actualKey] as number | undefined, p[targetKey] as number | undefined])
       .filter((v): v is number => v != null && isFinite(v));
     if (!values.length) return ['auto', 'auto'];
     return [Math.min(...values) - 3, Math.max(...values) + 3];
@@ -98,11 +95,7 @@ export const ReadingsTargetChart: React.FC<ReadingsTargetChartProps> = ({
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="label" hide={!showXAxis} ticks={commonTicks} />
-          <YAxis
-            unit={unit}
-            tickCount={5}
-            domain={yDomain}
-          />
+          <YAxis unit={unit} tickCount={5} domain={yDomain} />
           <Tooltip />
           <Line
             name="Readings"

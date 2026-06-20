@@ -20,19 +20,13 @@ export default function RecipesPage() {
 
   return (
     <Page>
-      <PageTitle
-        mb={3}
-        actions={
-          <AddNew onClick={() => setCreateOpen(true)}>
-            New Recipe
-          </AddNew>
-        }
-      >
+      <PageTitle mb={3} actions={<AddNew onClick={() => setCreateOpen(true)}>New Recipe</AddNew>}>
         Recipes
       </PageTitle>
 
       <Typography variant="body2" color="text.secondary" mb={2}>
-        Showing page {data?.page ?? 1} of {data?.pages ?? 1} — total: {data?.total ?? recipes.length}
+        Showing page {data?.page ?? 1} of {data?.pages ?? 1} — total:{' '}
+        {data?.total ?? recipes.length}
       </Typography>
 
       <RecipesTable recipes={recipes} onRowClick={(id) => navigate(`/recipes/${id}`)} />

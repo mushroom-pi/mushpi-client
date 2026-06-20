@@ -61,7 +61,11 @@ export const BuildQueryForm: React.FC = () => {
 
   return (
     <Stack spacing={1.5} mb={0.25} sx={{ '& > *': { flexShrink: 0 } }}>
-      <Stack direction={{ xs: 'column', xl: 'row' }} spacing={2} alignItems={{ xs: 'stretch', xl: 'center' }}>
+      <Stack
+        direction={{ xs: 'column', xl: 'row' }}
+        spacing={2}
+        alignItems={{ xs: 'stretch', xl: 'center' }}
+      >
         <PicoUnitSelect
           picoUnits={picoUnits}
           value={currentPicoUnitValue}

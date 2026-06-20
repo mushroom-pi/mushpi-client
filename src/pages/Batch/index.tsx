@@ -3,7 +3,15 @@ import { Box, Button, Stack } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { DeleteButton, EditButton, Error, Invalid, ItemPage, Loading, PageTitle } from '~components';
+import {
+  DeleteButton,
+  EditButton,
+  Error,
+  Invalid,
+  ItemPage,
+  Loading,
+  PageTitle,
+} from '~components';
 import { BatchProvider, useBatchContext } from '~ctx/Batch';
 import { BatchChartsProvider } from '~ctx/Charts';
 import { StatusChip } from '~pages/Batches/components/StatusChip';

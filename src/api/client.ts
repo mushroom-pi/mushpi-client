@@ -2,6 +2,7 @@ import {
   BatchesApi,
   Configuration,
   ControlApi,
+  ImagesApi,
   MonitoringApi,
   PicoUnitsApi,
   ReadingsApi,
@@ -29,6 +30,7 @@ export const Batches = new BatchesApi(configuration);
 export const Control = new ControlApi(configuration);
 export const Monitoring = new MonitoringApi(configuration);
 export const Recipes = new RecipesApi(configuration);
+export const Images = new ImagesApi(configuration);
 
 // optional helper to set token at runtime (if generator uses axios instance internally)
 export function setAuthToken(token: string | null) {

@@ -12,7 +12,13 @@ interface InfoCardProps {
   children?: React.ReactNode;
 }
 
-export const InfoCard: React.FC<InfoCardProps> = ({ title, subtitle, icon, headerAction, children }) => {
+export const InfoCard: React.FC<InfoCardProps> = ({
+  title,
+  subtitle,
+  icon,
+  headerAction,
+  children,
+}) => {
   return (
     <MuiCard>
       <CardContent>

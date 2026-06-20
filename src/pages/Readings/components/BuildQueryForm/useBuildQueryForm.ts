@@ -47,8 +47,7 @@ export function useBuildQueryForm() {
 
   const update = (overrideParams?: LocalParams) => {
     const source = overrideParams ?? localParams;
-    const picoUnitId =
-      source?.picoUnitId != null ? Number(source.picoUnitId) : params?.picoUnitId;
+    const picoUnitId = source?.picoUnitId != null ? Number(source.picoUnitId) : params?.picoUnitId;
     if (!picoUnitId) return;
 
     const merged: ListPicoUnitReadingsParams = {
@@ -65,11 +64,9 @@ export function useBuildQueryForm() {
   const onPicoUnitChange = (val: number) =>
     setLocalParams((prev) => ({ ...prev, picoUnitId: val }));
 
-  const onStartChange = (v: Dayjs | null) =>
-    setLocalParams((prev) => ({ ...prev, start: v }));
+  const onStartChange = (v: Dayjs | null) => setLocalParams((prev) => ({ ...prev, start: v }));
 
-  const onEndChange = (v: Dayjs | null) =>
-    setLocalParams((prev) => ({ ...prev, end: v }));
+  const onEndChange = (v: Dayjs | null) => setLocalParams((prev) => ({ ...prev, end: v }));
 
   const onUpdateClick = () => update();
 

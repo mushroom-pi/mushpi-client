@@ -53,6 +53,7 @@ export const recipeKeys = {
     return ['recipes', page, limit, species] as const;
   },
   detail: (id: number) => ['recipe', id] as const,
+  image: (id: number) => ['recipe', id, 'image'] as const,
   batches: (id: number, params?: { page?: number; limit?: number; status?: string }) => {
     const { page = 1, limit = 20, status } = params ?? {};
     return ['recipe', id, 'batches', page, limit, status] as const;
@@ -77,6 +78,5 @@ export const batchKeys = {
     end?: string | null,
     page?: number,
     limit?: number,
-  ) =>
-    ['batchReadings', batchId, start || 'none', end || 'none', page ?? 1, limit ?? 500] as const,
+  ) => ['batchReadings', batchId, start || 'none', end || 'none', page ?? 1, limit ?? 500] as const,
 };

@@ -4,8 +4,8 @@ import { unwrap } from '~api/adapter';
 import { Recipes } from '~api/client';
 import type {
   BatchListResponseDto,
-  Recipe,
   RecipesApiRecipeIdBatchesControllerListRequest as ListRecipeBatchesParams,
+  Recipe,
 } from '~api/generated';
 import { recipeKeys } from '~api/queryKeys';
 

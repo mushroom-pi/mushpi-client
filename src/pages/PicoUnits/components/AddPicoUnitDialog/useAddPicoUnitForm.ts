@@ -66,9 +66,7 @@ export function useAddPicoUnitForm({ onClose }: AddPicoUnitDialogProps) {
         await unwrap(PicoUnits.picoUnitIdControllerPing({ picoUnitId: id }));
       } catch {
         await unwrap(PicoUnits.picoUnitIdControllerRemove({ picoUnitId: id })).catch(() => {});
-        toast.warning(
-          'The pico unit could not be found in the local network. Try another handle.',
-        );
+        toast.warning('The pico unit could not be found in the local network. Try another handle.');
         setHandle('');
         setFieldError(undefined);
         setStep('idle');

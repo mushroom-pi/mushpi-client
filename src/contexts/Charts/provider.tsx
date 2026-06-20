@@ -62,7 +62,18 @@ export const ChartsProvider = ({
       displayPoints,
       setDisplayPoints,
     }),
-    [chartsData, labels, commonTicks, isLoading, isFetching, isError, error, queryData, params, displayPoints],
+    [
+      chartsData,
+      labels,
+      commonTicks,
+      isLoading,
+      isFetching,
+      isError,
+      error,
+      queryData,
+      params,
+      displayPoints,
+    ],
   );
 
   return <ChartsContext.Provider value={contextValue}>{children}</ChartsContext.Provider>;

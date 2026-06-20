@@ -36,14 +36,7 @@ export default function BatchesPage() {
 
   return (
     <Page>
-      <PageTitle
-        mb={1.5}
-        actions={
-          <AddNew onClick={() => setCreateOpen(true)}>
-            New Batch
-          </AddNew>
-        }
-      >
+      <PageTitle mb={1.5} actions={<AddNew onClick={() => setCreateOpen(true)}>New Batch</AddNew>}>
         Batches
       </PageTitle>
 

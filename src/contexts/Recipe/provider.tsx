@@ -3,9 +3,11 @@ import React, { createContext, useContext, useMemo } from 'react';
 
 import { useGetRecipe, useGetRecipeBatches } from './hooks';
 import {
+  createDeleteRecipeImageMutation,
   createDeleteRecipeMutation,
   createRecipeMutation,
   createUpdateRecipeMutation,
+  createUploadRecipeImageMutation,
 } from './mutations';
 import type { RecipeCtx } from './types';
 
@@ -23,6 +25,8 @@ export const RecipeProvider: React.FC<React.PropsWithChildren<{ recipeId: number
   const updateMutation = createUpdateRecipeMutation(qc);
   const deleteMutation = createDeleteRecipeMutation(qc);
   const createMutation = createRecipeMutation(qc);
+  const uploadImageMutation = createUploadRecipeImageMutation(qc);
+  const deleteImageMutation = createDeleteRecipeImageMutation(qc);
 
   const value = useMemo<RecipeCtx>(
     () => ({
@@ -43,6 +47,16 @@ export const RecipeProvider: React.FC<React.PropsWithChildren<{ recipeId: number
         mutateAsync: (id) => deleteMutation.mutateAsync(id),
         isLoading: deleteMutation.isPending,
       },
+      uploadImage: {
+        mutate: (vars) => uploadImageMutation.mutate(vars),
+        mutateAsync: (vars) => uploadImageMutation.mutateAsync(vars),
+        isLoading: uploadImageMutation.isPending,
+      },
+      deleteImage: {
+        mutate: (id) => deleteImageMutation.mutate(id),
+        mutateAsync: (id) => deleteImageMutation.mutateAsync(id),
+        isLoading: deleteImageMutation.isPending,
+      },
       createRecipe: {
         mutate: (body) => createMutation.mutate(body),
         mutateAsync: (body) => createMutation.mutateAsync(body),
@@ -60,6 +74,8 @@ export const RecipeProvider: React.FC<React.PropsWithChildren<{ recipeId: number
       updateMutation,
       deleteMutation,
       createMutation,
+      uploadImageMutation,
+      deleteImageMutation,
     ],
   );
 

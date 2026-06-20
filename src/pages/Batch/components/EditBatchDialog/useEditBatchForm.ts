@@ -47,10 +47,7 @@ export function useEditBatchForm({ open, onClose }: EditBatchDialogProps) {
   }, [batch, open, resetFields]);
 
   const canSubmit = useMemo(
-    () =>
-      startAt.trim() !== '' &&
-      !finishBeforeStartError &&
-      !Object.values(errors).some(Boolean),
+    () => startAt.trim() !== '' && !finishBeforeStartError && !Object.values(errors).some(Boolean),
     [startAt, finishBeforeStartError, errors],
   );
 

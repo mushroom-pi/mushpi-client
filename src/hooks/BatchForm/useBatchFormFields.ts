@@ -24,7 +24,16 @@ export function useBatchFormFields() {
   }, [startAt, finishAt]);
 
   const errors = useMemo<BatchFormErrors>(
-    () => validate({ description, species, temperatureTarget, humidityTarget, startAt, finishAt, notes }),
+    () =>
+      validate({
+        description,
+        species,
+        temperatureTarget,
+        humidityTarget,
+        startAt,
+        finishAt,
+        notes,
+      }),
     [description, species, temperatureTarget, humidityTarget, startAt, finishAt, notes],
   );
 

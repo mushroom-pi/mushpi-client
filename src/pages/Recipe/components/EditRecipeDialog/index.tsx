@@ -4,8 +4,17 @@ import type { EditRecipeDialogProps } from './interfaces';
 import { useEditRecipeForm } from './useEditRecipeForm';
 
 export function EditRecipeDialog({ open, onClose }: EditRecipeDialogProps) {
-  const { values, errors, hasChanges, isValid, isPending, updateField, touchField, closeDialog, handleSave } =
-    useEditRecipeForm({ open, onClose });
+  const {
+    values,
+    errors,
+    hasChanges,
+    isValid,
+    isPending,
+    updateField,
+    touchField,
+    closeDialog,
+    handleSave,
+  } = useEditRecipeForm({ open, onClose });
 
   return (
     <RecipeForm

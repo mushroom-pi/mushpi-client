@@ -35,11 +35,7 @@ export const DevicesTab: React.FC = () => {
         <OnOffChart dataKey="humidifier" height={panelHeight} />
       </IconChartRow>
 
-      <IconChartRow
-        tooltip="Fan"
-        icon={<FanIcon size={iconSize} />}
-        iconColWidth={iconColWidth}
-      >
+      <IconChartRow tooltip="Fan" icon={<FanIcon size={iconSize} />} iconColWidth={iconColWidth}>
         <OnOffChart dataKey="fan" height={panelHeight} />
       </IconChartRow>
 
