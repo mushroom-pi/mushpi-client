@@ -11,14 +11,11 @@ type RunOptions<T = unknown> = {
 };
 
 function extractMessage(err: unknown, fallback = 'Something went wrong'): string {
-  // Axios-like: err.response?.data?.message
   try {
     if (!err) return fallback;
-    // plain Error
-    if (err instanceof Error && err.message) return err.message;
-    // axios error-ish
     const anyErr = err as any;
     if (anyErr?.response?.data?.message) return String(anyErr.response.data.message);
+    if (err instanceof Error && err.message) return err.message;
     if (anyErr?.response?.data) return JSON.stringify(anyErr.response.data);
     if (anyErr?.message) return String(anyErr.message);
     if (typeof err === 'string') return err;
