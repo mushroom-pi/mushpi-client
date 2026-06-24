@@ -1,4 +1,6 @@
 // Barrel for reusable UI molecules.
+export { ImageManager } from './ImageManager';
+export type { ImageManagerImage, ImageManagerProps } from './ImageManager';
 export { ItemPage } from './ItemPage';
 export { InfoCard } from './InfoCard';
 export { EditableInfoCard } from './EditableInfoCard';

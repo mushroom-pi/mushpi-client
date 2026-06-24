@@ -6,7 +6,9 @@ import {
   createBatchMutation,
   createDeleteBatchMutation,
   createRecipeFromBatchMutation,
+  createRemoveBatchImageMutation,
   createUpdateBatchMutation,
+  createUploadBatchImagesMutation,
 } from './mutations';
 import type { BatchCtx } from './types';
 
@@ -24,6 +26,8 @@ export const BatchProvider: React.FC<React.PropsWithChildren<{ batchId: number }
   const deleteMutation = createDeleteBatchMutation(qc);
   const createMutation = createBatchMutation(qc);
   const createRecipeMutation = createRecipeFromBatchMutation(qc);
+  const uploadImagesMutation = createUploadBatchImagesMutation(qc);
+  const removeImageMutation = createRemoveBatchImageMutation(qc);
 
   const value = useMemo<BatchCtx>(
     () => ({
@@ -52,6 +56,16 @@ export const BatchProvider: React.FC<React.PropsWithChildren<{ batchId: number }
         mutateAsync: (vars) => createRecipeMutation.mutateAsync(vars),
         isLoading: createRecipeMutation.isPending,
       },
+      uploadImages: {
+        mutate: (vars) => uploadImagesMutation.mutate(vars),
+        mutateAsync: (vars) => uploadImagesMutation.mutateAsync(vars),
+        isLoading: uploadImagesMutation.isPending,
+      },
+      removeImage: {
+        mutate: (vars) => removeImageMutation.mutate(vars),
+        mutateAsync: (vars) => removeImageMutation.mutateAsync(vars),
+        isLoading: removeImageMutation.isPending,
+      },
     }),
     [
       batch,
@@ -63,6 +77,8 @@ export const BatchProvider: React.FC<React.PropsWithChildren<{ batchId: number }
       deleteMutation,
       createMutation,
       createRecipeMutation,
+      uploadImagesMutation,
+      removeImageMutation,
     ],
   );
 

@@ -67,6 +67,7 @@ export const batchKeys = {
     return ['batches', page, limit, status, picoUnitId, recipeId] as const;
   },
   detail: (id: number) => ['batch', id] as const,
+  images: (id: number) => ['batch', id, 'images'] as const,
   forUnit: (picoUnitId: number, params?: { page?: number; limit?: number; status?: string }) => {
     const { page = 1, limit = 20, status } = params ?? {};
     return ['batches', 'unit', picoUnitId, page, limit, status] as const;

@@ -30,4 +30,14 @@ export type BatchCtx = {
     mutateAsync: (body: CreateBatchDto) => Promise<Batch>;
     isLoading: boolean;
   };
+  uploadImages: {
+    mutate: (vars: { batchId: number; images: File[] }) => void;
+    mutateAsync: (vars: { batchId: number; images: File[] }) => Promise<Batch>;
+    isLoading: boolean;
+  };
+  removeImage: {
+    mutate: (vars: { batchId: number; filename: string }) => void;
+    mutateAsync: (vars: { batchId: number; filename: string }) => Promise<void>;
+    isLoading: boolean;
+  };
 };

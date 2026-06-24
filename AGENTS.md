@@ -24,6 +24,14 @@ yarn gen:all:remote      # regenerate both
 
 Both files are gitignored. Always regenerate after any `mushpi-server` endpoint change.
 
+## Images
+
+- `Recipe.image` / `Batch.images` contain **filenames only** (e.g. `"abc123.jpg"`)
+- `Recipe.image_url` / `Batch.images_url` contain **absolute URLs** for display
+- Images are managed via `ImagesApi` (upload, delete) — endpoints live in `src/api/generated/api.ts`
+- Shared UI: `ImageManager` molecule (`src/components/ui/molecules/ImageManager/`) handles both single-image (Recipe, `maxImages=1`, `allowHotlink=true`) and gallery (Batch, `maxImages=5`, `allowHotlink=false`) modes
+- Upload dialog supports drag-and-drop + file picker; optional URL tab for hotlinking (Recipe only)
+
 ## Form Validation
 
 All Create/Edit dialogs validate against generated Zod schemas. **Never hardcode validation bounds.**
@@ -67,11 +75,12 @@ src/
 ├── components/ui/
 │   ├── atoms/            # Stateless presentational
 │   ├── molecules/        # Composed (may use context/hooks)
+│   │   └── ImageManager/ # Shared image gallery/upload/remove (used by Recipe + Batch)
 │   └── index.ts
 ├── contexts/             # Context + hooks + mutations per entity
 │   ├── PicoUnit/mutations/: controlLoop, delete, outputs, setPoints, update
-│   ├── Recipe/mutations/: create, delete, update
-│   ├── Batch/mutations/: create, delete, update, createRecipeFromBatch
+│   ├── Recipe/mutations/: create, delete, image, update
+│   ├── Batch/mutations/: create, delete, image, update, createRecipeFromBatch
 │   ├── Charts/: provider.tsx, batchProvider.tsx
 │   └── Toast.tsx
 ├── hooks/                # useReadings, useBatchReadings, useServerHealth, useAsyncWithToast
