@@ -20,6 +20,8 @@ let content = readFileSync(filePath, 'utf8');
 const fixes = [
   { pattern: /(\breadings\?\s*:\s*)Array(\s*\|\s*undefined)/g, replacement: '$1Array<Readings>$2' },
   { pattern: /(\bbatches\?\s*:\s*)Array(\s*\|\s*undefined)/g, replacement: '$1Array<Batch>$2' },
+  { pattern: /(\bimages\?\s*:\s*\(?)Array(\s*\|\s*null\)?\s*\|\s*undefined)/g, replacement: '$1Array<string>$2' },
+  { pattern: /(\bimages_url\?\s*:\s*)Array(\s*\|\s*undefined)/g, replacement: '$1Array<string>$2' },
 ];
 
 let changed = false;
