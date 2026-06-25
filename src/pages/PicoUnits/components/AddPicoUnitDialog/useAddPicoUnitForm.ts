@@ -8,6 +8,7 @@ import type { PicoUnit } from '~api/generated';
 import { schemas } from '~api/generated/schemas';
 import { picoUnitsKeys } from '~api/queryKeys';
 import { useToast } from '~ctx/Toast';
+import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 
 import type { AddPicoUnitDialogProps } from './interfaces';
 
@@ -17,6 +18,7 @@ export function useAddPicoUnitForm({ onClose }: AddPicoUnitDialogProps) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const toast = useToast();
+  const { run } = useAsyncWithToast();
 
   const [step, setStep] = useState<Step>('idle');
   const [handle, setHandle] = useState('');
@@ -56,35 +58,37 @@ export function useAddPicoUnitForm({ onClose }: AddPicoUnitDialogProps) {
     setStep('searching');
 
     try {
-      const created = (await unwrap(
-        PicoUnits.picoUnitsControllerUpsert({ upsertPicoUnitDto: { handle } }),
-      )) as unknown as PicoUnit;
+      await run(
+        async () => {
+          const created = (await unwrap(
+            PicoUnits.picoUnitIdControllerUpsert({ upsertPicoUnitDto: { handle } }),
+          )) as unknown as PicoUnit;
 
-      const id = created.id;
+          const id = created.id;
 
-      try {
-        await unwrap(PicoUnits.picoUnitIdControllerPing({ picoUnitId: id }));
-      } catch {
-        await unwrap(PicoUnits.picoUnitIdControllerRemove({ picoUnitId: id })).catch(() => {});
-        toast.warning('The pico unit could not be found in the local network. Try another handle.');
-        setHandle('');
-        setFieldError(undefined);
-        setStep('idle');
-        return;
-      }
+          try {
+            await unwrap(PicoUnits.picoUnitIdControllerPing({ picoUnitId: id }));
+          } catch {
+            await unwrap(PicoUnits.picoUnitIdControllerRemove({ picoUnitId: id })).catch(() => {});
+            toast.warning('The pico unit could not be found in the local network. Try another handle.');
+            setHandle('');
+            setFieldError(undefined);
+            setStep('idle');
+            throw new Error('Ping failed');
+          }
 
-      await unwrap(Readings.picoUnitIdReadingsControllerPoll({ picoUnitId: id })).catch(() => {});
-      await qc.invalidateQueries({ queryKey: picoUnitsKeys.all });
+          await unwrap(Readings.picoUnitIdReadingsControllerPoll({ picoUnitId: id })).catch(() => {});
+          await qc.invalidateQueries({ queryKey: picoUnitsKeys.all });
 
-      navigate(`/pico-units/${id}`, { state: { openEditDialog: true } });
-      onClose();
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Failed to add pico unit. Please try again.';
-      toast.error(message);
+          navigate(`/pico-units/${id}`, { state: { openEditDialog: true } });
+          onClose();
+        },
+        { rethrow: true, skipErrorToast: true },
+      );
+    } catch {
       setStep('idle');
     }
-  }, [handle, navigate, onClose, qc, toast]);
+  }, [handle, navigate, onClose, qc, run, toast]);
 
   const reset = useCallback(() => {
     setHandle('');

@@ -6,6 +6,7 @@ type RunOptions<T = unknown> = {
   successMessage?: string;
   fallbackErrorMessage?: string;
   rethrow?: boolean; // default false
+  skipErrorToast?: boolean; // default false
   onSuccess?: (result: T) => void | Promise<void>;
   onError?: (err: unknown) => void | Promise<void>;
 };
@@ -37,6 +38,7 @@ export function useAsyncWithToast() {
         successMessage,
         fallbackErrorMessage = 'Failed to complete operation',
         rethrow = false,
+        skipErrorToast = false,
         onSuccess,
         onError,
       } = opts ?? {};
@@ -48,7 +50,7 @@ export function useAsyncWithToast() {
         return result;
       } catch (err) {
         const msg = extractMessage(err, fallbackErrorMessage);
-        toast.error(msg);
+        if (!skipErrorToast) toast.error(msg);
         if (onError) await onError(err);
         if (rethrow) throw err;
         // keep a rejected promise so callers that `await` still get a rejection if they want to handle it
