@@ -1,39 +1,65 @@
 /**
- * Post-processing fix for openapi-zod-client bug (v1.18.3).
+ * Post-processing fixes for openapi-zod-client bugs (v1.18.3).
  *
- * When generating TypeScript types for properties like `readings?: Array<Readings>`,
- * the library calls getTypescriptFromOpenApi() recursively for the array item schema.
- * If that item resolves to a named object (via $ref), the result is a TypeAliasDeclaration
- * node rather than a type reference. tanu.t.array() can't use a declaration as a generic
- * type argument, so the printed output loses the <Readings> part, producing bare `Array`.
+ * Fix 1: Bare Array types
+ * When generating TypeScript types for array properties, the library sometimes
+ * produces bare `Array` without a type parameter, causing TS error:
+ * Generic type 'Array<T>' requires 1 type argument(s).ts(2314)
  *
- * This causes TS error: Generic type 'Array<T>' requires 1 type argument(s).ts(2314)
+ * This script cross-references the Zod schemas (which are correct) to determine
+ * the proper type parameter for each bare Array, making the fix fully automatic
+ * for any new array properties added to the backend.
  *
- * The upstream repo (astahurski/openapi-zod-client) is not accepting PRs, so this
+ * Fix 2: Missing type annotations for z.lazy()
+ * When using the schemas-only template, circular references use z.lazy() without
+ * type annotations. TypeScript can't infer the return type when there are circular
+ * references, causing TS error:
+ * Function implicitly has return type 'any'.ts(7024)
+ *
+ * The upstream repo (astahurski/openapi-zod-client) is not processing PRs, so this
  * post-processing script is the pragmatic fix. It runs automatically after gen:schemas.
  */
 import { readFileSync, writeFileSync } from 'fs';
 
 const filePath = 'src/api/generated/schemas.ts';
 let content = readFileSync(filePath, 'utf8');
-
-const fixes = [
-  { pattern: /(\breadings\?\s*:\s*)Array(\s*\|\s*undefined)/g, replacement: '$1Array<Readings>$2' },
-  { pattern: /(\bbatches\?\s*:\s*)Array(\s*\|\s*undefined)/g, replacement: '$1Array<Batch>$2' },
-  { pattern: /(\bimages\?\s*:\s*\(?)Array(\s*\|\s*null\)?\s*\|\s*undefined)/g, replacement: '$1Array<string>$2' },
-  { pattern: /(\bimages_url\?\s*:\s*)Array(\s*\|\s*undefined)/g, replacement: '$1Array<string>$2' },
-];
-
 let changed = false;
-for (const { pattern, replacement } of fixes) {
-  const next = content.replace(pattern, replacement);
-  if (next !== content) changed = true;
-  content = next;
+
+// Fix 1: Bare Array types
+// Build a map from property names to their array element types using the Zod schemas
+// Matches: propName: z.array(Readings)  →  Readings
+//          propName: z.array(z.string() →  string
+const zodArrayPattern = /(\w+)\s*:\s*z\.array\(\s*(?:z\.((?!instanceof\b)\w+)\(|(\w+))/g;
+const arrayTypeMap = new Map();
+let match;
+while ((match = zodArrayPattern.exec(content)) !== null) {
+  const [, propName, zodPrimitive, namedType] = match;
+  arrayTypeMap.set(propName, zodPrimitive || namedType);
 }
+
+// Replace all bare Array occurrences in type definitions
+content = content.replace(
+  /(\b(\w+)\??\s*:\s*)(\(?)Array(?!\s*<)(\s*(?:\|\s*null\))?\s*(?:\|\s*undefined)?)/g,
+  (fullMatch, prefix, propName, openParen, suffix) => {
+    const tsType = arrayTypeMap.get(propName);
+    if (tsType) {
+      changed = true;
+      return `${prefix}${openParen}Array<${tsType}>${suffix}`;
+    }
+    return fullMatch;
+  },
+);
+
+// Fix 2: Add type annotations to z.lazy() calls for circular references
+const lazyPattern = /^const (\w+) = z\.lazy\(\(\) =>/gm;
+content = content.replace(lazyPattern, (_match, schemaName) => {
+  changed = true;
+  return `const ${schemaName}: z.ZodType<${schemaName}> = z.lazy(() =>`;
+});
 
 if (changed) {
   writeFileSync(filePath, content, 'utf8');
-  console.log('✅ Fixed bare Array types in generated schemas.ts');
+  console.log('✅ Fixed generated schemas.ts (Array types and z.lazy annotations)');
 } else {
-  console.log('ℹ️  No bare Array types found in schemas.ts');
+  console.log('ℹ️  No fixes needed in schemas.ts');
 }
