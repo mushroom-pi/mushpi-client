@@ -7,10 +7,8 @@ import { useAddPicoUnitForm } from './useAddPicoUnitForm';
 
 export const AddPicoUnitDialog: React.FC<AddPicoUnitDialogProps> = (props) => {
   const { open, onClose } = props;
-  const { handle, updateHandle, errors, isValid, step, handleSearch, reset } =
+  const { handle, updateHandle, errors, isValid, isPending, handleSubmit, reset } =
     useAddPicoUnitForm(props);
-
-  const isSearching = step === 'searching';
 
   function handleClose() {
     reset();
@@ -22,11 +20,11 @@ export const AddPicoUnitDialog: React.FC<AddPicoUnitDialogProps> = (props) => {
       open={open}
       onClose={handleClose}
       title={<HeaderAndIcon title="Add Pico Unit" />}
-      submitLabel="Search"
-      pendingLabel="Searching…"
-      canSubmit={isValid && !isSearching}
-      isPending={isSearching}
-      onSubmit={handleSearch}
+      submitLabel={isPending ? 'Adding…' : 'Add'}
+      pendingLabel="Adding…"
+      canSubmit={isValid && !isPending}
+      isPending={isPending}
+      onSubmit={handleSubmit}
       blockCloseWhenPending
     >
       <TextField
@@ -36,7 +34,7 @@ export const AddPicoUnitDialog: React.FC<AddPicoUnitDialogProps> = (props) => {
         fullWidth
         error={!!errors.handle}
         helperText={errors.handle ?? 'Unique identifier for the device on the network'}
-        disabled={isSearching}
+        disabled={isPending}
         autoFocus
       />
     </ModalForm>
