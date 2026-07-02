@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 
 import type { UpdatePicoUnitDto } from '~api/generated';
 import { schemas } from '~api/generated/schemas';
-import { HeaderAndIcon, PicoUnitForm } from '~components';
+import { ColorSwatchPicker, HeaderAndIcon, PicoUnitForm } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 
@@ -28,6 +28,7 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
   const [editName, setEditName] = useState<string>('');
   const [editDescription, setEditDescription] = useState<string>('');
   const [editEnabled, setEditEnabled] = useState<boolean>(false);
+  const [editFaceColor, setEditFaceColor] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -35,12 +36,14 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
       setEditName('');
       setEditDescription('');
       setEditEnabled(false);
+      setEditFaceColor(null);
       return;
     }
     setEditName(pico.name ?? '');
     setEditDescription(pico.description ?? '');
     setEditEnabled(!!pico.enabled);
-  }, [open, pico?.id, pico?.name, pico?.description, pico?.enabled]);
+    setEditFaceColor(pico.face_color ?? null);
+  }, [open, pico?.id, pico?.name, pico?.description, pico?.enabled, pico?.face_color]);
 
   // detect changes to enable/disable Save button
   const hasChanges = useMemo(() => {
@@ -48,23 +51,26 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
     return (
       (editName ?? '') !== (pico.name ?? '') ||
       (editDescription ?? '') !== (pico.description ?? '') ||
-      !!editEnabled !== !!pico.enabled
+      !!editEnabled !== !!pico.enabled ||
+      (editFaceColor ?? null) !== (pico.face_color ?? null)
     );
-  }, [pico, editName, editDescription, editEnabled]);
+  }, [pico, editName, editDescription, editEnabled, editFaceColor]);
 
   const errors = useMemo(() => {
     const result = schemas.UpdatePicoUnitDto.safeParse({
       name: editName,
       description: editDescription,
+      face_color: editFaceColor,
     });
     if (!result.success) {
       return {
         name: result.error.issues.find((i) => i.path[0] === 'name')?.message,
         description: result.error.issues.find((i) => i.path[0] === 'description')?.message,
+        faceColor: result.error.issues.find((i) => i.path[0] === 'face_color')?.message,
       };
     }
     return {};
-  }, [editName, editDescription]);
+  }, [editName, editDescription, editFaceColor]);
 
   async function doSaveEdits() {
     if (!pico) return;
@@ -72,6 +78,7 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
       name: editName,
       description: editDescription,
       enabled: !!editEnabled,
+      face_color: editFaceColor,
     };
 
     await run(() => updateMutation.mutateAsync({ picoUnitId: pico.id, body }), {
@@ -88,10 +95,12 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
       setEditName(pico.name ?? '');
       setEditDescription(pico.description ?? '');
       setEditEnabled(!!pico.enabled);
+      setEditFaceColor(pico.face_color ?? null);
     } else {
       setEditName('');
       setEditDescription('');
       setEditEnabled(false);
+      setEditFaceColor(null);
     }
     onClose();
   }
@@ -126,6 +135,13 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
             error={!!errors.description}
             helperText={errors.description ?? undefined}
           />
+
+          <Box>
+            <Typography variant="body2" sx={{ mt: 2, mb: 0.5 }}>
+              Face color
+            </Typography>
+            <ColorSwatchPicker value={editFaceColor} onChange={setEditFaceColor} />
+          </Box>
 
           <Box display="flex" alignItems="center" gap={2}>
             <Typography variant="body2">Enabled</Typography>

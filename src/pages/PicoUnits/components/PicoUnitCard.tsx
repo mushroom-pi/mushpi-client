@@ -56,7 +56,7 @@ export default function PicoUnitCard({
       >
         <CardHeader
           avatar={
-            <Avatar sx={{ bgcolor: isWarning ? 'warning.main' : 'primary.main' }}>
+            <Avatar sx={{ bgcolor: pico.face_color ?? 'primary.main' }}>
               {pico.name?.charAt(0) ?? 'P'}
             </Avatar>
           }
