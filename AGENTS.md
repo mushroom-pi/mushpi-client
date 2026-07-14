@@ -51,6 +51,30 @@ All Create/Edit dialogs validate against generated Zod schemas. **Never hardcode
 - Mutations in entity's `mutations/` folder (one file per concern)
 - Optimistic updates via `createOptimisticMutation` factory in `src/contexts/PicoUnit/helpers.ts`
 
+### useAsyncWithToast (imperative async with toast)
+
+For one-shot actions that don't benefit from mutation caching (e.g., add-pico-unit form), use the imperative `useAsyncWithToast` hook instead of TanStack `useMutation`:
+
+```ts
+const { run } = useAsyncWithToast();
+
+await run(
+  async () => { /* execute async work */ },
+  {
+    successMessage: 'Done',           // shown as success toast
+    fallbackErrorMessage: 'Failed',   // shown if error is not an HttpException
+    rethrow: true,                    // re-throws after toast so outer catch can handle
+    skipErrorToast: false,            // set true to suppress error toast (caller handles)
+    onSuccess: () => { /* callback */ },
+    onError: (err) => { /* callback */ },
+  },
+);
+```
+
+- `run()` returns the async function's result on success, or throws on error (when `rethrow: true`)
+- Server HTTP error responses (409, 424, etc.) automatically surface as error toasts with the server's descriptive message
+- Use `useMutation` for entity mutations that participate in React Query caching; use `useAsyncWithToast` for imperative flows like the Add dialog or delete confirmations that navigate away on success
+
 ## Routing
 
 | Path              | Page          |
@@ -118,6 +142,13 @@ Chart data utilities in `~utils/methods`: `downsampleChartPoints`, `smartSampleC
 - `picoUnitIdBatchesControllerGetCurrent` requires `batchId: 0` (generator bug — param not in URL, ignored)
 - Vite chunk size warning (~1.35 MB) is informational
 - `schemas.ts` sometimes uses bare `Array` without type param — regenerate from fixed server spec
+- `schemas.ts` sometimes uses `Array<z>` instead of `Array<string>` — fixed by `Fix 1b` in `scripts/fix-array-types.mjs` (generator bug in `openapi-zod-client` v1.18.3)
+- `PicoUnitCard.tsx` `friendlyDate` uses `new Date().toLocaleString()` instead of `dayjs` — pre-existing deviation from the "Use dayjs for dates" rule
+- Grep tool skips `src/api/generated/` (gitignored) — always use `read` or bash `grep`/`rg` directly to discover generated method signatures
+
+## Feature Palettes & Domain Constants
+
+Color palettes or other domain-specific constant arrays that are tightly coupled to a feature should co-locate with the UI component that consumes them. A stateless atom can export both the component and its default dataset (e.g. `ColorSwatchPicker` + `FACE_COLORS` from the same file). If a palette is consumed by multiple unrelated features, extract it to a shared constants file under `src/utils/` or `src/theme/`.
 
 ## Environment
 
