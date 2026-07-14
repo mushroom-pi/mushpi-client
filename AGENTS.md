@@ -113,7 +113,6 @@ src/
 ├── pages/                # Route pages (default exports)
 │   ├── PicoUnits/
 │   │   └── components/
-│   │       ├── provisioning.ts          # OFFLINE_THRESHOLD, LED_STATES, helpers
 │   │       ├── ProvisioningIllustrations.tsx  # SVG illustrations for provisioning wizards
 │   │       ├── LedStateReference.tsx     # Collapsible LED diagnostic accordion
 │   │       ├── ConnectPicoWizard/        # Multi-step wizard for new Pico provisioning
@@ -121,7 +120,10 @@ src/
 │   │       └── ManualRegisterDialog/     # Manual PicoUnit registration (mDNS-based)
 ├── theme/mushroomTheme.ts
 ├── types/charts.ts
-└── utils/methods.ts      # Pure helpers
+└── utils/
+    ├── methods.ts        # Generic: date formatting, bytes, percentages
+    ├── pico.ts           # Pico: provisioning constants, health helpers, LED_STATES
+    └── charts.ts         # Chart: samplers, downsampling, RLE dedup
 ```
 
 ## Charts (Recharts)
@@ -135,7 +137,7 @@ Three chart tabs in `/readings` and `/batches/:id`:
 Unit readings (`/readings`): shared query params from `ChartsProvider` (`useCharts()`).
 Batch readings (`/batches/:id`): `BatchChartsProvider` sources data from `useBatchReadings`, provides same context shape — chart tabs work unchanged for both.
 
-Chart data utilities in `~utils/methods`: `downsampleChartPoints`, `smartSampleChartPoints`, `rleDeduplicateOnOffPoints`.
+Chart data utilities in `~utils/charts`: `downsampleChartPoints`, `smartSampleChartPoints`, `rleDeduplicateOnOffPoints`.
 
 ## Build & Development
 
@@ -154,7 +156,7 @@ Chart data utilities in `~utils/methods`: `downsampleChartPoints`, `smartSampleC
 - `schemas.ts` sometimes uses `Array<z>` instead of `Array<string>` — fixed by `Fix 1b` in `scripts/fix-array-types.mjs` (generator bug in `openapi-zod-client` v1.18.3)
 - `PicoUnitCard.tsx` `friendlyDate` uses `new Date().toLocaleString()` instead of `dayjs` — pre-existing deviation from the "Use dayjs for dates" rule
 - Grep tool skips `src/api/generated/` (gitignored) — always use `read` or bash `grep`/`rg` directly to discover generated method signatures
-- Offline Pico detection: `isUnitOffline(pico)` checks `failed_calls >= 3` (import from `~pages/PicoUnits/components/provisioning`). This is the canonical health signal — derived from the server's cron polling failures.
+- Offline Pico detection: `isUnitOffline(pico)` checks `failed_calls >= 3` (import from `~utils/pico`). This is the canonical health signal — derived from the server's cron polling failures.
 - `PicoUnit.mac` (nullable string) stores the Pico's Wi‑Fi MAC address. Used client-side to derive the AP provisioning SSID (`mushpi-provision-XXXX` from last 4 hex chars). Set once by the server during the first successful cron poll; never updated.
 - Soft-AP provisioning wizards reference `http://192.168.4.1:5000` (Pico AP mode) in user instructions only — no direct API calls to Pico units from the frontend. All communication goes through `mushpi-server`.
 

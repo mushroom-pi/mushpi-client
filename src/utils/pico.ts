@@ -36,3 +36,9 @@ export const LED_STATES = [
   { id: 'solid', color: '#A27B35', label: 'Solid ON', meaning: 'Connected to Wi‑Fi, waiting to reach the hub' },
   { id: 'heartbeat', color: '#3C8D5A', label: 'Heartbeat blink', meaning: 'Fully connected to the hub — operational' },
 ] as const;
+
+export const chipColorForFailedCalls = (failedCalls: number | null) => {
+  if (!failedCalls) return 'success';
+  if (failedCalls < 3) return 'warning';
+  return 'error';
+};

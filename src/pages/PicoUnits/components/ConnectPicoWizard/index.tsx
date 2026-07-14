@@ -23,10 +23,10 @@ import { useNavigate } from 'react-router-dom';
 import type { PicoUnitListResponseDto } from '~api/generated';
 import { picoUnitsKeys } from '~api/queryKeys';
 import { HeaderAndIcon } from '~components';
+import { LED_STATES, POLL_FINISH_MAX_ATTEMPTS, PROVISION_AP_URL } from '~utils/pico';
 
 import { LedStateReference } from '../LedStateReference';
 import { ManualRegisterDialog } from '../ManualRegisterDialog';
-import { LED_STATES, POLL_FINISH_MAX_ATTEMPTS, PROVISION_AP_URL } from '../provisioning';
 import {
   JoinWifiIllustration,
   OpenBrowserIllustration,

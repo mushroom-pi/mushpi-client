@@ -18,8 +18,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 import type { PicoUnit } from '~api/generated';
-
-import { isUnitOffline } from './provisioning';
+import { isUnitOffline } from '~utils/pico';
 
 export default function PicoUnitCard({
   pico,

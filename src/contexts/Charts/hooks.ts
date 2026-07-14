@@ -6,7 +6,8 @@ import type {
 } from '~api/generated';
 import { useListPicoUnitReadings } from '~hook/useReadings';
 import type { ChartPoint } from '~type/charts';
-import { bytesToMB, smartSampleChartPoints } from '~utils/methods';
+import { smartSampleChartPoints } from '~utils/charts';
+import { bytesToMB } from '~utils/methods';
 
 export const fmtTsShort = (iso?: string) => {
   if (!iso) return '';

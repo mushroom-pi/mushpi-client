@@ -5,12 +5,11 @@ import { unwrap } from '~api/adapter';
 import { PicoUnits } from '~api/client';
 import type { PicoUnitListResponseDto } from '~api/generated';
 import { picoUnitsKeys } from '~api/queryKeys';
-
 import {
   isUnitOffline,
   POLL_FINISH_INTERVAL_MS,
   POLL_FINISH_MAX_ATTEMPTS,
-} from '../provisioning';
+} from '~utils/pico';
 
 export function useReconnectPoll(picoUnitId: number | undefined) {
   const qc = useQueryClient();

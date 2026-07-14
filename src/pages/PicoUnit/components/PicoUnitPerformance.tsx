@@ -5,7 +5,7 @@ import React from 'react';
 import { InfoCard, InfoField, Loading } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
-import { chipColorForFailedCalls } from '~utils/methods';
+import { chipColorForFailedCalls } from '~utils/pico';
 
 function chipColorForResponse(ms?: number | null) {
   if (typeof ms !== 'number') return 'default';

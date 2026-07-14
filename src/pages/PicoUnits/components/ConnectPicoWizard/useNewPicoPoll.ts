@@ -5,12 +5,11 @@ import { unwrap } from '~api/adapter';
 import { PicoUnits } from '~api/client';
 import type { PicoUnit, PicoUnitListResponseDto } from '~api/generated';
 import { picoUnitsKeys } from '~api/queryKeys';
-
 import {
   diffNewUnitIds,
   POLL_FINISH_INTERVAL_MS,
   POLL_FINISH_MAX_ATTEMPTS,
-} from '../provisioning';
+} from '~utils/pico';
 
 export function useNewPicoPoll(
   baselineIds: number[] | null,

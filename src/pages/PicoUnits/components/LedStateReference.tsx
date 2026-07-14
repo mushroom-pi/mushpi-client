@@ -7,7 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { LED_STATES } from './provisioning';
+import { LED_STATES } from '~utils/pico';
 
 interface LedStateReferenceProps {
   compact?: boolean;

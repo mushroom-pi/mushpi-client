@@ -19,9 +19,9 @@ import {
 import { useEffect, useState } from 'react';
 
 import { HeaderAndIcon } from '~components';
+import { apSsidOrFallback, LED_STATES, POLL_FINISH_MAX_ATTEMPTS, PROVISION_AP_URL } from '~utils/pico';
 
 import { LedStateReference } from '../LedStateReference';
-import { apSsidOrFallback, LED_STATES, POLL_FINISH_MAX_ATTEMPTS, PROVISION_AP_URL } from '../provisioning';
 import {
   JoinWifiIllustration,
   OpenBrowserIllustration,

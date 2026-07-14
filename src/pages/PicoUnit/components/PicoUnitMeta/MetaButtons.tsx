@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { DeleteButton, EditButton } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
-import { isUnitOffline } from '~pages/PicoUnits/components/provisioning';
+import { isUnitOffline } from '~utils/pico';
 
 type MetaButtonsProps = {
   setEditOpen: (open: boolean) => void;

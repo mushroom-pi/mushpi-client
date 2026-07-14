@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react';
 
 import type { Batch } from '~api/generated';
 import { useListBatchReadings } from '~hook/useBatchReadings';
-import { smartSampleChartPoints } from '~utils/methods';
+import { smartSampleChartPoints } from '~utils/charts';
 
 import { toChartPoints } from './hooks';
 import { ChartsContext, type ChartsContextValue } from './provider';
