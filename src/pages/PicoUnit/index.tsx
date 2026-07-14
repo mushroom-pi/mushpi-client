@@ -2,9 +2,11 @@ import { Box, Chip, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
+import type { PicoUnit } from '~api/generated';
 import { Error, Invalid, ItemPage, Loading } from '~components';
 import { PicoUnitProvider, usePicoUnitContext } from '~ctx/PicoUnit';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
+import { ReconnectPicoDialog } from '~pages/PicoUnits/components/ReconnectPicoDialog';
 
 import { PicoUnitDetailGrid as DetailGrid } from './components/PicoUnitDetailGrid';
 import { DeletePicoUnit } from './components/PicoUnitMeta/DeletePicoUnit';
@@ -15,6 +17,7 @@ function PicoUnitDetailInner() {
   const { pico, isLoading, isError, error, refetch } = usePicoUnitContext();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [reconnectPico, setReconnectPico] = useState<PicoUnit | null>(null);
   const location = useLocation();
 
   useEffect(() => {
@@ -30,7 +33,13 @@ function PicoUnitDetailInner() {
   return (
     <ItemPage
       title={pico.name ?? 'No name'}
-      actions={<MetaButtons setEditOpen={setEditOpen} setDeleteOpen={setDeleteOpen} />}
+      actions={
+        <MetaButtons
+          setEditOpen={setEditOpen}
+          setDeleteOpen={setDeleteOpen}
+          onReconnect={() => setReconnectPico(pico)}
+        />
+      }
       meta={
         <>
           <Stack direction="row" spacing={2} alignItems="center" mb={2}>
@@ -52,6 +61,7 @@ function PicoUnitDetailInner() {
       <DetailGrid pico={pico} />
       <EditMetaDialog open={editOpen} onClose={() => setEditOpen(false)} />
       <DeletePicoUnit open={deleteOpen} onClose={() => setDeleteOpen(false)} />
+      <ReconnectPicoDialog pico={reconnectPico} onClose={() => setReconnectPico(null)} />
     </ItemPage>
   );
 }

@@ -1,6 +1,6 @@
 # mushpi-client — Project Context
 
-React 19 + Vite web dashboard served from Raspberry Pi 3 B+. Talks only to `mushpi-server`; never directly to Pico units.
+React 19 + Vite web dashboard served from Raspberry Pi 3 B+. Talks only to `mushpi-server`; never directly to Pico units. EXCEPTION: provisioning wizards reference `http://192.168.4.1:5000` (Pico Soft-AP) in user-facing instructions only — no direct API calls to Pico units from the frontend.
 
 ## Stack
 
@@ -74,6 +74,7 @@ await run(
 - `run()` returns the async function's result on success, or throws on error (when `rethrow: true`)
 - Server HTTP error responses (409, 424, etc.) automatically surface as error toasts with the server's descriptive message
 - Use `useMutation` for entity mutations that participate in React Query caching; use `useAsyncWithToast` for imperative flows like the Add dialog or delete confirmations that navigate away on success
+- When pairing `useAsyncWithToast` with `ModalForm` (which needs `isPending` for the submit button), manage a local `useState(false)` `isPending` boolean — set `true` before `run()`, `false` in the `finally` block. The `ModalForm`'s `canSubmit` and `isPending` props use this local state, not a React Query mutation's `isPending`
 
 ## Routing
 
@@ -110,6 +111,14 @@ src/
 ├── hooks/                # useReadings, useBatchReadings, useServerHealth, useAsyncWithToast
 ├── layout/               # Page wrapper, Sidebar
 ├── pages/                # Route pages (default exports)
+│   ├── PicoUnits/
+│   │   └── components/
+│   │       ├── provisioning.ts          # OFFLINE_THRESHOLD, LED_STATES, helpers
+│   │       ├── ProvisioningIllustrations.tsx  # SVG illustrations for provisioning wizards
+│   │       ├── LedStateReference.tsx     # Collapsible LED diagnostic accordion
+│   │       ├── ConnectPicoWizard/        # Multi-step wizard for new Pico provisioning
+│   │       ├── ReconnectPicoDialog/      # Multi-step wizard for offline Pico recovery
+│   │       └── ManualRegisterDialog/     # Manual PicoUnit registration (mDNS-based)
 ├── theme/mushroomTheme.ts
 ├── types/charts.ts
 └── utils/methods.ts      # Pure helpers
@@ -145,6 +154,9 @@ Chart data utilities in `~utils/methods`: `downsampleChartPoints`, `smartSampleC
 - `schemas.ts` sometimes uses `Array<z>` instead of `Array<string>` — fixed by `Fix 1b` in `scripts/fix-array-types.mjs` (generator bug in `openapi-zod-client` v1.18.3)
 - `PicoUnitCard.tsx` `friendlyDate` uses `new Date().toLocaleString()` instead of `dayjs` — pre-existing deviation from the "Use dayjs for dates" rule
 - Grep tool skips `src/api/generated/` (gitignored) — always use `read` or bash `grep`/`rg` directly to discover generated method signatures
+- Offline Pico detection: `isUnitOffline(pico)` checks `failed_calls >= 3` (import from `~pages/PicoUnits/components/provisioning`). This is the canonical health signal — derived from the server's cron polling failures.
+- `PicoUnit.mac` (nullable string) stores the Pico's Wi‑Fi MAC address. Used client-side to derive the AP provisioning SSID (`mushpi-provision-XXXX` from last 4 hex chars). Set once by the server during the first successful cron poll; never updated.
+- Soft-AP provisioning wizards reference `http://192.168.4.1:5000` (Pico AP mode) in user instructions only — no direct API calls to Pico units from the frontend. All communication goes through `mushpi-server`.
 
 ## Feature Palettes & Domain Constants
 

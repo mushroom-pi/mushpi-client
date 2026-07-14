@@ -1,13 +1,15 @@
 import RefreshIcon from '@mui/icons-material/Refresh';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import WifiTetheringIcon from '@mui/icons-material/WifiTethering';
 import {
   Avatar,
   Box,
+  Button,
   Card,
   CardActionArea,
   CardActions,
   CardContent,
   CardHeader,
+  Chip,
   IconButton,
   Switch,
   Tooltip,
@@ -17,15 +19,19 @@ import { useNavigate } from 'react-router-dom';
 
 import type { PicoUnit } from '~api/generated';
 
+import { isUnitOffline } from './provisioning';
+
 export default function PicoUnitCard({
   pico,
   onRefresh,
+  onReconnect,
 }: {
   pico: PicoUnit;
   onRefresh?: (id: number) => void;
+  onReconnect?: (pico: PicoUnit) => void;
 }) {
   const navigate = useNavigate();
-  const isWarning = (pico.failed_calls ?? 0) > 3;
+  const offline = isUnitOffline(pico);
 
   function friendlyDate(ts?: string) {
     if (!ts) return '—';
@@ -42,8 +48,10 @@ export default function PicoUnitCard({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        borderColor: isWarning ? 'warning.main' : undefined,
-        boxShadow: isWarning ? (theme) => `0 6px 20px ${theme.palette.warning.main}22` : undefined,
+        ...(offline && {
+          opacity: 0.7,
+          filter: 'grayscale(0.4)',
+        }),
       }}
     >
       {/* CardActionArea makes the main card content clickable */}
@@ -70,11 +78,7 @@ export default function PicoUnitCard({
                 {pico.handle ? `${pico.name ? pico.name + ' — ' : ''}${pico.handle}` : ''}
               </Typography>
 
-              {isWarning && (
-                <Tooltip title={`Failed calls: ${pico.failed_calls}`}>
-                  <WarningAmberIcon color="warning" sx={{ ml: 0.5 }} />
-                </Tooltip>
-              )}
+              {offline && <Chip size="small" color="error" label="Offline" />}
             </Box>
           }
           subheader={
@@ -105,7 +109,19 @@ export default function PicoUnitCard({
           <Switch checked={!!pico.enabled} disabled />
         </Box>
 
-        <Box>
+        <Box display="flex" alignItems="center" gap={0.5}>
+          {offline && onReconnect && (
+            <Button
+              size="small"
+              startIcon={<WifiTetheringIcon />}
+              onClick={(e) => {
+                e.stopPropagation();
+                onReconnect(pico);
+              }}
+            >
+              Reconnect
+            </Button>
+          )}
           <Tooltip title="Refresh">
             <IconButton
               size="small"

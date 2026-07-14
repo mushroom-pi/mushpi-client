@@ -1,4 +1,4 @@
-export interface AddPicoUnitDialogProps {
+export interface ConnectPicoWizardProps {
   open: boolean;
   onClose: () => void;
 }

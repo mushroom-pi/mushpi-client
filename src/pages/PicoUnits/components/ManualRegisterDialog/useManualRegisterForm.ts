@@ -9,9 +9,9 @@ import { schemas } from '~api/generated/schemas';
 import { picoUnitsKeys } from '~api/queryKeys';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 
-import type { AddPicoUnitDialogProps } from './interfaces';
+import type { ManualRegisterDialogProps } from './interfaces';
 
-export function useAddPicoUnitForm({ onClose }: AddPicoUnitDialogProps) {
+export function useManualRegisterForm({ onClose, onSuccess }: ManualRegisterDialogProps) {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const { run } = useAsyncWithToast();
@@ -61,17 +61,22 @@ export function useAddPicoUnitForm({ onClose }: AddPicoUnitDialogProps) {
           )) as unknown as PicoUnit;
 
           await qc.invalidateQueries({ queryKey: picoUnitsKeys.all });
-          navigate(`/pico-units/${created.id}`, { state: { openEditDialog: true } });
-          onClose();
+
+          if (onSuccess) {
+            onSuccess(created);
+          } else {
+            navigate(`/pico-units/${created.id}`, { state: { openEditDialog: true } });
+            onClose();
+          }
         },
-        { rethrow: true, successMessage: 'Unit added successfully' },
+        { rethrow: true, successMessage: 'Unit registered successfully' },
       );
     } catch {
       // error toast already shown by useAsyncWithToast
     } finally {
       setIsPending(false);
     }
-  }, [handle, navigate, onClose, qc, run]);
+  }, [handle, navigate, onClose, onSuccess, qc, run]);
 
   const reset = useCallback(() => {
     setHandle('');

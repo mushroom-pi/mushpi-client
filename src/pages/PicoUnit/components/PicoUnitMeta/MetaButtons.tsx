@@ -1,21 +1,28 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
+import WifiTetheringIcon from '@mui/icons-material/WifiTethering';
 import { Box, Button, IconButton, Stack, Tooltip } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { DeleteButton, EditButton } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
+import { isUnitOffline } from '~pages/PicoUnits/components/provisioning';
 
 type MetaButtonsProps = {
   setEditOpen: (open: boolean) => void;
   setDeleteOpen: (open: boolean) => void;
+  onReconnect: () => void;
 };
 
-export const MetaButtons: React.FC<MetaButtonsProps> = ({ setDeleteOpen, setEditOpen }) => {
+export const MetaButtons: React.FC<MetaButtonsProps> = ({
+  setDeleteOpen,
+  setEditOpen,
+  onReconnect,
+}) => {
   const navigate = useNavigate();
-  const { isLoading, refetch } = usePicoUnitContext();
+  const { isLoading, refetch, pico } = usePicoUnitContext();
 
   return (
     <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-end">
@@ -43,6 +50,19 @@ export const MetaButtons: React.FC<MetaButtonsProps> = ({ setDeleteOpen, setEdit
           Readings
         </Box>
       </Button>
+
+      {pico && isUnitOffline(pico) && (
+        <Button
+          color="warning"
+          variant="outlined"
+          startIcon={<WifiTetheringIcon />}
+          onClick={onReconnect}
+        >
+          <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+            Reconnect
+          </Box>
+        </Button>
+      )}
 
       <EditButton onClick={() => setEditOpen(true)} />
       <DeleteButton onClick={() => setDeleteOpen(true)} />

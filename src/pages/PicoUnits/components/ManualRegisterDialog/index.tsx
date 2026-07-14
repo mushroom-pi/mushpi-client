@@ -2,13 +2,13 @@ import { TextField } from '@mui/material';
 
 import { HeaderAndIcon, ModalForm } from '~components';
 
-import type { AddPicoUnitDialogProps } from './interfaces';
-import { useAddPicoUnitForm } from './useAddPicoUnitForm';
+import type { ManualRegisterDialogProps } from './interfaces';
+import { useManualRegisterForm } from './useManualRegisterForm';
 
-export const AddPicoUnitDialog: React.FC<AddPicoUnitDialogProps> = (props) => {
+export const ManualRegisterDialog: React.FC<ManualRegisterDialogProps> = (props) => {
   const { open, onClose } = props;
   const { handle, updateHandle, errors, isValid, isPending, handleSubmit, reset } =
-    useAddPicoUnitForm(props);
+    useManualRegisterForm(props);
 
   function handleClose() {
     reset();
@@ -19,9 +19,9 @@ export const AddPicoUnitDialog: React.FC<AddPicoUnitDialogProps> = (props) => {
     <ModalForm
       open={open}
       onClose={handleClose}
-      title={<HeaderAndIcon title="Add Pico Unit" />}
-      submitLabel={isPending ? 'Adding…' : 'Add'}
-      pendingLabel="Adding…"
+      title={<HeaderAndIcon title="Register Pico Manually" />}
+      submitLabel={isPending ? 'Registering…' : 'Register'}
+      pendingLabel="Registering…"
       canSubmit={isValid && !isPending}
       isPending={isPending}
       onSubmit={handleSubmit}

@@ -1,16 +1,19 @@
 import { Grid, Typography } from '@mui/material';
 import { useState } from 'react';
 
+import type { PicoUnit } from '~api/generated';
 import { AddNew, Error, Loading, PageTitle } from '~components';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { Page } from '~layout/Page';
 
-import { AddPicoUnitDialog } from './components/AddPicoUnitDialog';
+import { ConnectPicoWizard } from './components/ConnectPicoWizard';
 import PicoUnitCard from './components/PicoUnitCard';
+import { ReconnectPicoDialog } from './components/ReconnectPicoDialog';
 
 export default function PicoUnitsPage() {
   const { units: items, isLoading, isError, error, refetch, queryData } = usePicoUnitsContext();
-  const [addOpen, setAddOpen] = useState(false);
+  const [connectOpen, setConnectOpen] = useState(false);
+  const [reconnectUnit, setReconnectUnit] = useState<PicoUnit | null>(null);
 
   if (isLoading) return <Loading item="pico units" />;
   if (isError) return <Error item="pico units" error={error} />;
@@ -21,8 +24,8 @@ export default function PicoUnitsPage() {
         mb={3}
         actions={
           <>
-            <AddNew onClick={() => setAddOpen(true)} sx={{ mr: 1 }}>
-              Add manually
+            <AddNew onClick={() => setConnectOpen(true)} sx={{ mr: 1 }}>
+              Connect new Pico
             </AddNew>
           </>
         }
@@ -42,13 +45,18 @@ export default function PicoUnitsPage() {
         ) : (
           items.map((p) => (
             <Grid key={p.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-              <PicoUnitCard pico={p} onRefresh={() => refetch()} />
+              <PicoUnitCard
+                pico={p}
+                onRefresh={() => refetch()}
+                onReconnect={setReconnectUnit}
+              />
             </Grid>
           ))
         )}
       </Grid>
 
-      <AddPicoUnitDialog open={addOpen} onClose={() => setAddOpen(false)} />
+      <ConnectPicoWizard open={connectOpen} onClose={() => setConnectOpen(false)} />
+      <ReconnectPicoDialog pico={reconnectUnit} onClose={() => setReconnectUnit(null)} />
     </Page>
   );
 }
