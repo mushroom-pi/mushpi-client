@@ -1,4 +1,4 @@
-import { Box, Chip, Stack, Typography } from '@mui/material';
+import { Box, Chip, LinearProgress, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
@@ -12,9 +12,10 @@ import { PicoUnitDetailGrid as DetailGrid } from './components/PicoUnitDetailGri
 import { DeletePicoUnit } from './components/PicoUnitMeta/DeletePicoUnit';
 import { EditMetaDialog } from './components/PicoUnitMeta/EditMetaDialog';
 import { MetaButtons } from './components/PicoUnitMeta/MetaButtons';
+import { PicoUnitStatCards } from './components/PicoUnitStatCards';
 
 function PicoUnitDetailInner() {
-  const { pico, isLoading, isError, error, refetch } = usePicoUnitContext();
+  const { pico, isLoading, isError, error, refetch, pollPico } = usePicoUnitContext();
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [reconnectPico, setReconnectPico] = useState<PicoUnit | null>(null);
@@ -27,42 +28,53 @@ function PicoUnitDetailInner() {
     }
   }, []);
 
+  // On-mount poll to get fresh readings from the Pico
+  useEffect(() => {
+    if (pico?.id) {
+      pollPico.mutate({ picoUnitId: pico.id });
+    }
+  }, [pico?.id]);
+
   if (isLoading) return <Loading item="pico unit" />;
   if (isError || !pico) return <Error item="pico unit" refetch={refetch} error={error} />;
 
   return (
-    <ItemPage
-      title={pico.name ?? 'No name'}
-      actions={
-        <MetaButtons
-          setEditOpen={setEditOpen}
-          setDeleteOpen={setDeleteOpen}
-          onReconnect={() => setReconnectPico(pico)}
-        />
-      }
-      meta={
-        <>
-          <Stack direction="row" spacing={2} alignItems="center" mb={2}>
-            <Chip
-              label={pico.enabled ? 'Enabled' : 'Disabled'}
-              color={pico.enabled ? 'info' : 'default'}
-              size="small"
-            />
-            <Typography variant="subtitle2" color="text.secondary">
-              {pico.handle ?? ''}
-            </Typography>
-          </Stack>
-          <Box mb={3}>
-            <Typography variant="body2">{pico.description ?? 'No description'}</Typography>
-          </Box>
-        </>
-      }
-    >
-      <DetailGrid pico={pico} />
-      <EditMetaDialog open={editOpen} onClose={() => setEditOpen(false)} />
-      <DeletePicoUnit open={deleteOpen} onClose={() => setDeleteOpen(false)} />
-      <ReconnectPicoDialog pico={reconnectPico} onClose={() => setReconnectPico(null)} />
-    </ItemPage>
+    <>
+      {pollPico.isLoading && <LinearProgress />}
+      <ItemPage
+        title={pico.name ?? 'No name'}
+        actions={
+          <MetaButtons
+            setEditOpen={setEditOpen}
+            setDeleteOpen={setDeleteOpen}
+            onReconnect={() => setReconnectPico(pico)}
+          />
+        }
+        meta={
+          <>
+            <Stack direction="row" spacing={2} alignItems="center" mb={2}>
+              <Chip
+                label={pico.enabled ? 'Enabled' : 'Disabled'}
+                color={pico.enabled ? 'info' : 'default'}
+                size="small"
+              />
+              <Typography variant="subtitle2" color="text.secondary">
+                {pico.handle ?? ''}
+              </Typography>
+            </Stack>
+            <Box mb={3}>
+              <Typography variant="body2">{pico.description ?? 'No description'}</Typography>
+            </Box>
+          </>
+        }
+      >
+        <PicoUnitStatCards pico={pico} isPolling={pollPico.isLoading} />
+        <DetailGrid pico={pico} />
+        <EditMetaDialog open={editOpen} onClose={() => setEditOpen(false)} />
+        <DeletePicoUnit open={deleteOpen} onClose={() => setDeleteOpen(false)} />
+        <ReconnectPicoDialog pico={reconnectPico} onClose={() => setReconnectPico(null)} />
+      </ItemPage>
+    </>
   );
 }
 
@@ -71,11 +83,11 @@ export default function PicoUnitDetail() {
   const { id } = useParams<{ id: string }>();
   const picoId = id ? Number(id) : null;
 
-  if (!picoId) return <Invalid item="pico unit id" />;
-
   useEffect(() => {
-    setSelectedUnitId(picoId);
+    if (picoId) setSelectedUnitId(picoId);
   }, [picoId]);
+
+  if (!picoId) return <Invalid item="pico unit id" />;
 
   return (
     <PicoUnitProvider picoUnitId={picoId}>

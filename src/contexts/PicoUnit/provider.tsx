@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import React, { createContext, useContext, useMemo } from 'react';
 
-import { useGetPicoUnit } from './hooks';
+import { useGetPicoUnit, usePollPicoUnit } from './hooks';
 import {
   createChangeOutputsMutation,
   createChangeTargetsMutation,
@@ -28,6 +28,7 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
   // fetch single item
   const { data: pico, isLoading, isError, error, refetch } = useGetPicoUnit(picoUnitId);
 
+  const pollMutation = usePollPicoUnit();
   const updateMutation = createUpdateMutation(qc);
   const deleteMutation = createDeleteMutation(qc);
   const toggleControlLoopMutation = createToggleControlLoopMutation(qc);
@@ -41,6 +42,11 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
       isError,
       error,
       refetch: () => void refetch(),
+      pollPico: {
+        mutate: (params) => pollMutation.mutate(params),
+        mutateAsync: (params) => pollMutation.mutateAsync(params),
+        isLoading: pollMutation.isPending,
+      },
       updatePico: {
         mutate: (vars) => updateMutation.mutate(vars),
         mutateAsync: (vars) => updateMutation.mutateAsync(vars),
@@ -73,6 +79,7 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
       isError,
       error,
       refetch,
+      pollMutation,
       updateMutation,
       deleteMutation,
       toggleControlLoopMutation,

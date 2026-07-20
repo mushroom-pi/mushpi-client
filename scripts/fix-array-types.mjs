@@ -50,6 +50,22 @@ content = content.replace(
   },
 );
 
+// Fix 1b: Array<z> — sometimes the generator emits `Array<z>` instead of `Array<string>` etc.
+// The `z` is the Zod namespace leaking as a TypeScript type (e.g. `images?: Array<z> | null`).
+// We cross-reference the Zod schema (which is always correct) to find the real element type,
+// just like Fix 1 does for bare `Array`.
+content = content.replace(
+  /(\b(\w+)\??\s*:\s*)(\(?)Array<z>(\s*(?:\|\s*null\))?\s*(?:\|\s*undefined)?)/g,
+  (fullMatch, prefix, propName, openParen, suffix) => {
+    const tsType = arrayTypeMap.get(propName);
+    if (tsType) {
+      changed = true;
+      return `${prefix}${openParen}Array<${tsType}>${suffix}`;
+    }
+    return fullMatch;
+  },
+);
+
 // Fix 2: Add type annotations to z.lazy() calls for circular references
 const lazyPattern = /^const (\w+) = z\.lazy\(\(\) =>/gm;
 content = content.replace(lazyPattern, (_match, schemaName) => {

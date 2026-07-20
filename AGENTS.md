@@ -47,9 +47,11 @@ All Create/Edit dialogs validate against generated Zod schemas. **Never hardcode
 
 - React Query for all server state — no `useEffect` + `useState` for fetched data
 - Query keys in `src/api/queryKeys.ts` (picoUnitKeys, recipeKeys, batchKeys, etc.)
-- Context hooks: usePicoUnit, usePicoUnits, useRecipe, useRecipes, useBatch, useBatches, useCharts
+- Context hooks: usePicoUnit (detail page via `PicoUnitProvider` + `usePicoUnitContext`), usePicoUnits (list page), useRecipe, useRecipes, useBatch, useBatches, useCharts
 - Mutations in entity's `mutations/` folder (one file per concern)
 - Optimistic updates via `createOptimisticMutation` factory in `src/contexts/PicoUnit/helpers.ts`
+- **On-demand hardware polling**: `usePollPicoUnit` mutation calls `POST /pico-units/:id/poll` to trigger an immediate Pico poll (stores a new reading, returns updated `PicoUnit` with `latest_reading`). Exposed via `pollPico` on `PicoUnitCtx`. Used on page mount, after control mutations, and for periodic 60 s background refresh on the unit detail, readings, and batch pages.
+- Long-lived readings views (unit detail, readings board, batch detail) auto-refresh every 60 s via hardware poll on the unit detail page and `refetchInterval` on the readings/batch readings queries.
 
 ### useAsyncWithToast (imperative async with toast)
 
@@ -111,7 +113,9 @@ src/
 ├── hooks/                # useReadings, useBatchReadings, useServerHealth, useAsyncWithToast
 ├── layout/               # Page wrapper, Sidebar
 ├── pages/                # Route pages (default exports)
-│   ├── PicoUnits/
+│   ├── PicoUnit/          # Unit detail page at /pico-units/:id
+│   │   └── components/    # PicoUnitStatCards, PicoUnitDetailGrid, PicoUnitDevices, etc.
+│   ├── PicoUnits/         # Units list page at /pico-units
 │   │   └── components/
 │   │       ├── ProvisioningIllustrations.tsx  # SVG illustrations for provisioning wizards
 │   │       ├── LedStateReference.tsx     # Collapsible LED diagnostic accordion

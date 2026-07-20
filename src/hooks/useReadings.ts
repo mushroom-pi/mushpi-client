@@ -29,6 +29,7 @@ export const useListPicoUnitReadings = (
       return resp as unknown as ReadingsListResponseDto;
     },
     enabled: picoUnitId != null && enabled, // This makes sure that the query is called ONLY if there is a picoUnitId
+    refetchInterval: 60_000,
   });
 };
 

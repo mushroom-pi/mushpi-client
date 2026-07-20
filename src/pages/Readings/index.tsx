@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 import { Loading, PageTitle } from '~components';
 import { ChartsProvider } from '~ctx/Charts';
+import { usePollPicoUnit } from '~ctx/PicoUnit';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { Page } from '~layout/Page';
 
@@ -16,11 +17,20 @@ export const ReadingsPage = () => {
     setSelectedUnitId,
   } = usePicoUnitsContext();
 
+  const pollPico = usePollPicoUnit();
+
   useEffect(() => {
     if (selectedUnitId == null && picoUnits?.length) setSelectedUnitId(picoUnits[0].id);
   }, [picoUnits, selectedUnitId]);
 
   const selectedId = selectedUnitId ?? picoUnits?.[0]?.id ?? null;
+
+  // On-mount / on-unit-change poll to get fresh readings from the Pico
+  useEffect(() => {
+    if (selectedId) {
+      pollPico.mutate({ picoUnitId: selectedId });
+    }
+  }, [selectedId]);
 
   if (isLoadingPicoUnits || !selectedId) {
     return <Loading item="pico unit" />;

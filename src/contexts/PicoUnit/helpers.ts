@@ -1,7 +1,9 @@
 import { useMutation, type useQueryClient } from '@tanstack/react-query';
 
+import { unwrap } from '~api/adapter';
+import { PicoUnits } from '~api/client';
 import type { PicoUnit, Readings } from '~api/generated';
-import { picoUnitKeys, picoUnitsKeys } from '~api/queryKeys';
+import { picoUnitKeys, picoUnitsKeys, readingsKeys } from '~api/queryKeys';
 
 export function updateItemInAllPages(
   queryClient: ReturnType<typeof useQueryClient>,
@@ -39,10 +41,11 @@ export function removeItemFromAllPages(
 /**
  * createOptimisticMutation centralizes the common mutation lifecycle for mutations that:
  * - cancel queries for ['picoUnit', id] and ['picoUnits']
- * - snapshot item and lists
+ * - snapshot item
  * - apply an optimistic update to ['picoUnit', id] and all list pages
  * - on error restore snapshot or invalidate
- * - on settled invalidate queries to re-sync
+ * - on settled poll hardware for live state, then invalidate list/readings;
+ *   fall back to DB invalidation if poll fails
  *
  * usage: createOptimisticMutation(qc, {
  *   mutationFn,
@@ -66,7 +69,6 @@ export function createOptimisticMutation<Input, Result = any>(
       await qc.cancelQueries({ queryKey: picoUnitsKeys.all });
 
       const snapshotItem = qc.getQueryData(picoUnitKeys.detail(id));
-      const snapshotLists = qc.getQueryData(picoUnitsKeys.all);
 
       const prevItem = qc.getQueryData<PicoUnit>(picoUnitKeys.detail(id));
       const optimisticItem = opts.applyOptimistic(prevItem, vars);
@@ -83,7 +85,7 @@ export function createOptimisticMutation<Input, Result = any>(
         if (maybe) updateItemInAllPages(qc, id, () => maybe);
       }
 
-      return { snapshotItem, snapshotLists };
+      return { snapshotItem };
     },
     onError: (_err, vars: Input, context: any) => {
       const id = opts.getIdFromVars(vars);
@@ -92,20 +94,35 @@ export function createOptimisticMutation<Input, Result = any>(
       } else {
         qc.invalidateQueries({ queryKey: picoUnitKeys.detail(id) });
       }
-      if (context?.snapshotLists) {
-        qc.invalidateQueries({ queryKey: picoUnitsKeys.all });
-      }
+      qc.invalidateQueries({ queryKey: picoUnitsKeys.all });
     },
     onSettled: (_data, _err, vars: Input) => {
       const id = opts.getIdFromVars(vars);
-      qc.invalidateQueries({ queryKey: picoUnitKeys.detail(id) });
-      qc.invalidateQueries({ queryKey: picoUnitsKeys.all });
+      // Fire poll to get live hardware state; don't invalidate detail — the poll's
+      // setQueryData provides the authoritative result and we must avoid a stale DB
+      // fetch overwriting it.
+      unwrap(PicoUnits.picoUnitIdControllerPoll({ picoUnitId: id }))
+        .then((result) => {
+          qc.setQueryData(picoUnitKeys.detail(id), result);
+          // Now that a fresh reading is stored on the server, invalidate list/readings
+          qc.invalidateQueries({ queryKey: picoUnitsKeys.all });
+          qc.invalidateQueries({ queryKey: readingsKeys.all, exact: false });
+        })
+        .catch(() => {
+          // Poll failed — fall back to DB data
+          qc.invalidateQueries({ queryKey: picoUnitKeys.detail(id) });
+          qc.invalidateQueries({ queryKey: picoUnitsKeys.all });
+          qc.invalidateQueries({ queryKey: readingsKeys.all, exact: false });
+        });
     },
   });
 }
 
 /** small helper that applies/merges reading fields safely */
-export function applyReadingPatch(prev: Readings | undefined, patch: Partial<Readings>): Readings {
+export function applyReadingPatch(
+  prev: Readings | null | undefined,
+  patch: Partial<Readings>,
+): Readings {
   return {
     ...(prev ?? {}),
     ...patch,

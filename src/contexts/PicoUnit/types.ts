@@ -12,6 +12,11 @@ export type PicoUnitCtx = {
   isError: boolean;
   error?: unknown;
   refetch: () => void;
+  pollPico: {
+    mutate: (params: { picoUnitId: number }) => void;
+    mutateAsync: (params: { picoUnitId: number }) => Promise<PicoUnit>;
+    isLoading: boolean;
+  };
   updatePico: {
     mutate: (vars: { picoUnitId: number; body: Partial<UpdatePicoUnitDto> }) => void;
     mutateAsync: (vars: { picoUnitId: number; body: Partial<UpdatePicoUnitDto> }) => Promise<any>;
