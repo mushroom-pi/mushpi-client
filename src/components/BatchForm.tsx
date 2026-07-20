@@ -1,6 +1,8 @@
 import { TextField } from '@mui/material';
+import dayjs from 'dayjs';
 import type { ReactNode } from 'react';
 
+import { DateTimeField } from './ui/atoms/DateTimeField';
 import { ModalForm } from './ui/molecules/ModalForm';
 
 export interface BatchFormProps {
@@ -93,25 +95,21 @@ export function BatchForm({
         error={!!descriptionError}
         helperText={descriptionError ?? undefined}
       />
-      <TextField
+      <DateTimeField
         label="Start"
-        type="datetime-local"
-        value={startAt}
-        onChange={(e) => onStartAtChange(e.target.value)}
-        fullWidth
-        slotProps={{ inputLabel: { shrink: true } }}
+        value={startAt ? dayjs(startAt) : null}
+        onChange={(v) => onStartAtChange(v ? v.format('YYYY-MM-DDTHH:mm') : '')}
         error={!!startAtError}
         helperText={startAtError ?? undefined}
+        sx={{ width: '100%' }}
       />
-      <TextField
+      <DateTimeField
         label="Finish"
-        type="datetime-local"
-        value={finishAt}
-        onChange={(e) => setFinishAt(e.target.value)}
-        fullWidth
-        slotProps={{ inputLabel: { shrink: true } }}
+        value={finishAt ? dayjs(finishAt) : null}
+        onChange={(v) => setFinishAt(v ? v.format('YYYY-MM-DDTHH:mm') : '')}
         error={!!finishBeforeStartError}
         helperText={finishBeforeStartError ?? undefined}
+        sx={{ width: '100%' }}
       />
       <TextField
         label="Species"
