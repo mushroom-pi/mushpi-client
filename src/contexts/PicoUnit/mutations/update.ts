@@ -16,7 +16,7 @@ export const createUpdateMutation = (qc: ReturnType<typeof useQueryClient>) =>
       body: Partial<UpdatePicoUnitDto>;
     }) => {
       const res = await unwrap(
-        PicoUnits.picoUnitIdControllerUpdate({ picoUnitId, updatePicoUnitDto: body }),
+        PicoUnits.picoUnitIdControllerUpdateV1({ picoUnitId, updatePicoUnitDto: body }),
       );
       return res as unknown as PicoUnit;
     },

@@ -8,7 +8,7 @@ import { removeItemFromAllPages } from '../helpers';
 export const createDeleteMutation = (qc: ReturnType<typeof useQueryClient>) =>
   useMutation({
     mutationFn: async (id: number) => {
-      await unwrap(PicoUnits.picoUnitIdControllerRemove({ picoUnitId: id }));
+      await unwrap(PicoUnits.picoUnitIdControllerRemoveV1({ picoUnitId: id }));
       return id;
     },
     onMutate: async (id) => {

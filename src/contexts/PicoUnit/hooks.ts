@@ -13,7 +13,7 @@ export function useGetPicoUnit(picoUnitId: number | null) {
   useEffect(() => {
     if (!picoUnitId) return;
     const interval = setInterval(() => {
-      unwrap(PicoUnits.picoUnitIdControllerPoll({ picoUnitId }))
+      unwrap(PicoUnits.picoUnitIdControllerPollV1({ picoUnitId }))
         .then((result) => queryClient.setQueryData(picoUnitKeys.detail(picoUnitId), result))
         .catch(() => {}); // silent — falls back to last known data
     }, 60_000);
@@ -23,7 +23,7 @@ export function useGetPicoUnit(picoUnitId: number | null) {
   return useQuery<PicoUnit, unknown, PicoUnit>({
     queryKey: picoUnitKeys.detail(picoUnitId!),
     queryFn: async () => {
-      const res = await unwrap(PicoUnits.picoUnitIdControllerGetOne({ picoUnitId: picoUnitId! }));
+      const res = await unwrap(PicoUnits.picoUnitIdControllerGetOneV1({ picoUnitId: picoUnitId! }));
       return res as unknown as PicoUnit;
     },
     enabled: picoUnitId != null,
@@ -36,7 +36,7 @@ export function usePollPicoUnit() {
   return useMutation<PicoUnit, unknown, { picoUnitId: number }>({
     mutationKey: ['picoUnit', 'poll'],
     mutationFn: async ({ picoUnitId }) => {
-      const res = await unwrap(PicoUnits.picoUnitIdControllerPoll({ picoUnitId }));
+      const res = await unwrap(PicoUnits.picoUnitIdControllerPollV1({ picoUnitId }));
       return res as unknown as PicoUnit;
     },
     onSuccess: (data, { picoUnitId }) => {

@@ -34,7 +34,11 @@ const arrayTypeMap = new Map();
 let match;
 while ((match = zodArrayPattern.exec(content)) !== null) {
   const [, propName, zodPrimitive, namedType] = match;
-  arrayTypeMap.set(propName, zodPrimitive || namedType);
+  const resolved = zodPrimitive || namedType;
+  // Don't overwrite a previously resolved mapping (e.g. z.string() should win over z.instanceof(File))
+  if (!arrayTypeMap.has(propName) || resolved !== 'z') {
+    arrayTypeMap.set(propName, resolved);
+  }
 }
 
 // Replace all bare Array occurrences in type definitions

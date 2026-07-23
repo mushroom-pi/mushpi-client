@@ -8,7 +8,7 @@ import { batchKeys } from '~api/queryKeys';
 export const createBatchMutation = (qc: ReturnType<typeof useQueryClient>) =>
   useMutation({
     mutationFn: async (body: CreateBatchDto) => {
-      const res = await unwrap(Batches.batchesControllerCreate({ createBatchDto: body }));
+      const res = await unwrap(Batches.batchesControllerCreateV1({ createBatchDto: body }));
       return res as unknown as Batch;
     },
     onSuccess: () => {

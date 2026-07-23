@@ -9,7 +9,7 @@ export const createUpdateBatchMutation = (qc: ReturnType<typeof useQueryClient>)
   useMutation({
     mutationFn: async ({ batchId, body }: { batchId: number; body: Partial<UpdateBatchDto> }) => {
       const res = await unwrap(
-        Batches.batchIdControllerUpdate({ batchId, updateBatchDto: body as UpdateBatchDto }),
+        Batches.batchIdControllerUpdateV1({ batchId, updateBatchDto: body as UpdateBatchDto }),
       );
       return res as unknown as Batch;
     },

@@ -32,6 +32,7 @@ export const POLL_FINISH_MAX_ATTEMPTS = 5;
 
 export const LED_STATES = [
   { id: 'off', color: '#4a5568', label: 'LED OFF', meaning: 'No power, or still booting (wait a moment)' },
+  { id: 'config_error', color: '#C53030', label: '3 fast blinks + pause', meaning: 'config.json is malformed or has invalid values — check serial output' },
   { id: 'provisioning', color: '#C66F2F', label: 'Slow double-blink', meaning: 'Provisioning mode — correct! Waiting for credentials' },
   { id: 'solid', color: '#A27B35', label: 'Solid ON', meaning: 'Connected to Wi‑Fi, waiting to reach the hub' },
   { id: 'heartbeat', color: '#3C8D5A', label: 'Heartbeat blink', meaning: 'Fully connected to the hub — operational' },

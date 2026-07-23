@@ -57,7 +57,7 @@ export function useManualRegisterForm({ onClose, onSuccess }: ManualRegisterDial
       await run(
         async () => {
           const created = (await unwrap(
-            PicoUnits.picoUnitsControllerCreate({ createPicoUnitDto: { handle } }),
+            PicoUnits.picoUnitsControllerCreateV1({ createPicoUnitDto: { handle } }),
           )) as unknown as PicoUnit;
 
           await qc.invalidateQueries({ queryKey: picoUnitsKeys.all });

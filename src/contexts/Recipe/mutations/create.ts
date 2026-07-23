@@ -8,7 +8,7 @@ import { recipeKeys } from '~api/queryKeys';
 export const createRecipeMutation = (qc: ReturnType<typeof useQueryClient>) =>
   useMutation({
     mutationFn: async (body: CreateRecipeDto) => {
-      const res = await unwrap(Recipes.recipesControllerCreate({ createRecipeDto: body }));
+      const res = await unwrap(Recipes.recipesControllerCreateV1({ createRecipeDto: body }));
       return res as unknown as Recipe;
     },
     onSuccess: () => {

@@ -10,7 +10,7 @@ export const createToggleControlLoopMutation = (qc: ReturnType<typeof useQueryCl
   createOptimisticMutation(qc, {
     mutationFn: async ({ picoUnitId, body }: { picoUnitId: number; body: ControlLoopDto }) => {
       const res = await unwrap(
-        Control.picoUnitIdControlControllerLoop({ picoUnitId, controlLoopDto: body }),
+        Control.picoUnitIdControlControllerLoopV1({ picoUnitId, controlLoopDto: body }),
       );
       return res as unknown as ControlLoopDto;
     },

@@ -17,7 +17,7 @@ export const createUploadRecipeImageMutation = (qc: ReturnType<typeof useQueryCl
       url?: string;
     }) => {
       const res = await unwrap(
-        Images.recipeIdImageControllerSetImage({ recipeId, image: file, url }),
+        Images.recipeIdImageControllerSetImageV1({ recipeId, image: file, url }),
       );
       return res as unknown as Recipe;
     },
@@ -31,7 +31,7 @@ export const createUploadRecipeImageMutation = (qc: ReturnType<typeof useQueryCl
 export const createDeleteRecipeImageMutation = (qc: ReturnType<typeof useQueryClient>) =>
   useMutation({
     mutationFn: async (recipeId: number) => {
-      await unwrap(Images.recipeIdImageControllerRemoveImage({ recipeId }));
+      await unwrap(Images.recipeIdImageControllerRemoveImageV1({ recipeId }));
     },
     onSuccess: (_data, recipeId) => {
       qc.invalidateQueries({ queryKey: recipeKeys.detail(recipeId) });

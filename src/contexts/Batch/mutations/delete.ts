@@ -7,7 +7,7 @@ import { batchKeys } from '~api/queryKeys';
 export const createDeleteBatchMutation = (qc: ReturnType<typeof useQueryClient>) =>
   useMutation({
     mutationFn: async (batchId: number) => {
-      await unwrap(Batches.batchIdControllerRemove({ batchId }));
+      await unwrap(Batches.batchIdControllerRemoveV1({ batchId }));
     },
     onSuccess: (_data, batchId) => {
       qc.removeQueries({ queryKey: batchKeys.detail(batchId), exact: true });

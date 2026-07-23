@@ -17,7 +17,7 @@ export const createRecipeFromBatchMutation = (qc: ReturnType<typeof useQueryClie
       notes?: string;
     }) => {
       const res = await unwrap(
-        Batches.batchIdRecipeControllerCreateRecipe({
+        Batches.batchIdRecipeControllerCreateRecipeV1({
           batchId,
           createRecipeFromBatchDto: { name, notes },
         }),

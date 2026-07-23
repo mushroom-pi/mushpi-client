@@ -1,7 +1,7 @@
 import type { Dayjs } from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
 
-import type { ReadingsApiPicoUnitIdReadingsControllerListForUnitRequest as ListPicoUnitReadingsParams } from '~api/generated';
+import type { ReadingsApiPicoUnitIdReadingsControllerListForUnitV1Request as ListPicoUnitReadingsParams } from '~api/generated';
 import { useChartsContext } from '~ctx/Charts';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { useExportPicoUnitReadingsCmd } from '~hook/useReadings';

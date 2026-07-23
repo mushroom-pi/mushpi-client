@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useEffect, useMemo, useState } from 'react';
 
-import { type Batch, BatchesControllerListStatusEnum, type CreateBatchDto } from '~api/generated';
+import { type Batch, BatchesControllerListV1StatusEnum, type CreateBatchDto } from '~api/generated';
 import { createBatchMutation } from '~ctx/Batch';
 import { useListBatches } from '~ctx/Batches';
 import { useListPicoUnits } from '~ctx/PicoUnits';
@@ -49,7 +49,7 @@ export function useCreateBatchForm({
   const { data: picoUnitsData } = useListPicoUnits({ limit: 100, enabled: true }, { enabled: open });
   const { data: recipesData } = useListRecipes({ limit: 100 }, { enabled: open });
   const { data: activeBatchesData } = useListBatches(
-    { status: BatchesControllerListStatusEnum.InProgress, limit: 100 },
+    { status: BatchesControllerListV1StatusEnum.InProgress, limit: 100 },
     { enabled: open },
   );
 

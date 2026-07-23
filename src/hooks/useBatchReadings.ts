@@ -4,8 +4,8 @@ import { useCallback } from 'react';
 import { unwrap } from '~api/adapter';
 import { Readings } from '~api/client';
 import type {
-  ReadingsApiBatchIdReadingsControllerExportCsvForUnitRequest as ExportBatchReadingsParams,
-  ReadingsApiBatchIdReadingsControllerListForBatchRequest as ListBatchReadingsParams,
+  ReadingsApiBatchIdReadingsControllerExportCsvForUnitV1Request as ExportBatchReadingsParams,
+  ReadingsApiBatchIdReadingsControllerListForBatchV1Request as ListBatchReadingsParams,
   ReadingsListResponseDto,
 } from '~api/generated';
 import { batchKeys } from '~api/queryKeys';
@@ -30,7 +30,7 @@ export const useListBatchReadings = (
       };
 
       const resp = await unwrap<ReadingsListResponseDto>(
-        Readings.batchIdReadingsControllerListForBatch(apiParams),
+        Readings.batchIdReadingsControllerListForBatchV1(apiParams),
       );
       return resp;
     },
@@ -59,7 +59,7 @@ export const useExportBatchReadingsCmd = () => {
     };
 
     const resp = (await unwrap(
-      Readings.batchIdReadingsControllerExportCsvForUnit(apiParams, { responseType: 'blob' }),
+      Readings.batchIdReadingsControllerExportCsvForUnitV1(apiParams, { responseType: 'blob' }),
     )) as unknown;
 
     if (resp instanceof Blob) return resp;

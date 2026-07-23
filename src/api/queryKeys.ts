@@ -10,9 +10,9 @@
  *   queryKey: batchKeys.list({ status: 'in-progress', picoUnitId: 2 })
  */
 import type {
-  BatchesApiBatchesControllerListRequest as ListBatchesParams,
-  PicoUnitsApiPicoUnitsControllerListRequest as ListPicoUnitsParams,
-  RecipesApiRecipesControllerListRequest as ListRecipesParams,
+  BatchesApiBatchesControllerListV1Request as ListBatchesParams,
+  PicoUnitsApiPicoUnitsControllerListV1Request as ListPicoUnitsParams,
+  RecipesApiRecipesControllerListV1Request as ListRecipesParams,
 } from './generated';
 
 export const picoUnitsKeys = {

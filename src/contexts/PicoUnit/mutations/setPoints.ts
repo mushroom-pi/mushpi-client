@@ -10,7 +10,7 @@ export const createChangeTargetsMutation = (qc: ReturnType<typeof useQueryClient
   createOptimisticMutation(qc, {
     mutationFn: async ({ picoUnitId, body }: { picoUnitId: number; body: ChangeSetPointsDto }) => {
       const res = await unwrap(
-        Control.picoUnitIdControlControllerSetpoints({ picoUnitId, changeSetPointsDto: body }),
+        Control.picoUnitIdControlControllerSetpointsV1({ picoUnitId, changeSetPointsDto: body }),
       );
       return res as unknown as ChangeSetPointsDto;
     },

@@ -5,9 +5,9 @@ import { Batches } from '~api/client';
 import type {
   Batch,
   BatchListResponseDto,
-  BatchesControllerListStatusEnum,
-  BatchesApiBatchesControllerListRequest as ListBatchesParams,
-  PicoUnitIdBatchesControllerListStatusEnum,
+  BatchesControllerListV1StatusEnum,
+  BatchesApiBatchesControllerListV1Request as ListBatchesParams,
+  PicoUnitIdBatchesControllerListV1StatusEnum,
 } from '~api/generated';
 import { batchKeys } from '~api/queryKeys';
 
@@ -28,7 +28,7 @@ export function useListBatches(
     queryKey: batchKeys.list({ page, limit, status, picoUnitId, recipeId }),
     queryFn: async () => {
       const resp = await unwrap(
-        Batches.batchesControllerList({ page, limit, status, picoUnitId, recipeId }),
+        Batches.batchesControllerListV1({ page, limit, status, picoUnitId, recipeId }),
       );
       return resp as unknown as BatchListResponseDto;
     },
@@ -42,7 +42,7 @@ export function usePicoUnitBatches(
   params?: {
     page?: number;
     limit?: number;
-    status?: PicoUnitIdBatchesControllerListStatusEnum;
+    status?: PicoUnitIdBatchesControllerListV1StatusEnum;
   },
 ) {
   const page = params?.page ?? 1;
@@ -53,7 +53,7 @@ export function usePicoUnitBatches(
     queryKey: batchKeys.forUnit(picoUnitId ?? 0, { page, limit, status }),
     queryFn: async () => {
       const resp = await unwrap(
-        Batches.picoUnitIdBatchesControllerList({ picoUnitId: picoUnitId!, page, limit, status }),
+        Batches.picoUnitIdBatchesControllerListV1({ picoUnitId: picoUnitId!, page, limit, status }),
       );
       return resp as unknown as BatchListResponseDto;
     },
@@ -69,7 +69,7 @@ export function usePicoUnitCurrentBatch(picoUnitId: number | null) {
     queryKey: batchKeys.currentForUnit(picoUnitId ?? 0),
     queryFn: async () => {
       const resp = await unwrap(
-        Batches.picoUnitIdBatchesControllerGetCurrent({ picoUnitId: picoUnitId!, batchId: 0 }),
+        Batches.picoUnitIdBatchesControllerGetCurrentV1({ picoUnitId: picoUnitId!, batchId: 0 }),
       );
       return resp as unknown as Batch;
     },
@@ -81,4 +81,4 @@ export function usePicoUnitCurrentBatch(picoUnitId: number | null) {
   });
 }
 
-export type { BatchesControllerListStatusEnum, PicoUnitIdBatchesControllerListStatusEnum };
+export type { BatchesControllerListV1StatusEnum, PicoUnitIdBatchesControllerListV1StatusEnum };

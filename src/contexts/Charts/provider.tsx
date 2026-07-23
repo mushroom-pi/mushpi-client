@@ -2,7 +2,7 @@ import { omit } from 'lodash';
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import type {
-  ReadingsApiPicoUnitIdReadingsControllerListForUnitRequest as ListPicoUnitReadingsParams,
+  ReadingsApiPicoUnitIdReadingsControllerListForUnitV1Request as ListPicoUnitReadingsParams,
   ReadingsListResponseDto,
 } from '~api/generated';
 import type { ChartPoint } from '~type/charts';
@@ -39,7 +39,7 @@ export const ChartsProvider = ({
 
   useEffect(() => {
     if (initialParams?.picoUnitId != null && initialParams.picoUnitId !== params.picoUnitId) {
-      setParams((prev) => ({ ...prev, ...initialParams }));
+      setParams((prev: ListPicoUnitReadingsParams) => ({ ...prev, ...initialParams }));
     }
   }, [initialParams?.picoUnitId]);
 

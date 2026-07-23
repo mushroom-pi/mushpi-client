@@ -3,7 +3,7 @@ import { type UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { unwrap } from '~api/adapter';
 import { Recipes } from '~api/client';
 import type {
-  RecipesApiRecipesControllerListRequest as ListRecipesParams,
+  RecipesApiRecipesControllerListV1Request as ListRecipesParams,
   RecipeListResponseDto,
 } from '~api/generated';
 import { recipeKeys } from '~api/queryKeys';
@@ -22,7 +22,7 @@ export function useListRecipes(
   return useQuery<RecipeListResponseDto, unknown, RecipeListResponseDto>({
     queryKey: recipeKeys.list({ page, limit, species }),
     queryFn: async () => {
-      const resp = await unwrap(Recipes.recipesControllerList({ page, limit, species }));
+      const resp = await unwrap(Recipes.recipesControllerListV1({ page, limit, species }));
       return resp as unknown as RecipeListResponseDto;
     },
     placeholderData: (prev?: RecipeListResponseDto) => prev,

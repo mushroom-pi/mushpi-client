@@ -8,7 +8,7 @@ import { batchKeys } from '~api/queryKeys';
 export const createUploadBatchImagesMutation = (qc: ReturnType<typeof useQueryClient>) =>
   useMutation({
     mutationFn: async ({ batchId, images }: { batchId: number; images: File[] }) => {
-      const res = await unwrap(Batches.batchIdImagesControllerAddImages({ batchId, images }));
+      const res = await unwrap(Batches.batchIdImagesControllerAddImagesV1({ batchId, images }));
       return res as unknown as Batch;
     },
     onSuccess: (_data, { batchId }) => {
@@ -20,7 +20,7 @@ export const createUploadBatchImagesMutation = (qc: ReturnType<typeof useQueryCl
 export const createRemoveBatchImageMutation = (qc: ReturnType<typeof useQueryClient>) =>
   useMutation({
     mutationFn: async ({ batchId, filename }: { batchId: number; filename: string }) => {
-      await unwrap(Batches.batchIdImagesControllerRemoveImage({ batchId, filename }));
+      await unwrap(Batches.batchIdImagesControllerRemoveImageV1({ batchId, filename }));
     },
     onSuccess: (_data, { batchId }) => {
       qc.invalidateQueries({ queryKey: batchKeys.detail(batchId) });

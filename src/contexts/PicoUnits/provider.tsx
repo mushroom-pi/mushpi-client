@@ -2,7 +2,7 @@ import { omit } from 'lodash';
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 import type {
-  PicoUnitsApiPicoUnitsControllerListRequest as ListPicoUnitsParams,
+  PicoUnitsApiPicoUnitsControllerListV1Request as ListPicoUnitsParams,
   PicoUnit,
   PicoUnitListResponseDto,
 } from '~api/generated';

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import type {
-  ReadingsApiPicoUnitIdReadingsControllerListForUnitRequest as ListPicoUnitReadingsParams,
+  ReadingsApiPicoUnitIdReadingsControllerListForUnitV1Request as ListPicoUnitReadingsParams,
   Readings,
 } from '~api/generated';
 import { useListPicoUnitReadings } from '~hook/useReadings';

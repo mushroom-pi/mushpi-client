@@ -2,7 +2,7 @@ import { Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/materia
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { BatchesControllerListStatusEnum } from '~api/generated';
+import { BatchesControllerListV1StatusEnum } from '~api/generated';
 import { AddNew, Error, Loading, PageTitle } from '~components';
 import { useListBatches } from '~ctx/Batches';
 import { Page } from '~layout/Page';
@@ -11,7 +11,7 @@ import { BatchesTable } from './components/BatchesTable';
 import { CreateBatchDialog } from './components/CreateBatchDialog';
 
 type BatchStatus =
-  (typeof BatchesControllerListStatusEnum)[keyof typeof BatchesControllerListStatusEnum];
+  (typeof BatchesControllerListV1StatusEnum)[keyof typeof BatchesControllerListV1StatusEnum];
 
 type StatusFilter = 'all' | BatchStatus;
 
@@ -55,11 +55,11 @@ export default function BatchesPage() {
           aria-label="Batch status filter"
         >
           <ToggleButton value="all">All</ToggleButton>
-          <ToggleButton value={BatchesControllerListStatusEnum.Planned}>Planned</ToggleButton>
-          <ToggleButton value={BatchesControllerListStatusEnum.InProgress}>
+          <ToggleButton value={BatchesControllerListV1StatusEnum.Planned}>Planned</ToggleButton>
+          <ToggleButton value={BatchesControllerListV1StatusEnum.InProgress}>
             In Progress
           </ToggleButton>
-          <ToggleButton value={BatchesControllerListStatusEnum.Finished}>Finished</ToggleButton>
+          <ToggleButton value={BatchesControllerListV1StatusEnum.Finished}>Finished</ToggleButton>
         </ToggleButtonGroup>
 
         <BatchesTable batches={batches} onRowClick={(id) => navigate(`/batches/${id}`)} />

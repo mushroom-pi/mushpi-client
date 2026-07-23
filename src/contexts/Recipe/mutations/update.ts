@@ -15,7 +15,7 @@ export const createUpdateRecipeMutation = (qc: ReturnType<typeof useQueryClient>
       body: Partial<UpdateRecipeDto>;
     }) => {
       const res = await unwrap(
-        Recipes.recipeIdControllerUpdate({ recipeId, updateRecipeDto: body as UpdateRecipeDto }),
+        Recipes.recipeIdControllerUpdateV1({ recipeId, updateRecipeDto: body as UpdateRecipeDto }),
       );
       return res as unknown as Recipe;
     },

@@ -4,8 +4,8 @@ import { useCallback } from 'react';
 import { unwrap } from '~api/adapter';
 import { Readings } from '~api/client';
 import type {
-  ReadingsApiPicoUnitIdReadingsControllerExportCsvForUnitRequest as ExportPicoUnitReadingsParams,
-  ReadingsApiPicoUnitIdReadingsControllerListForUnitRequest as ListPicoUnitReadingsParams,
+  ReadingsApiPicoUnitIdReadingsControllerExportCsvForUnitV1Request as ExportPicoUnitReadingsParams,
+  ReadingsApiPicoUnitIdReadingsControllerListForUnitV1Request as ListPicoUnitReadingsParams,
   ReadingsListResponseDto,
 } from '~api/generated';
 import { readingsKeys } from '~api/queryKeys';
@@ -24,7 +24,7 @@ export const useListPicoUnitReadings = (
       if (end) params.end = typeof end === 'string' ? end : new Date(end).toISOString();
 
       const resp = await unwrap(
-        Readings.picoUnitIdReadingsControllerListForUnit(params as ListPicoUnitReadingsParams),
+        Readings.picoUnitIdReadingsControllerListForUnitV1(params as ListPicoUnitReadingsParams),
       );
       return resp as unknown as ReadingsListResponseDto;
     },
@@ -55,7 +55,7 @@ export const useExportPicoUnitReadingsCmd = () => {
     if (end) apiParams.end = typeof end === 'string' ? end : new Date(end).toISOString();
 
     const resp = await unwrap(
-      Readings.picoUnitIdReadingsControllerExportCsvForUnit(
+      Readings.picoUnitIdReadingsControllerExportCsvForUnitV1(
         apiParams as ExportPicoUnitReadingsParams,
         { responseType: 'blob' },
       ),

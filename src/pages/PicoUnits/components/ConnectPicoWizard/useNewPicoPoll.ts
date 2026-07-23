@@ -29,7 +29,7 @@ export function useNewPicoPoll(
     queryKey: picoUnitsKeys.list({ page: 1, limit: 100 }),
     queryFn: async () => {
       const resp = await unwrap(
-        PicoUnits.picoUnitsControllerList({ page: 1, limit: 100 }),
+        PicoUnits.picoUnitsControllerListV1({ page: 1, limit: 100 }),
       );
       return resp as unknown as PicoUnitListResponseDto;
     },

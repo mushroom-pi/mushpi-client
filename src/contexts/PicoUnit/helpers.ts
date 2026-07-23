@@ -101,7 +101,7 @@ export function createOptimisticMutation<Input, Result = any>(
       // Fire poll to get live hardware state; don't invalidate detail — the poll's
       // setQueryData provides the authoritative result and we must avoid a stale DB
       // fetch overwriting it.
-      unwrap(PicoUnits.picoUnitIdControllerPoll({ picoUnitId: id }))
+      unwrap(PicoUnits.picoUnitIdControllerPollV1({ picoUnitId: id }))
         .then((result) => {
           qc.setQueryData(picoUnitKeys.detail(id), result);
           // Now that a fresh reading is stored on the server, invalidate list/readings

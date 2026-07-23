@@ -3,7 +3,7 @@ import { type UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { unwrap } from '~api/adapter';
 import { PicoUnits } from '~api/client';
 import type {
-  PicoUnitsApiPicoUnitsControllerListRequest as ListPicoUnitsParams,
+  PicoUnitsApiPicoUnitsControllerListV1Request as ListPicoUnitsParams,
   PicoUnitListResponseDto,
 } from '~api/generated';
 import { picoUnitsKeys } from '~api/queryKeys';
@@ -26,7 +26,7 @@ export function useListPicoUnits(
     queryKey,
     queryFn: async () => {
       const resp = await unwrap(
-        PicoUnits.picoUnitsControllerList({ page, limit, ...params } as ListPicoUnitsParams),
+        PicoUnits.picoUnitsControllerListV1({ page, limit, ...params } as ListPicoUnitsParams),
       );
       return resp as unknown as PicoUnitListResponseDto;
     },

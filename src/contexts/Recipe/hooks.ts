@@ -4,7 +4,7 @@ import { unwrap } from '~api/adapter';
 import { Recipes } from '~api/client';
 import type {
   BatchListResponseDto,
-  RecipesApiRecipeIdBatchesControllerListRequest as ListRecipeBatchesParams,
+  RecipesApiRecipeIdBatchesControllerListV1Request as ListRecipeBatchesParams,
   Recipe,
 } from '~api/generated';
 import { recipeKeys } from '~api/queryKeys';
@@ -13,7 +13,7 @@ export function useGetRecipe(recipeId: number | null) {
   return useQuery<Recipe, unknown, Recipe>({
     queryKey: recipeKeys.detail(recipeId ?? 0),
     queryFn: async () => {
-      const res = await unwrap(Recipes.recipeIdControllerGetOne({ recipeId: recipeId! }));
+      const res = await unwrap(Recipes.recipeIdControllerGetOneV1({ recipeId: recipeId! }));
       return res as unknown as Recipe;
     },
     enabled: recipeId != null,
@@ -32,7 +32,7 @@ export function useGetRecipeBatches(
     queryKey: recipeKeys.batches(recipeId ?? 0, { page, limit, status }),
     queryFn: async () => {
       const res = await unwrap(
-        Recipes.recipeIdBatchesControllerList({ recipeId: recipeId!, page, limit, status }),
+        Recipes.recipeIdBatchesControllerListV1({ recipeId: recipeId!, page, limit, status }),
       );
       return res as unknown as BatchListResponseDto;
     },

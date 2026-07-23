@@ -9,7 +9,7 @@ export function useGetBatch(batchId: number | null) {
   return useQuery<Batch, unknown, Batch>({
     queryKey: batchKeys.detail(batchId ?? 0),
     queryFn: async () => {
-      const res = await unwrap(Batches.batchIdControllerGetOne({ batchId: batchId! }));
+      const res = await unwrap(Batches.batchIdControllerGetOneV1({ batchId: batchId! }));
       return res as unknown as Batch;
     },
     enabled: batchId != null,
