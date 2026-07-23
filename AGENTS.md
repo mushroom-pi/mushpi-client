@@ -2,6 +2,8 @@
 
 React 19 + Vite web dashboard served from Raspberry Pi 3 B+. Talks only to `mushpi-server`; never directly to Pico units. EXCEPTION: provisioning wizards reference `http://192.168.4.1:5000` (Pico Soft-AP) in user-facing instructions only — no direct API calls to Pico units from the frontend.
 
+> **Skill**: For general React frontend patterns (atomic design, React Query conventions, Zod form validation, ModalForm/DataTable usage), load the `frontend-react` skill. This file documents **only** what is specific to this project or deviates from standard frontend conventions.
+
 ## Stack
 
 React 19 · TypeScript ~5.9 · Vite 7 · MUI v7 · TanStack React Query v5 · axios · React Router DOM v7 · Recharts v3 · dayjs · Yarn 1
@@ -34,23 +36,20 @@ Both files are gitignored. Always regenerate after any `mushpi-server` endpoint 
 
 ## Form Validation
 
-All Create/Edit dialogs validate against generated Zod schemas. **Never hardcode validation bounds.**
+All Create/Edit dialogs validate against generated Zod schemas (see `frontend-react` skill for general pattern). Project-specific rules:
 
-- `toDto()` converts string form values to DTO types (empty numeric strings → undefined, non-empty → Number())
-- `safeParse()` against the generated schema, map issues to per-field errors
-- Use `issue.message` directly — do not rewrite Zod error messages
-- `isValid` = `!Object.values(errors).some(Boolean)` (not `Object.keys(errors).length === 0`)
-- Disable submit: `canSubmit={hasChanges && isValid}` (edit) or `canSubmit={isValid}` (create)
-- Many server DTOs are `.partial()` — only validate constraints when a value is present
+- **Never hardcode validation bounds** — use the generated Zod schemas as the single source of truth.
+- Many server DTOs are `.partial()` — only validate constraints when a value is present.
 
 ## State Management
 
-- React Query for all server state — no `useEffect` + `useState` for fetched data
-- Query keys in `src/api/queryKeys.ts` (picoUnitKeys, recipeKeys, batchKeys, etc.)
+Standard React Query patterns apply (see `frontend-react` skill). Project-specific:
+
+- Query key factories in `src/api/queryKeys.ts` (picoUnitKeys, recipeKeys, batchKeys, etc.)
 - Context hooks: usePicoUnit (detail page via `PicoUnitProvider` + `usePicoUnitContext`), usePicoUnits (list page), useRecipe, useRecipes, useBatch, useBatches, useCharts
 - Mutations in entity's `mutations/` folder (one file per concern)
 - Optimistic updates via `createOptimisticMutation` factory in `src/contexts/PicoUnit/helpers.ts`
-- **On-demand hardware polling**: `usePollPicoUnit` mutation calls `POST /pico-units/:id/poll` to trigger an immediate Pico poll (stores a new reading, returns updated `PicoUnit` with `latest_reading`). Exposed via `pollPico` on `PicoUnitCtx`. Used on page mount, after control mutations, and for periodic 60 s background refresh on the unit detail, readings, and batch pages.
+- **On-demand hardware polling**: `usePollPicoUnit` mutation calls `POST /v1/pico-units/:id/poll` to trigger an immediate Pico poll (stores a new reading, returns updated `PicoUnit` with `latest_reading`). Exposed via `pollPico` on `PicoUnitCtx`. Used on page mount, after control mutations, and for periodic 60 s background refresh on the unit detail, readings, and batch pages.
 - Long-lived readings views (unit detail, readings board, batch detail) auto-refresh every 60 s via hardware poll on the unit detail page and `refetchInterval` on the readings/batch readings queries.
 
 ### useAsyncWithToast (imperative async with toast)
@@ -154,8 +153,9 @@ Chart data utilities in `~utils/charts`: `downsampleChartPoints`, `smartSampleCh
 
 ## Known Quirks
 
-- `picoUnitIdBatchesControllerGetCurrent` requires `batchId: 0` (generator bug — param not in URL, ignored)
+- `picoUnitIdBatchesControllerGetCurrentV1` requires `batchId: 0` (generator bug — param not in URL, ignored)
 - Vite chunk size warning (~1.35 MB) is informational
+- **V1 naming**: all generated API methods carry a `V1` suffix (e.g. `batchesControllerListV1`, `picoUnitIdControllerGetOneV1`). This comes from the server's URI versioning (`/v1/` prefix) and is not a bug. Method names will change again when `/v2/` endpoints are introduced — plan client code accordingly.
 - `schemas.ts` sometimes uses bare `Array` without type param — regenerate from fixed server spec
 - `schemas.ts` sometimes uses `Array<z>` instead of `Array<string>` — fixed by `Fix 1b` in `scripts/fix-array-types.mjs` (generator bug in `openapi-zod-client` v1.18.3)
 - `PicoUnitCard.tsx` `friendlyDate` uses `new Date().toLocaleString()` instead of `dayjs` — pre-existing deviation from the "Use dayjs for dates" rule
@@ -176,8 +176,6 @@ VITE_API_BASE_URL=http://localhost:3000
 
 ## Coding Rules
 
-- Functional components only
-- Named exports for components; default export only for pages
-- No `any` — use types from `src/api/generated/`
-- Use dayjs for dates, not Date directly
+Standard conventions from `frontend-react` skill apply. Project-specific additions:
+
 - Import order: @trivago/prettier-plugin-sort-imports
