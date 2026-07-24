@@ -37,7 +37,10 @@ export const PicoUnitResources: React.FC<OptionalPicoUnitProps> = ({ pico: dataP
 
   return (
     <InfoCard title="Resources" subtitle="Capacity usage" icon={<DataUsageIcon />}>
-      <InfoField label="Uptime">
+      <InfoField
+        label="Uptime"
+        tooltip="For how long has the unit been running since the latest hard reset"
+      >
         <ReadableTime seconds={isHealthy ? lr.board_uptime_s : null} variant="body1" />
       </InfoField>
       <InfoField

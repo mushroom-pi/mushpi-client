@@ -19,7 +19,11 @@ export const ControlsInfo: React.FC<OptionalPicoUnitProps> = ({ pico: dataProp }
 
   return (
     <>
-      <OnOffInfo label="Control loop" value={controlLoop} />
+      <OnOffInfo
+        label="Control loop"
+        value={controlLoop}
+        tooltip="When on, the unit will use the devices to try to meet the target temperature and humidity"
+      />
       <InfoField label="Target temperature" display="beside">
         <Chip
           label={tempTarget ? `${tempTarget} °C` : '—'}

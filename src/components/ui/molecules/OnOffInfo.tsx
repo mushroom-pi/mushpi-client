@@ -6,10 +6,11 @@ import { InfoField } from '../atoms/InfoField';
 interface OnOffInputProps {
   label: string;
   value: boolean;
+  tooltip?: string;
 }
 
-export const OnOffInfo: React.FC<OnOffInputProps> = ({ label, value }) => (
-  <InfoField label={label} display="beside">
+export const OnOffInfo: React.FC<OnOffInputProps> = ({ label, value, tooltip }) => (
+  <InfoField label={label} display="beside" tooltip={tooltip}>
     <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
       <Chip label="Off" color={value ? 'default' : 'info'} size="small" />
       <Switch checked={value} name={label.toLowerCase()} disabled={true} size="medium" />

@@ -14,3 +14,4 @@ export { IconChartRow } from './IconChartRow';
 export { AddNew } from './AddNew';
 export { ColorSwatchPicker } from './ColorSwatchPicker';
 export { FACE_COLORS } from './ColorSwatchPicker';
+export { UnitHealthIcon } from './UnitHealthIcon';

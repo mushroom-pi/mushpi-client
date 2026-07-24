@@ -43,3 +43,21 @@ export const chipColorForFailedCalls = (failedCalls: number | null) => {
   if (failedCalls < 3) return 'warning';
   return 'error';
 };
+
+export const FAILS_READINGS_UNHEALTHY = 5;
+
+/** Combines both failure signals — unit is healthy only if reachable AND sensor is good */
+export function isUnitHealthy(pico: {
+  failed_calls?: number;
+  failed_readings?: number;
+}): boolean {
+  return (pico.failed_calls ?? 0) < 3 && (pico.failed_readings ?? 0) < FAILS_READINGS_UNHEALTHY;
+}
+
+/** Color for the failed_readings chip: 0=success(green), 1-4=warning(yellow), 5+=error(red) */
+export const chipColorForFailedReadings = (failedReadings: number | null | undefined) => {
+  const n = failedReadings ?? 0;
+  if (n === 0) return 'success' as const;
+  if (n < FAILS_READINGS_UNHEALTHY) return 'warning' as const;
+  return 'error' as const;
+};

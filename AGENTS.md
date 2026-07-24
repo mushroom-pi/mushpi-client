@@ -161,6 +161,8 @@ Chart data utilities in `~utils/charts`: `downsampleChartPoints`, `smartSampleCh
 - `PicoUnitCard.tsx` `friendlyDate` uses `new Date().toLocaleString()` instead of `dayjs` — pre-existing deviation from the "Use dayjs for dates" rule
 - Grep tool skips `src/api/generated/` (gitignored) — always use `read` or bash `grep`/`rg` directly to discover generated method signatures
 - Offline Pico detection: `isUnitOffline(pico)` checks `failed_calls >= 3` (import from `~utils/pico`). This is the canonical health signal — derived from the server's cron polling failures.
+- Combined health check: `isUnitHealthy(pico)` checks both `failed_calls >= 3` (unreachable) and `failed_readings >= 5` (sensor fault). Import from `~utils/pico`. Orthogonal to `isUnitOffline` — a unit can be reachable but have a faulty sensor.
+- Health icon: `UnitHealthIcon` (import from `~components`) renders a ✓/⚠ icon with a tooltip explaining the specific failure mode. Used in `PicoUnitCard` (list page) and as `titleAdornment` on the unit detail page.
 - `PicoUnit.mac` (nullable string) stores the Pico's Wi‑Fi MAC address. Used client-side to derive the AP provisioning SSID (`mushpi-provision-XXXX` from last 4 hex chars). Set once by the server during the first successful cron poll; never updated.
 - Soft-AP provisioning wizards reference `http://192.168.4.1:5000` (Pico AP mode) in user instructions only — no direct API calls to Pico units from the frontend. All communication goes through `mushpi-server`.
 

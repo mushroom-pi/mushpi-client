@@ -9,7 +9,6 @@ import {
   CardActions,
   CardContent,
   CardHeader,
-  Chip,
   IconButton,
   Switch,
   Tooltip,
@@ -18,6 +17,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 import type { PicoUnit } from '~api/generated';
+import { UnitHealthIcon } from '~components';
 import { isUnitOffline } from '~utils/pico';
 
 export default function PicoUnitCard({
@@ -74,16 +74,17 @@ export default function PicoUnitCard({
               </Typography>
 
               <Typography variant="caption" color="text.secondary" noWrap sx={{ ml: 0.5 }}>
-                {pico.handle ? `${pico.name ? pico.name + ' — ' : ''}${pico.handle}` : ''}
+                {pico.handle}
               </Typography>
-
-              {offline && <Chip size="small" color="error" label="Offline" />}
             </Box>
           }
           subheader={
-            <Typography variant="caption" color="text.secondary">
-              Last seen: {friendlyDate(pico.last_seen)}
-            </Typography>
+            <Box display="flex" alignItems="center" gap={0.5}>
+              <UnitHealthIcon pico={pico} />
+              <Typography variant="caption" color="text.secondary">
+                Last seen: {friendlyDate(pico.last_seen)}
+              </Typography>
+            </Box>
           }
         />
 

@@ -11,6 +11,7 @@ import {
 import type React from 'react';
 
 import type { PicoUnit } from '~api/generated';
+import { isUnitHealthy } from '~utils/pico';
 
 interface PicoUnitStatCardsProps {
   pico?: PicoUnit;
@@ -19,6 +20,7 @@ interface PicoUnitStatCardsProps {
 
 export const PicoUnitStatCards: React.FC<PicoUnitStatCardsProps> = ({ pico, isPolling }) => {
   const reading = pico?.latest_reading;
+  const healthy = pico ? isUnitHealthy(pico) : true;
   const temperature = reading?.temperature;
   const humidity = reading?.humidity;
 
@@ -37,7 +39,7 @@ export const PicoUnitStatCards: React.FC<PicoUnitStatCardsProps> = ({ pico, isPo
               {isPolling && <CircularProgress size={16} />}
             </Box>
             <Typography variant="h4" mt={1}>
-              {temperature != null ? `${temperature}°C` : '--°C'}
+              {temperature != null && healthy ? `${temperature}°C` : '--°C'}
             </Typography>
           </CardContent>
         </Card>
@@ -55,7 +57,7 @@ export const PicoUnitStatCards: React.FC<PicoUnitStatCardsProps> = ({ pico, isPo
               {isPolling && <CircularProgress size={16} />}
             </Box>
             <Typography variant="h4" mt={1}>
-              {humidity != null ? `${humidity}%` : '--%'}
+              {humidity != null && healthy ? `${humidity}%` : '--%'}
             </Typography>
           </CardContent>
         </Card>

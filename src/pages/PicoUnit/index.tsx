@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import type { PicoUnit } from '~api/generated';
-import { Error, Invalid, ItemPage, Loading } from '~components';
+import { Error, Invalid, ItemPage, Loading, UnitHealthIcon } from '~components';
 import { PicoUnitProvider, usePicoUnitContext } from '~ctx/PicoUnit';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { ReconnectPicoDialog } from '~pages/PicoUnits/components/ReconnectPicoDialog';
@@ -43,6 +43,7 @@ function PicoUnitDetailInner() {
       {pollPico.isLoading && <LinearProgress />}
       <ItemPage
         title={pico.name ?? 'No name'}
+        titleAdornment={<UnitHealthIcon pico={pico} />}
         actions={
           <MetaButtons
             setEditOpen={setEditOpen}
