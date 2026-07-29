@@ -2,6 +2,7 @@ import {
   BatchesApi,
   Configuration,
   ControlApi,
+  DashboardApi,
   ImagesApi,
   MonitoringApi,
   PicoUnitsApi,
@@ -28,6 +29,7 @@ export const PicoUnits = new PicoUnitsApi(configuration);
 export const Readings = new ReadingsApi(configuration);
 export const Batches = new BatchesApi(configuration);
 export const Control = new ControlApi(configuration);
+export const Dashboard = new DashboardApi(configuration);
 export const Monitoring = new MonitoringApi(configuration);
 export const Recipes = new RecipesApi(configuration);
 export const Images = new ImagesApi(configuration);

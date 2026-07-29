@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import type { PicoUnit } from '~api/generated';
+import { DeviationAlert, HUMIDITY_DEVIATION_THRESHOLD, TEMP_DEVIATION_THRESHOLD } from '~components';
 import { Error, Invalid, ItemPage, Loading, UnitHealthIcon } from '~components';
 import { PicoUnitProvider, usePicoUnitContext } from '~ctx/PicoUnit';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
@@ -38,6 +39,25 @@ function PicoUnitDetailInner() {
   if (isLoading) return <Loading item="pico unit" />;
   if (isError || !pico) return <Error item="pico unit" refetch={refetch} error={error} />;
 
+  const reading = pico.latest_reading as Record<string, unknown> | null;
+  const controlLoopEnabled = reading?.control_loop_enabled === true;
+  const temp = reading?.temperature as number | null | undefined;
+  const tempSet = reading?.temperature_set as number | null | undefined;
+  const humidity = reading?.humidity as number | null | undefined;
+  const humiditySet = reading?.humidity_set as number | null | undefined;
+
+  const tempDeviation =
+    controlLoopEnabled &&
+    temp != null &&
+    tempSet != null &&
+    Math.abs(temp - tempSet) > TEMP_DEVIATION_THRESHOLD;
+
+  const humidityDeviation =
+    controlLoopEnabled &&
+    humidity != null &&
+    humiditySet != null &&
+    Math.abs(humidity - humiditySet) > HUMIDITY_DEVIATION_THRESHOLD;
+
   return (
     <>
       {pollPico.isLoading && <LinearProgress />}
@@ -69,6 +89,26 @@ function PicoUnitDetailInner() {
           </>
         }
       >
+        {(tempDeviation || humidityDeviation) && (
+          <Stack spacing={1} sx={{ mb: 2 }}>
+            {tempDeviation && temp != null && tempSet != null && (
+              <DeviationAlert
+                type="temp"
+                actualValue={temp}
+                targetValue={tempSet}
+                variant="filled"
+              />
+            )}
+            {humidityDeviation && humidity != null && humiditySet != null && (
+              <DeviationAlert
+                type="humidity"
+                actualValue={humidity}
+                targetValue={humiditySet}
+                variant="filled"
+              />
+            )}
+          </Stack>
+        )}
         <PicoUnitStatCards pico={pico} isPolling={pollPico.isLoading} />
         <DetailGrid pico={pico} />
         <EditMetaDialog open={editOpen} onClose={() => setEditOpen(false)} />

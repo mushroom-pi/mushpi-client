@@ -15,3 +15,4 @@ export { DataTable } from './DataTable';
 export type { DataTableColumn, DataTableProps } from './DataTable';
 export { ModalForm } from './ModalForm';
 export type { ModalFormProps } from './ModalForm';
+export { DeviationAlert, TEMP_DEVIATION_THRESHOLD, HUMIDITY_DEVIATION_THRESHOLD } from './DeviationAlert';

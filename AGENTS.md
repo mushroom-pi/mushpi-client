@@ -26,6 +26,8 @@ yarn gen:all:remote      # regenerate both
 
 Both files are gitignored. Always regenerate after any `mushpi-server` endpoint change.
 
+**New API classes must be manually wired.** After introducing a new server controller (e.g. `DashboardModule`), the generated `*Api` class (e.g. `DashboardApi`) is created in `src/api/generated/api.ts` but is **not auto-exported**. You must manually import and instantiate it in `src/api/client.ts` alongside the other API exports. Same pattern as existing `Control`, `Images`, `Monitoring`, etc.
+
 ## Images
 
 - `Recipe.image` / `Batch.images` contain **filenames only** (e.g. `"abc123.jpg"`)
@@ -51,6 +53,8 @@ Standard React Query patterns apply (see `frontend-react` skill). Project-specif
 - Optimistic updates via `createOptimisticMutation` factory in `src/contexts/PicoUnit/helpers.ts`
 - **On-demand hardware polling**: `usePollPicoUnit` mutation calls `POST /v1/pico-units/:id/poll` to trigger an immediate Pico poll (stores a new reading, returns updated `PicoUnit` with `latest_reading`). Exposed via `pollPico` on `PicoUnitCtx`. Used on page mount, after control mutations, and for periodic 60 s background refresh on the unit detail, readings, and batch pages.
 - Long-lived readings views (unit detail, readings board, batch detail) auto-refresh every 60 s via hardware poll on the unit detail page and `refetchInterval` on the readings/batch readings queries.
+- Dashboard uses `useDashboard` hook with `refetchInterval: 60_000` — single `GET /v1/dashboard/summary` call returns all aggregated data.
+- **dayjs relative time**: The `relativeTime` plugin is NOT registered globally. Use `dayjs().diff()` + manual formatting for "X ago" strings. See `src/pages/Dashboard/methods.ts` for the pattern (`formatRelativeFromNow`, `formatLastSeen`).
 
 ### useAsyncWithToast (imperative async with toast)
 
@@ -101,7 +105,8 @@ src/
 ├── components/ui/
 │   ├── atoms/            # Stateless presentational
 │   ├── molecules/        # Composed (may use context/hooks)
-│   │   └── ImageManager/ # Shared image gallery/upload/remove (used by Recipe + Batch)
+│   │   ├── ImageManager/  # Shared image gallery/upload/remove (used by Recipe + Batch)
+│   │   └── DeviationAlert # Temp/humidity deviation warning (used by Dashboard + PicoUnit detail)
 │   └── index.ts
 ├── contexts/             # Context + hooks + mutations per entity
 │   ├── PicoUnit/mutations/: controlLoop, delete, outputs, setPoints, update
@@ -109,9 +114,13 @@ src/
 │   ├── Batch/mutations/: create, delete, image, update, createRecipeFromBatch
 │   ├── Charts/: provider.tsx, batchProvider.tsx
 │   └── Toast.tsx
-├── hooks/                # useReadings, useBatchReadings, useServerHealth, useAsyncWithToast
+├── hooks/                # useDashboard, useReadings, useBatchReadings, useServerHealth, useAsyncWithToast
 ├── layout/               # Page wrapper, Sidebar
 ├── pages/                # Route pages (default exports)
+│   │                       # ⚠️ Page components MUST live in <PageName>/index.tsx,
+│   │                       #   never as a bare <PageName>.tsx at the pages root.
+│   ├── Dashboard/         # Dashboard page at /
+│   │   └── components/    # WarningsBanner, StatsRow, UnitCards, etc.
 │   ├── PicoUnit/          # Unit detail page at /pico-units/:id
 │   │   └── components/    # PicoUnitStatCards, PicoUnitDetailGrid, PicoUnitDevices, etc.
 │   ├── PicoUnits/         # Units list page at /pico-units
@@ -119,8 +128,9 @@ src/
 │   │       ├── ProvisioningIllustrations.tsx  # SVG illustrations for provisioning wizards
 │   │       ├── LedStateReference.tsx     # Collapsible LED diagnostic accordion
 │   │       ├── ConnectPicoWizard/        # Multi-step wizard for new Pico provisioning
-│   │       ├── ReconnectPicoDialog/      # Multi-step wizard for offline Pico recovery
-│   │       └── ManualRegisterDialog/     # Manual PicoUnit registration (mDNS-based)
+│       │   ├── ReconnectPicoDialog/      # Multi-step wizard for offline Pico recovery
+│       │   └── ManualRegisterDialog/     # Manual PicoUnit registration (mDNS-based)
+│   │   └── components/                   # Page-scoped widgets (NOT shared molecules)
 ├── theme/mushroomTheme.ts
 ├── types/charts.ts
 └── utils/

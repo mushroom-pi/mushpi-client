@@ -81,3 +81,7 @@ export const batchKeys = {
     limit?: number,
   ) => ['batchReadings', batchId, start || 'none', end || 'none', page ?? 1, limit ?? 500] as const,
 };
+
+export const dashboardKeys = {
+  all: ['dashboard', 'summary'] as const,
+};
