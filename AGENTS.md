@@ -47,7 +47,7 @@ All Create/Edit dialogs validate against generated Zod schemas (see `frontend-re
 
 Standard React Query patterns apply (see `frontend-react` skill). Project-specific:
 
-- Query key factories in `src/api/queryKeys.ts` (picoUnitKeys, recipeKeys, batchKeys, etc.)
+- Query key factories in `src/api/queryKeys.ts` (picoUnitKeys, recipeKeys, batchKeys, serverHealthKeys, serverPingKeys, etc.)
 - Context hooks: usePicoUnit (detail page via `PicoUnitProvider` + `usePicoUnitContext`), usePicoUnits (list page), useRecipe, useRecipes, useBatch, useBatches, useCharts
 - Mutations in entity's `mutations/` folder (one file per concern)
 - Optimistic updates via `createOptimisticMutation` factory in `src/contexts/PicoUnit/helpers.ts`
@@ -114,7 +114,7 @@ src/
 │   ├── Batch/mutations/: create, delete, image, update, createRecipeFromBatch
 │   ├── Charts/: provider.tsx, batchProvider.tsx
 │   └── Toast.tsx
-├── hooks/                # useDashboard, useReadings, useBatchReadings, useServerHealth, useAsyncWithToast
+├── hooks/                # useDashboard, useReadings, useBatchReadings, useServerHealth, useIsServerReachable, useAsyncWithToast
 ├── layout/               # Page wrapper, Sidebar
 ├── pages/                # Route pages (default exports)
 │   │                       # ⚠️ Page components MUST live in <PageName>/index.tsx,
@@ -175,6 +175,8 @@ Chart data utilities in `~utils/charts`: `downsampleChartPoints`, `smartSampleCh
 - Health icon: `UnitHealthIcon` (import from `~components`) renders a ✓/⚠ icon with a tooltip explaining the specific failure mode. Used in `PicoUnitCard` (list page) and as `titleAdornment` on the unit detail page.
 - `PicoUnit.mac` (nullable string) stores the Pico's Wi‑Fi MAC address. Used client-side to derive the AP provisioning SSID (`mushpi-provision-XXXX` from last 4 hex chars). Set once by the server during the first successful cron poll; never updated.
 - Soft-AP provisioning wizards reference `http://192.168.4.1:5000` (Pico AP mode) in user instructions only — no direct API calls to Pico units from the frontend. All communication goes through `mushpi-server`.
+- Server-down detection: `ServerDownBanner` (import from `~components`) renders a warning `Alert` at the top of the app when `GET /ping` fails. Uses `useIsServerReachable` hook (30s polling, `retry: false`). Fast-path: any successful server response from another query immediately clears the banner via `QueryCache.subscribe()` — no waiting for the next ping tick.
+- `/ping` vs `/health`: `/ping` returns bare `"pong"` — use for liveness polling (`retry: false`, low overhead). `/health` returns full `HealthCheckResponseDto` with server/database/service status — use for the Server page. The `monitoringControllerPing()` method exists on both `MonitoringApi` and `NoValidationApi` in the generated client; use `MonitoringApi` (consistent with `useServerHealth`).
 
 ## Feature Palettes & Domain Constants
 

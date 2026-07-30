@@ -28,3 +28,6 @@ dist-ssr
 
 # Generated API client
 src/api/generated/*
+
+# OpenAPI spec copy (used for local regeneration, canonical source is mushpi-server/spec/)
+openapi.json

@@ -40,6 +40,10 @@ export function ServerSkeleton() {
             </CardContent>
           </Card>
         </Grid>
+
+        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <CardSkeleton variant="card" lines={4} />
+        </Grid>
       </Grid>
     </>
   );
