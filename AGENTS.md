@@ -190,4 +190,5 @@ VITE_API_BASE_URL=http://localhost:3000
 
 Standard conventions from `frontend-react` skill apply. Project-specific additions:
 
-- Import order: @trivago/prettier-plugin-sort-imports
+- Import order: `@trivago/prettier-plugin-sort-imports` handles sort order via Prettier. Third-party imports first, then `~` aliases, then relative imports.
+- Loading states: Prefer shape-matched MUI `<Skeleton>` components over the generic `<Loading />` spinner for data pages. See the `frontend-react` skill for the full pattern (hierarchy, gating on `isLoading`, page shell structure). Reusable skeletons live in atoms/molecules; page-scoped skeleton compositions live in `pages/<Page>/components/`.
