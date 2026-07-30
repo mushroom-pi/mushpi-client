@@ -1,6 +1,7 @@
 import DataUsageIcon from '@mui/icons-material/DataUsage';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 import ThermostatIcon from '@mui/icons-material/Thermostat';
-import { Chip, Grid, LinearProgress, Stack, Typography } from '@mui/material';
+import { Button, Chip, Grid, LinearProgress, Stack, Typography } from '@mui/material';
 import type { FC } from 'react';
 
 import { BigDisplay, Error, InfoCard, InfoField, PageTitle, ReadableTime } from '~components';
@@ -19,6 +20,11 @@ function severityColorForLoad(load?: number | null) {
 export const Server: FC = () => {
   const { data: serverHealth, isLoading, isError, error, refetch } = useServerHealth();
   const isHealthy = !!serverHealth?.server?.healthy && !error;
+
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
+  const docsPath = import.meta.env.VITE_DOCS_PATH as string | undefined;
+  const docsUrl =
+    apiBaseUrl && docsPath ? `${apiBaseUrl}/${docsPath}` : undefined;
 
   let content: React.ReactNode;
 
@@ -86,7 +92,24 @@ export const Server: FC = () => {
 
   return (
     <Page>
-      <PageTitle>Server</PageTitle>
+      <PageTitle
+        actions={
+          !isLoading && !isError && docsUrl ? (
+            <Button
+              component="a"
+              href={docsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="outlined"
+              startIcon={<MenuBookIcon />}
+            >
+              API Docs
+            </Button>
+          ) : undefined
+        }
+      >
+        Server
+      </PageTitle>
       {content}
     </Page>
   );
