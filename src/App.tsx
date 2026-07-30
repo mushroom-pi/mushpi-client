@@ -1,6 +1,8 @@
 import { Box } from '@mui/material';
 import { Route, Routes } from 'react-router-dom';
 
+import { ServerDownBanner } from '~components';
+
 import Sidebar from './layout/Sidebar';
 import { drawerWidth } from './layout/Sidebar/constants';
 import BatchDetail from './pages/Batch';
@@ -25,6 +27,7 @@ export default function App() {
           marginLeft: { xs: 0, md: `${drawerWidth}px` },
         }}
       >
+        <ServerDownBanner />
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/pico-units" element={<PicoUnits />} />

@@ -46,6 +46,10 @@ export const serverHealthKeys = {
   all: ['serverHealth'] as const,
 };
 
+export const serverPingKeys = {
+  all: ['serverPing'] as const,
+};
+
 export const recipeKeys = {
   all: ['recipes'] as const,
   list: (params?: Partial<ListRecipesParams>) => {

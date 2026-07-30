@@ -22,3 +22,4 @@ export { TableSkeleton } from './TableSkeleton';
 export type { TableSkeletonProps } from './TableSkeleton';
 export { ChartsTabsSkeleton } from './ChartsTabsSkeleton';
 export type { ChartsTabsSkeletonProps } from './ChartsTabsSkeleton';
+export { ServerDownBanner } from './ServerDownBanner';

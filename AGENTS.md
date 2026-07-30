@@ -10,7 +10,7 @@ React 19 · TypeScript ~5.9 · Vite 7 · MUI v7 · TanStack React Query v5 · ax
 
 ## Path Aliases
 
-`vite.config.ts` + `tsconfig.app.json`: `~api`, `~ctx`, `~hook`, `~int`, `~type`, `~comp`, `~components`, `~layout`, `~utils`, `~pages`
+`vite.config.ts` + `tsconfig.app.json`: `~api`, `~ctx`, `~hook`, `~int`, `~type`, `~comp`, `~components`, `~layout`, `~utils`, `~pages`, `~assets`
 
 ## API Client
 

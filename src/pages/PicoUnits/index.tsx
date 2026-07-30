@@ -25,7 +25,7 @@ export default function PicoUnitsPage() {
       </>
     );
   } else if (isError) {
-    content = <Error item="pico units" error={error} />;
+    content = <Error item="pico units" error={error} refetch={refetch} />;
   } else {
     content = (
       <>
@@ -41,11 +41,7 @@ export default function PicoUnitsPage() {
           ) : (
             items.map((p) => (
               <Grid key={p.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                <PicoUnitCard
-                  pico={p}
-                  onRefresh={() => refetch()}
-                  onReconnect={setReconnectUnit}
-                />
+                <PicoUnitCard pico={p} onRefresh={() => refetch()} onReconnect={setReconnectUnit} />
               </Grid>
             ))
           )}
