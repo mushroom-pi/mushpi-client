@@ -1,0 +1,40 @@
+<svg
+  viewBox="0 0 260 180"
+  width="260"
+  height="180"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  role="img"
+  aria-label="Success - Pico connected"
+>
+  <!-- Background -->
+  <rect width="260" height="180" rx="12" fill="#0f1720" />
+
+  <!-- Large checkmark circle -->
+  <circle cx="130" cy="65" r="30" fill="#3C8D5A" opacity="0.15" stroke="#3C8D5A" stroke-width="2" />
+  <!-- Checkmark -->
+  <path d="M115 65 L126 76 L147 55" stroke="#3C8D5A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+
+  <!-- Pico board icon (simplified) -->
+  <rect x="55" y="110" width="50" height="30" rx="4" fill="#0f1b12" stroke="#2a3a2e" stroke-width="1" />
+  <rect x="50" y="118" width="8" height="10" rx="1" fill="#888" />
+  <!-- Tiny LED on board -->
+  <circle cx="92" cy="118" r="2.5" fill="#3C8D5A" />
+
+  <!-- Wi-Fi waves going to board -->
+  <path d="M125 120 Q135 110 145 120" fill="none" stroke="#C66F2F" stroke-width="1.5" opacity="0.4" />
+  <path d="M120 125 Q135 108 150 125" fill="none" stroke="#C66F2F" stroke-width="1.5" opacity="0.6" />
+  <path d="M115 130 Q135 105 155 130" fill="none" stroke="#C66F2F" stroke-width="1.5" opacity="0.8" />
+
+  <!-- Router / signal source -->
+  <rect x="155" y="115" width="30" height="20" rx="3" fill="#0f1b12" stroke="#2a3a2e" stroke-width="1" />
+  <circle cx="170" cy="120" r="2" fill="#C66F2F" />
+  <!-- Antenna -->
+  <line x1="170" y1="115" x2="170" y2="108" stroke="#9AA6A0" stroke-width="1" />
+  <circle cx="170" cy="106" r="2" fill="#C66F2F" opacity="0.6" />
+
+  <!-- Connected text -->
+  <text x="130" y="162" text-anchor="middle" fill="#3C8D5A" font-size="12" font-weight="bold" font-family="sans-serif">
+    Connected!
+  </text>
+</svg>

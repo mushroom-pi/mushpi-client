@@ -48,6 +48,7 @@ module.exports = [
           pathGroups: [
             // keep these in sync with your tsconfig/vite aliases if you want special ordering
             { pattern: '~api/**', group: 'internal' },
+            { pattern: '~assets/**', group: 'internal' },
             { pattern: '~ctx/**', group: 'internal' },
             { pattern: '~hook/**', group: 'internal' },
             { pattern: '~int/**', group: 'internal' },

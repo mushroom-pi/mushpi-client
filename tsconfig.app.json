@@ -29,6 +29,7 @@
       "src/*": ["src/*"],
       "@/*": ["src/*"],
       "~api/*": ["src/api/*"],
+      "~assets/*": ["src/assets/*"],
       "~ctx/*": ["src/contexts/*"],
       "~hook/*": ["src/hooks/*"],
       "~int/*": ["src/interfaces/*"],

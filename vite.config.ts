@@ -10,6 +10,7 @@ export default defineConfig({
       { find: 'src', replacement: path.resolve(__dirname, 'src') },
       { find: '@', replacement: path.resolve(__dirname, 'src') },
       { find: '~api', replacement: path.resolve(__dirname, 'src/api') },
+      { find: '~assets', replacement: path.resolve(__dirname, 'src/assets') },
       { find: '~ctx', replacement: path.resolve(__dirname, 'src/contexts') },
       { find: '~hook', replacement: path.resolve(__dirname, 'src/hooks') },
       { find: '~int', replacement: path.resolve(__dirname, 'src/interfaces') },

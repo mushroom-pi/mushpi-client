@@ -2,7 +2,7 @@ import { Box, Button, Container, Typography } from '@mui/material';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import sadMushroomSvg from '../../../assets/SadMushroom.svg';
+import sadMushroomSvg from '~assets/SadMushroom.svg';
 
 interface ErrorProps {
   compact?: boolean;
@@ -51,11 +51,7 @@ export const Error: React.FC<ErrorProps> = ({ compact, item, error, refetch }) =
         <Typography variant="h5" color="text.primary" sx={{ mt: 3, mb: 1 }}>
           Oops! Couldn&apos;t load {itemLabel}
         </Typography>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ mb: 3, maxWidth: 400 }}
-        >
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 400 }}>
           {errorMessage}
         </Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
