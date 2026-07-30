@@ -25,7 +25,7 @@ export default function PicoUnitsPage() {
       </>
     );
   } else if (isError) {
-    content = <Error compact item="pico units" error={error} />;
+    content = <Error item="pico units" error={error} />;
   } else {
     content = (
       <>

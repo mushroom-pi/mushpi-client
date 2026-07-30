@@ -36,7 +36,7 @@ export default function BatchesPage() {
       </>
     );
   } else if (isError && !data) {
-    content = <Error compact item="batches" error={error} refetch={() => void refetch()} />;
+    content = <Error item="batches" error={error} refetch={() => void refetch()} />;
   } else {
     content = (
       <>

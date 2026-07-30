@@ -25,7 +25,7 @@ export const Server: FC = () => {
   if (isLoading) {
     content = <ServerSkeleton />;
   } else if (isError || !serverHealth) {
-    content = <Error compact item="server health" error={error} refetch={refetch} />;
+    content = <Error item="server health" error={error} refetch={refetch} />;
   } else {
     content = (
       <>

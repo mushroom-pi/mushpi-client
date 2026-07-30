@@ -43,7 +43,7 @@ export const ReadingsPage = () => {
   if (isLoadingPicoUnits) {
     content = <ReadingsSkeleton />;
   } else if (isError) {
-    content = <Error compact item="pico units" error={error} refetch={refetch} />;
+    content = <Error item="pico units" error={error} refetch={refetch} />;
   } else if (!selectedId) {
     content = (
       <Box sx={{ textAlign: 'center', mt: 8 }}>

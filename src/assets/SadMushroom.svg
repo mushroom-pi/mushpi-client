@@ -1,0 +1,23 @@
+<svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg" aria-label="Sad mushroom" role="img" width="140">
+  <!-- Stem — slightly bent -->
+  <path d="M53 92 Q49 120 51 148 C51 153 64 153 64 148 Q62 120 61 92 Z" fill="#F0E4D0"/>
+  <!-- Tiny wilting leaf at stem base -->
+  <path d="M51 146 Q40 138 34 147 Q41 144 51 149" fill="#3C8D5A" opacity="0.5"/>
+  <!-- Cap group — tilted to suggest wilting -->
+  <g transform="rotate(-12, 57, 75)">
+    <ellipse cx="57" cy="72" rx="43" ry="28" fill="#C4956A"/>
+    <path d="M18 78 Q57 92 96 78" fill="#B08458" opacity="0.5"/>
+    <circle cx="40" cy="58" r="5.5" fill="#E8D5B7" opacity="0.6"/>
+    <circle cx="68" cy="55" r="4" fill="#E8D5B7" opacity="0.6"/>
+    <circle cx="52" cy="48" r="3.5" fill="#E8D5B7" opacity="0.6"/>
+    <g stroke="#5D4037" stroke-width="1.8" stroke-linecap="round">
+      <line x1="43" y1="70" x2="48" y2="75"/>
+      <line x1="48" y1="70" x2="43" y2="75"/>
+    </g>
+    <g stroke="#5D4037" stroke-width="1.8" stroke-linecap="round">
+      <line x1="63" y1="68" x2="68" y2="73"/>
+      <line x1="68" y1="68" x2="63" y2="73"/>
+    </g>
+    <path d="M48 82 Q55.5 77 63 82" stroke="#5D4037" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>

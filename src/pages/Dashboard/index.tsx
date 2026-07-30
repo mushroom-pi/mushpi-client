@@ -23,7 +23,7 @@ export default function Dashboard() {
   if (isLoading) {
     content = <DashboardSkeleton />;
   } else if (isError) {
-    content = <Error compact item="dashboard" error={error} refetch={refetch} />;
+    content = <Error item="dashboard" error={error} refetch={refetch} />;
   } else {
     const { units, batches, recipes, stats, warnings } = data!;
 

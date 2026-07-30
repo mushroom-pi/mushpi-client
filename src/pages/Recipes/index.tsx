@@ -25,7 +25,7 @@ export default function RecipesPage() {
       </>
     );
   } else if (isError) {
-    content = <Error compact item="recipes" error={error} refetch={() => void refetch()} />;
+    content = <Error item="recipes" error={error} refetch={() => void refetch()} />;
   } else {
     content = (
       <>
