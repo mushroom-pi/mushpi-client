@@ -1,8 +1,8 @@
-import { Typography } from '@mui/material';
+import { Skeleton, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { AddNew, Error, Loading, PageTitle } from '~components';
+import { AddNew, Error, PageTitle, TableSkeleton } from '~components';
 import { useListRecipes } from '~ctx/Recipes';
 import { Page } from '~layout/Page';
 
@@ -13,7 +13,20 @@ export default function RecipesPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const { data, isLoading, isError, error, refetch } = useListRecipes({ page: 1, limit: 20 });
 
-  if (isLoading) return <Loading item="recipes" />;
+  if (isLoading) {
+    return (
+      <Page>
+        <PageTitle
+          mb={3}
+          actions={<Skeleton variant="rounded" width={140} height={36} />}
+        >
+          Recipes
+        </PageTitle>
+        <Skeleton variant="text" width="40%" height={20} sx={{ mb: 2 }} />
+        <TableSkeleton columns={6} rows={6} />
+      </Page>
+    );
+  }
   if (isError) return <Error item="recipes" error={error} refetch={() => void refetch()} />;
 
   const recipes = data?.items ?? [];

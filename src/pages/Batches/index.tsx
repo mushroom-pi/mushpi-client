@@ -1,9 +1,9 @@
-import { Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
+import { Skeleton, Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { BatchesControllerListV1StatusEnum } from '~api/generated';
-import { AddNew, Error, Loading, PageTitle } from '~components';
+import { AddNew, Error, PageTitle, TableSkeleton } from '~components';
 import { useListBatches } from '~ctx/Batches';
 import { Page } from '~layout/Page';
 
@@ -25,7 +25,18 @@ export default function BatchesPage() {
   });
 
   if (isLoading && !data) {
-    return <Loading item="batches" />;
+    return (
+      <Page>
+        <PageTitle
+          mb={1.5}
+          actions={<Skeleton variant="rounded" width={130} height={36} />}
+        >
+          Batches
+        </PageTitle>
+        <Skeleton variant="text" width="40%" height={20} sx={{ mb: 2 }} />
+        <TableSkeleton columns={7} rows={6} />
+      </Page>
+    );
   }
 
   if (isError && !data) {

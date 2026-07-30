@@ -1,6 +1,8 @@
+import { Box, Button, Typography } from '@mui/material';
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
-import { Loading, PageTitle } from '~components';
+import { Error, PageTitle } from '~components';
 import { ChartsProvider } from '~ctx/Charts';
 import { usePollPicoUnit } from '~ctx/PicoUnit';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
@@ -8,11 +10,15 @@ import { Page } from '~layout/Page';
 
 import { BuildQueryForm } from './components/BuildQueryForm';
 import { ChartsTabs } from './components/ChartsTabs';
+import { ReadingsSkeleton } from './components/ReadingsSkeleton';
 
 export const ReadingsPage = () => {
   const {
     units: picoUnits,
     isLoading: isLoadingPicoUnits,
+    isError,
+    error,
+    refetch,
     selectedUnitId,
     setSelectedUnitId,
   } = usePicoUnitsContext();
@@ -32,8 +38,29 @@ export const ReadingsPage = () => {
     }
   }, [selectedId]);
 
-  if (isLoadingPicoUnits || !selectedId) {
-    return <Loading item="pico unit" />;
+  if (isLoadingPicoUnits) return <ReadingsSkeleton />;
+
+  if (isError) {
+    return <Error item="pico units" error={error} refetch={refetch} />;
+  }
+
+  if (!selectedId) {
+    return (
+      <Page>
+        <PageTitle>Readings</PageTitle>
+        <Box sx={{ textAlign: 'center', mt: 8 }}>
+          <Typography variant="h5" gutterBottom>
+            No Pico units available
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Add a Pico unit to start viewing readings.
+          </Typography>
+          <Button component={Link} to="/pico-units">
+            Go to Pico Units
+          </Button>
+        </Box>
+      </Page>
+    );
   }
 
   return (

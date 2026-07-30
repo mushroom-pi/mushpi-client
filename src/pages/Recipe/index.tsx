@@ -2,12 +2,13 @@ import { Stack } from '@mui/material';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { DeleteButton, EditButton, Error, Invalid, ItemPage, Loading } from '~components';
+import { DeleteButton, EditButton, Error, Invalid, ItemPage } from '~components';
 import { RecipeProvider, useRecipeContext } from '~ctx/Recipe';
 
 import { DeleteRecipeDialog } from './components/DeleteRecipeDialog';
 import { EditRecipeDialog } from './components/EditRecipeDialog';
 import { RecipeBatches } from './components/RecipeBatches';
+import { RecipeDetailSkeleton } from './components/RecipeDetailSkeleton';
 import { RecipeMeta } from './components/RecipeMeta';
 
 function RecipeDetailInner() {
@@ -15,7 +16,7 @@ function RecipeDetailInner() {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 
-  if (isLoading) return <Loading item="recipe" />;
+  if (isLoading) return <RecipeDetailSkeleton />;
   if (isError || !recipe) return <Error item="recipe" error={error} refetch={refetch} />;
 
   return (

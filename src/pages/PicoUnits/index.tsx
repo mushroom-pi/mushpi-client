@@ -1,8 +1,8 @@
-import { Grid, Typography } from '@mui/material';
+import { Grid, Skeleton, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import type { PicoUnit } from '~api/generated';
-import { AddNew, Error, Loading, PageTitle } from '~components';
+import { AddNew, CardGridSkeleton, Error, PageTitle } from '~components';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { Page } from '~layout/Page';
 
@@ -15,7 +15,22 @@ export default function PicoUnitsPage() {
   const [connectOpen, setConnectOpen] = useState(false);
   const [reconnectUnit, setReconnectUnit] = useState<PicoUnit | null>(null);
 
-  if (isLoading) return <Loading item="pico units" />;
+  if (isLoading) {
+    return (
+      <Page>
+        <PageTitle
+          mb={3}
+          actions={
+            <Skeleton variant="rounded" width={180} height={36} sx={{ mr: 1 }} />
+          }
+        >
+          Pico Units
+        </PageTitle>
+        <Skeleton variant="text" width="40%" height={20} sx={{ mb: 2 }} />
+        <CardGridSkeleton count={8} md={4} lg={3} />
+      </Page>
+    );
+  }
   if (isError) return <Error item="pico units" error={error} />;
 
   return (

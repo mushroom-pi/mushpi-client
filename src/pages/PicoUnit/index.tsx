@@ -4,12 +4,13 @@ import { useLocation, useParams } from 'react-router-dom';
 
 import type { PicoUnit } from '~api/generated';
 import { DeviationAlert, HUMIDITY_DEVIATION_THRESHOLD, TEMP_DEVIATION_THRESHOLD } from '~components';
-import { Error, Invalid, ItemPage, Loading, UnitHealthIcon } from '~components';
+import { Error, Invalid, ItemPage, UnitHealthIcon } from '~components';
 import { PicoUnitProvider, usePicoUnitContext } from '~ctx/PicoUnit';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { ReconnectPicoDialog } from '~pages/PicoUnits/components/ReconnectPicoDialog';
 
 import { PicoUnitDetailGrid as DetailGrid } from './components/PicoUnitDetailGrid';
+import { PicoUnitDetailSkeleton } from './components/PicoUnitDetailSkeleton';
 import { DeletePicoUnit } from './components/PicoUnitMeta/DeletePicoUnit';
 import { EditMetaDialog } from './components/PicoUnitMeta/EditMetaDialog';
 import { MetaButtons } from './components/PicoUnitMeta/MetaButtons';
@@ -36,7 +37,7 @@ function PicoUnitDetailInner() {
     }
   }, [pico?.id]);
 
-  if (isLoading) return <Loading item="pico unit" />;
+  if (isLoading) return <PicoUnitDetailSkeleton />;
   if (isError || !pico) return <Error item="pico unit" refetch={refetch} error={error} />;
 
   const reading = pico.latest_reading as Record<string, unknown> | null;

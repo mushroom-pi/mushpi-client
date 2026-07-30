@@ -1,12 +1,13 @@
 import { Box, Grid, Link, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-import { Error, Loading, PageTitle } from '~components';
+import { Error, PageTitle } from '~components';
 import { useDashboard } from '~hook/useDashboard';
 import { Page } from '~layout/Page';
 
 import { ActiveBatchesWidget } from './components/ActiveBatchesWidget';
 import { ApproachingCompletionWidget } from './components/ApproachingCompletionWidget';
+import { DashboardSkeleton } from './components/DashboardSkeleton';
 import { MostUsedRecipesWidget } from './components/MostUsedRecipesWidget';
 import { RecentlyFinishedWidget } from './components/RecentlyFinishedWidget';
 import { StatsRow } from './components/StatsRow';
@@ -17,7 +18,14 @@ export default function Dashboard() {
   const { data, isLoading, isError, error, refetch } = useDashboard();
   const navigate = useNavigate();
 
-  if (isLoading) return <Loading item="dashboard" />;
+  if (isLoading) {
+    return (
+      <Page>
+        <PageTitle>Dashboard</PageTitle>
+        <DashboardSkeleton />
+      </Page>
+    );
+  }
   if (isError) return <Error item="dashboard" error={error} refetch={refetch} />;
 
   const { units, batches, recipes, stats, warnings } = data!;

@@ -9,7 +9,6 @@ import {
   Error,
   Invalid,
   ItemPage,
-  Loading,
   PageTitle,
 } from '~components';
 import { BatchProvider, useBatchContext } from '~ctx/Batch';
@@ -17,6 +16,7 @@ import { BatchChartsProvider } from '~ctx/Charts';
 import { StatusChip } from '~pages/Batches/components/StatusChip';
 import { ChartsTabs } from '~pages/Readings/components/ChartsTabs';
 
+import { BatchDetailSkeleton } from './components/BatchDetailSkeleton';
 import { BatchMeta } from './components/BatchMeta';
 import { DeleteBatchDialog } from './components/DeleteBatchDialog';
 import { EditBatchDialog } from './components/EditBatchDialog';
@@ -30,7 +30,7 @@ function BatchDetailInner() {
   const [saveRecipeOpen, setSaveRecipeOpen] = useState(false);
 
   if (isLoading) {
-    return <Loading item="batch" />;
+    return <BatchDetailSkeleton />;
   }
 
   if (isError || !batch) {
