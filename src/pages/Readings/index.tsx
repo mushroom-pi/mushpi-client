@@ -38,38 +38,39 @@ export const ReadingsPage = () => {
     }
   }, [selectedId]);
 
-  if (isLoadingPicoUnits) return <ReadingsSkeleton />;
+  let content: React.ReactNode;
 
-  if (isError) {
-    return <Error item="pico units" error={error} refetch={refetch} />;
-  }
-
-  if (!selectedId) {
-    return (
-      <Page>
-        <PageTitle>Readings</PageTitle>
-        <Box sx={{ textAlign: 'center', mt: 8 }}>
-          <Typography variant="h5" gutterBottom>
-            No Pico units available
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Add a Pico unit to start viewing readings.
-          </Typography>
-          <Button component={Link} to="/pico-units">
-            Go to Pico Units
-          </Button>
-        </Box>
-      </Page>
+  if (isLoadingPicoUnits) {
+    content = <ReadingsSkeleton />;
+  } else if (isError) {
+    content = <Error compact item="pico units" error={error} refetch={refetch} />;
+  } else if (!selectedId) {
+    content = (
+      <Box sx={{ textAlign: 'center', mt: 8 }}>
+        <Typography variant="h5" gutterBottom>
+          No Pico units available
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Add a Pico unit to start viewing readings.
+        </Typography>
+        <Button component={Link} to="/pico-units">
+          Go to Pico Units
+        </Button>
+      </Box>
+    );
+  } else {
+    content = (
+      <ChartsProvider initialParams={{ picoUnitId: selectedId, page: 1, limit: 500 }}>
+        <BuildQueryForm />
+        <ChartsTabs />
+      </ChartsProvider>
     );
   }
 
   return (
-    <ChartsProvider initialParams={{ picoUnitId: selectedId, page: 1, limit: 500 }}>
-      <Page>
-        <PageTitle mb={2.5}>Readings</PageTitle>
-        <BuildQueryForm />
-        <ChartsTabs />
-      </Page>
-    </ChartsProvider>
+    <Page>
+      <PageTitle mb={2.5}>Readings</PageTitle>
+      {content}
+    </Page>
   );
 };

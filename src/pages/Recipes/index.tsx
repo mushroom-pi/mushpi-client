@@ -13,36 +13,48 @@ export default function RecipesPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const { data, isLoading, isError, error, refetch } = useListRecipes({ page: 1, limit: 20 });
 
+  const recipes = data?.items ?? [];
+
+  let content: React.ReactNode;
+
   if (isLoading) {
-    return (
-      <Page>
-        <PageTitle
-          mb={3}
-          actions={<Skeleton variant="rounded" width={140} height={36} />}
-        >
-          Recipes
-        </PageTitle>
+    content = (
+      <>
         <Skeleton variant="text" width="40%" height={20} sx={{ mb: 2 }} />
         <TableSkeleton columns={6} rows={6} />
-      </Page>
+      </>
+    );
+  } else if (isError) {
+    content = <Error compact item="recipes" error={error} refetch={() => void refetch()} />;
+  } else {
+    content = (
+      <>
+        <Typography variant="body2" color="text.secondary" mb={2}>
+          Showing page {data?.page ?? 1} of {data?.pages ?? 1} — total:{' '}
+          {data?.total ?? recipes.length}
+        </Typography>
+
+        <RecipesTable recipes={recipes} onRowClick={(id) => navigate(`/recipes/${id}`)} />
+      </>
     );
   }
-  if (isError) return <Error item="recipes" error={error} refetch={() => void refetch()} />;
-
-  const recipes = data?.items ?? [];
 
   return (
     <Page>
-      <PageTitle mb={3} actions={<AddNew onClick={() => setCreateOpen(true)}>New Recipe</AddNew>}>
+      <PageTitle
+        mb={3}
+        actions={
+          isLoading || isError ? (
+            <Skeleton variant="rounded" width={140} height={36} />
+          ) : (
+            <AddNew onClick={() => setCreateOpen(true)}>New Recipe</AddNew>
+          )
+        }
+      >
         Recipes
       </PageTitle>
 
-      <Typography variant="body2" color="text.secondary" mb={2}>
-        Showing page {data?.page ?? 1} of {data?.pages ?? 1} — total:{' '}
-        {data?.total ?? recipes.length}
-      </Typography>
-
-      <RecipesTable recipes={recipes} onRowClick={(id) => navigate(`/recipes/${id}`)} />
+      {content}
 
       <CreateRecipeDialog open={createOpen} onClose={() => setCreateOpen(false)} />
     </Page>

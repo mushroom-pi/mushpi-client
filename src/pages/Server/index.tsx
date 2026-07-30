@@ -20,73 +20,74 @@ export const Server: FC = () => {
   const { data: serverHealth, isLoading, isError, error, refetch } = useServerHealth();
   const isHealthy = !!serverHealth?.server?.healthy && !error;
 
-  if (isLoading) {
-    return (
-      <Page>
-        <PageTitle>Server</PageTitle>
-        <ServerSkeleton />
-      </Page>
-    );
-  }
+  let content: React.ReactNode;
 
-  if (isError || !serverHealth) {
-    return <Error item="server health" error={error} refetch={refetch} />;
+  if (isLoading) {
+    content = <ServerSkeleton />;
+  } else if (isError || !serverHealth) {
+    content = <Error compact item="server health" error={error} refetch={refetch} />;
+  } else {
+    content = (
+      <>
+        <Stack direction="row" spacing={2} alignItems="center" justifyContent="flex-start" mb={2}>
+          <Chip
+            label={isHealthy ? 'Healthy' : 'Unhealthy'}
+            color={isHealthy ? 'success' : 'error'}
+            size="small"
+          />
+          <Typography variant="subtitle2" color="text.secondary">
+            {serverHealth.server?.environment + ' environment'}
+          </Typography>
+        </Stack>
+
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+            <InfoCard title="Overview" subtitle="General status" icon={<ThermostatIcon />}>
+              <InfoField label="App version">
+                <BigDisplay content={serverHealth.server?.appVersion} />
+              </InfoField>
+              <InfoField label="Node.js version">
+                <BigDisplay content={serverHealth.server?.nodeVersion} />
+              </InfoField>
+            </InfoCard>
+          </Grid>
+
+          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+            <InfoCard title="Resources" subtitle="Capacity usage" icon={<DataUsageIcon />}>
+              <InfoField label="Uptime">
+                <ReadableTime seconds={serverHealth.server?.upTime.seconds} variant="body1" />
+              </InfoField>
+              {['1 minute', '5 minutes', '15 minutes'].map((t, i) => (
+                <InfoField
+                  label={`Load average (${t})`}
+                  extra={String(serverHealth.server?.loadAverage[i])}
+                >
+                  <LinearProgress
+                    variant="determinate"
+                    value={serverHealth.server?.loadAverage[i] ?? 0}
+                    sx={{
+                      height: 10,
+                      borderRadius: 2,
+                      mt: 1,
+                      backgroundColor: 'divider',
+                      '& .MuiLinearProgress-bar': {
+                        bgcolor: severityColorForLoad(serverHealth.server?.loadAverage[i]),
+                      },
+                    }}
+                  />
+                </InfoField>
+              ))}
+            </InfoCard>
+          </Grid>
+        </Grid>
+      </>
+    );
   }
 
   return (
     <Page>
       <PageTitle>Server</PageTitle>
-      <Stack direction="row" spacing={2} alignItems="center" justifyContent="flex-start" mb={2}>
-        <Chip
-          label={isHealthy ? 'Healthy' : 'Unhealthy'}
-          color={isHealthy ? 'success' : 'error'}
-          size="small"
-        />
-        <Typography variant="subtitle2" color="text.secondary">
-          {serverHealth.server?.environment + ' environment'}
-        </Typography>
-      </Stack>
-
-      <Grid container spacing={2}>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoCard title="Overview" subtitle="General status" icon={<ThermostatIcon />}>
-            <InfoField label="App version">
-              <BigDisplay content={serverHealth.server?.appVersion} />
-            </InfoField>
-            <InfoField label="Node.js version">
-              <BigDisplay content={serverHealth.server?.nodeVersion} />
-            </InfoField>
-          </InfoCard>
-        </Grid>
-
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoCard title="Resources" subtitle="Capacity usage" icon={<DataUsageIcon />}>
-            <InfoField label="Uptime">
-              <ReadableTime seconds={serverHealth.server?.upTime.seconds} variant="body1" />
-            </InfoField>
-            {['1 minute', '5 minutes', '15 minutes'].map((t, i) => (
-              <InfoField
-                label={`Load average (${t})`}
-                extra={String(serverHealth.server?.loadAverage[i])}
-              >
-                <LinearProgress
-                  variant="determinate"
-                  value={serverHealth.server?.loadAverage[i] ?? 0}
-                  sx={{
-                    height: 10,
-                    borderRadius: 2,
-                    mt: 1,
-                    backgroundColor: 'divider',
-                    '& .MuiLinearProgress-bar': {
-                      bgcolor: severityColorForLoad(serverHealth.server?.loadAverage[i]),
-                    },
-                  }}
-                />
-              </InfoField>
-            ))}
-          </InfoCard>
-        </Grid>
-      </Grid>
+      {content}
     </Page>
   );
 };

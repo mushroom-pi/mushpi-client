@@ -18,27 +18,21 @@ export default function Dashboard() {
   const { data, isLoading, isError, error, refetch } = useDashboard();
   const navigate = useNavigate();
 
+  let content: React.ReactNode;
+
   if (isLoading) {
-    return (
-      <Page>
-        <PageTitle>Dashboard</PageTitle>
-        <DashboardSkeleton />
-      </Page>
+    content = <DashboardSkeleton />;
+  } else if (isError) {
+    content = <Error compact item="dashboard" error={error} refetch={refetch} />;
+  } else {
+    const { units, batches, recipes, stats, warnings } = data!;
+
+    const unitNames = new Map<number, string>(
+      units.items.map((u) => [u.id, u.name ?? u.handle]),
     );
-  }
-  if (isError) return <Error item="dashboard" error={error} refetch={refetch} />;
 
-  const { units, batches, recipes, stats, warnings } = data!;
-
-  const unitNames = new Map<number, string>(
-    units.items.map((u) => [u.id, u.name ?? u.handle]),
-  );
-
-  // Empty state: no units at all
-  if (units.items.length === 0 && units.total === 0) {
-    return (
-      <Page>
-        <PageTitle>Dashboard</PageTitle>
+    if (units.items.length === 0 && units.total === 0) {
+      content = (
         <Box sx={{ textAlign: 'center', py: 8 }}>
           <Typography variant="h5" gutterBottom>
             No Pico units connected yet
@@ -50,39 +44,45 @@ export default function Dashboard() {
             Go to Pico Units
           </Link>
         </Box>
-      </Page>
-    );
+      );
+    } else {
+      content = (
+        <>
+          <WarningsBanner warnings={warnings} unitNames={unitNames} />
+          <StatsRow
+            units={units.total}
+            activeBatches={batches.active}
+            totalBatches={batches.total}
+            totalReadings={stats.totalReadings}
+          />
+          <UnitCards
+            items={units.items}
+            healthy={units.healthy}
+            degraded={units.degraded}
+            offline={units.offline}
+            total={units.total}
+          />
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <ActiveBatchesWidget items={units.items} />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <ApproachingCompletionWidget batches={batches.approachingCompletion} />
+              <RecentlyFinishedWidget batches={batches.recentlyFinished} />
+            </Grid>
+          </Grid>
+          <Box sx={{ mt: 2 }}>
+            <MostUsedRecipesWidget recipes={recipes.mostUsed} />
+          </Box>
+        </>
+      );
+    }
   }
 
   return (
     <Page>
       <PageTitle>Dashboard</PageTitle>
-      <WarningsBanner warnings={warnings} unitNames={unitNames} />
-      <StatsRow
-        units={units.total}
-        activeBatches={batches.active}
-        totalBatches={batches.total}
-        totalReadings={stats.totalReadings}
-      />
-      <UnitCards
-        items={units.items}
-        healthy={units.healthy}
-        degraded={units.degraded}
-        offline={units.offline}
-        total={units.total}
-      />
-      <Grid container spacing={2}>
-        <Grid size={{ xs: 12, md: 6 }}>
-          <ActiveBatchesWidget items={units.items} />
-        </Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
-          <ApproachingCompletionWidget batches={batches.approachingCompletion} />
-          <RecentlyFinishedWidget batches={batches.recentlyFinished} />
-        </Grid>
-      </Grid>
-      <Box sx={{ mt: 2 }}>
-        <MostUsedRecipesWidget recipes={recipes.mostUsed} />
-      </Box>
+      {content}
     </Page>
   );
 }
