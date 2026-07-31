@@ -1,6 +1,7 @@
 import type {
   ChangeOutputsDto,
   ChangeSetPointsDto,
+  ChangeSetupDto,
   ControlLoopDto,
   PicoUnit,
   UpdatePicoUnitDto,
@@ -40,6 +41,11 @@ export type PicoUnitCtx = {
   changeOutputs?: {
     mutate: (vars: { picoUnitId: number; body: ChangeOutputsDto }) => void;
     mutateAsync: (vars: { picoUnitId: number; body: ChangeOutputsDto }) => Promise<any>;
+    isLoading: boolean;
+  };
+  changeSetup?: {
+    mutate: (vars: { picoUnitId: number; body: ChangeSetupDto }) => void;
+    mutateAsync: (vars: { picoUnitId: number; body: ChangeSetupDto }) => Promise<any>;
     isLoading: boolean;
   };
 };

@@ -111,7 +111,7 @@ src/
 │   │   └── DeviationAlert # Temp/humidity deviation warning (used by Dashboard + PicoUnit detail)
 │   └── index.ts
 ├── contexts/             # Context + hooks + mutations per entity
-│   ├── PicoUnit/mutations/: controlLoop, delete, outputs, setPoints, update
+│   ├── PicoUnit/mutations/: changeSetup, controlLoop, delete, outputs, setPoints, update
 │   ├── Recipe/mutations/: create, delete, image, update
 │   ├── Batch/mutations/: create, delete, image, update, createRecipeFromBatch
 │   ├── Charts/: provider.tsx, batchProvider.tsx
@@ -183,6 +183,10 @@ Chart data utilities in `~utils/charts`: `downsampleChartPoints`, `smartSampleCh
 - `/ping` vs `/health`: `/ping` returns bare `"pong"` — use for liveness polling (`retry: false`, low overhead). `/health` returns full `HealthCheckResponseDto` with server/database/service status — use for the Server page. The `monitoringControllerPing()` method exists on both `MonitoringApi` and `NoValidationApi` in the generated client; use `MonitoringApi` (consistent with `useServerHealth`).
 - **Sidebar icon for Server page**: `DnsIcon` (`@mui/icons-material/Dns`), not `SettingsIcon`. The gear icon belongs to Settings. Server originally used `SettingsIcon` — reassigned during Feature #15.
 - **Settings page**: Uses `SettingsApi` (manually wired in `src/api/client.ts`). `useSettings()` query + `useUpdateSettings()` mutation co-located in `src/hooks/useSettings.ts` (singleton resource pattern, not in entity mutations folder). Zod validation uses the generated `UpdateSettingsDto` schema.
+- **`PicoUnit.devices` field**: `POST /v1/pico-units/:id/poll` now returns `PollPicoUnitResponseDto` which extends `PicoUnit` with an optional `devices?: DevicesDto` field containing live pin mapping from the Pico (`active_high`, `pins.dht/humidifier/fan/heater`). This field is only available on poll responses — it is not persisted server-side. The client accesses it via `pico.devices` from `pollPico()` results.
+- **`MappingInfo` card — content without `latest_reading`**: The pin mapping info card (`PicoUnitMapping/MappingInfo.tsx`) gates on `pico` only (not `latest_reading`), since pin mapping is independent of sensor readings. This is a separate pattern from Controls/Devices cards which require sensor data. Document as a distinct card category.
+- **Generated DTO naming collision**: Both the TypeScript interface and the Zod schema for DTOs like `ChangeSetupDto` share the same exported name. When importing both from `src/api/generated/`, rename one to avoid conflicts — e.g. `import { ChangeSetupDto, ChangeSetupDtoSchema } from '~api/generated/schemas'`. The schema rename convention appends `Schema` to the DTO name.
+- **`active_high` excluded from UI**: The `active_high` field (relay polarity) is deliberately excluded from the pin mapping dialog — it is relay configuration, not Pico pin mapping. It passes through in `devices` but the UI only exposes the 4 GPIO pin numbers.
 
 ## Feature Palettes & Domain Constants
 

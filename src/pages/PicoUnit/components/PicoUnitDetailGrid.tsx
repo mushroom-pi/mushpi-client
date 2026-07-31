@@ -6,7 +6,7 @@ import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 import { PicoUnitBatches as Batches } from './PicoUnitBatches';
 import { PicoUnitControls as Controls } from './PicoUnitControls';
 import { PicoUnitDevices as Devices } from './PicoUnitDevices';
-import { PicoUnitMappingInfo as Mapping } from './PicoUnitMappingInfo';
+import { PicoUnitMapping as Mapping } from './PicoUnitMapping';
 import { PicoUnitOverview as Overview } from './PicoUnitOverview';
 import { PicoUnitPerformance as Performance } from './PicoUnitPerformance';
 import { PicoUnitResources as Resources } from './PicoUnitResources';

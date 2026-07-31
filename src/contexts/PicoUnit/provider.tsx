@@ -4,6 +4,7 @@ import React, { createContext, useContext, useMemo } from 'react';
 import { useGetPicoUnit, usePollPicoUnit } from './hooks';
 import {
   createChangeOutputsMutation,
+  createChangeSetupMutation,
   createChangeTargetsMutation,
   createDeleteMutation,
   createToggleControlLoopMutation,
@@ -34,6 +35,7 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
   const toggleControlLoopMutation = createToggleControlLoopMutation(qc);
   const changeTargetsMutation = createChangeTargetsMutation(qc);
   const changeOutputsMutation = createChangeOutputsMutation(qc);
+  const changeSetupMutation = createChangeSetupMutation(qc);
 
   const value = useMemo<PicoUnitCtx>(
     () => ({
@@ -72,6 +74,11 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
         mutateAsync: (vars) => changeOutputsMutation.mutateAsync(vars),
         isLoading: changeOutputsMutation.isPending,
       },
+      changeSetup: {
+        mutate: (vars) => changeSetupMutation.mutate(vars),
+        mutateAsync: (vars) => changeSetupMutation.mutateAsync(vars),
+        isLoading: changeSetupMutation.isPending,
+      },
     }),
     [
       pico,
@@ -85,6 +92,7 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
       toggleControlLoopMutation,
       changeTargetsMutation,
       changeOutputsMutation,
+      changeSetupMutation,
     ],
   );
 
