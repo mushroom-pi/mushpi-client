@@ -8,6 +8,7 @@ import {
   PicoUnitsApi,
   ReadingsApi,
   RecipesApi,
+  SettingsApi,
 } from './generated';
 
 // Build a configuration object for runtime values
@@ -33,6 +34,7 @@ export const Dashboard = new DashboardApi(configuration);
 export const Monitoring = new MonitoringApi(configuration);
 export const Recipes = new RecipesApi(configuration);
 export const Images = new ImagesApi(configuration);
+export const Settings = new SettingsApi(configuration);
 
 // optional helper to set token at runtime (if generator uses axios instance internally)
 export function setAuthToken(token: string | null) {

@@ -1,3 +1,4 @@
+import DnsIcon from '@mui/icons-material/Dns';
 import HomeIcon from '@mui/icons-material/Home';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
@@ -12,7 +13,8 @@ export const navItems = [
   { to: '/batches', label: 'Batches', icon: <Inventory2Icon /> },
   { to: '/recipes', label: 'Recipes', icon: <MenuBookIcon /> },
   { to: '/readings', label: 'Readings', icon: <ShowChartIcon /> },
-  { to: '/server', label: 'Server', icon: <SettingsIcon /> },
+  { to: '/server', label: 'Server', icon: <DnsIcon /> },
+  { to: '/settings', label: 'Settings', icon: <SettingsIcon /> },
 ];
 
 export const activeSx = (theme: Theme) => ({

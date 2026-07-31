@@ -89,3 +89,7 @@ export const batchKeys = {
 export const dashboardKeys = {
   all: ['dashboard', 'summary'] as const,
 };
+
+export const settingsKeys = {
+  all: ['settings'] as const,
+};

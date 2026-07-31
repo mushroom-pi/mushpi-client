@@ -47,13 +47,14 @@ All Create/Edit dialogs validate against generated Zod schemas (see `frontend-re
 
 Standard React Query patterns apply (see `frontend-react` skill). Project-specific:
 
-- Query key factories in `src/api/queryKeys.ts` (picoUnitKeys, recipeKeys, batchKeys, serverHealthKeys, serverPingKeys, etc.)
+- Query key factories in `src/api/queryKeys.ts` (picoUnitKeys, recipeKeys, batchKeys, serverHealthKeys, serverPingKeys, settingsKeys, etc.)
 - Context hooks: usePicoUnit (detail page via `PicoUnitProvider` + `usePicoUnitContext`), usePicoUnits (list page), useRecipe, useRecipes, useBatch, useBatches, useCharts
 - Mutations in entity's `mutations/` folder (one file per concern)
 - Optimistic updates via `createOptimisticMutation` factory in `src/contexts/PicoUnit/helpers.ts`
 - **On-demand hardware polling**: `usePollPicoUnit` mutation calls `POST /v1/pico-units/:id/poll` to trigger an immediate Pico poll (stores a new reading, returns updated `PicoUnit` with `latest_reading`). Exposed via `pollPico` on `PicoUnitCtx`. Used on page mount, after control mutations, and for periodic 60 s background refresh on the unit detail, readings, and batch pages.
 - Long-lived readings views (unit detail, readings board, batch detail) auto-refresh every 60 s via hardware poll on the unit detail page and `refetchInterval` on the readings/batch readings queries.
 - Dashboard uses `useDashboard` hook with `refetchInterval: 60_000` — single `GET /v1/dashboard/summary` call returns all aggregated data.
+- **Settings**: `useSettings()` fetches current timezone from `GET /v1/settings`. `useUpdateSettings()` mutation calls `PATCH /v1/settings` with `onSuccess` cache update + snackbar. Co-located in `src/hooks/useSettings.ts` (singleton resource pattern — not in entity mutations folder).
 - **dayjs relative time**: The `relativeTime` plugin is NOT registered globally. Use `dayjs().diff()` + manual formatting for "X ago" strings. See `src/pages/Dashboard/methods.ts` for the pattern (`formatRelativeFromNow`, `formatLastSeen`).
 
 ### useAsyncWithToast (imperative async with toast)
@@ -94,6 +95,7 @@ await run(
 | `/batches`        | Batches list  |
 | `/batches/:id`    | Batch detail  |
 | `/server`         | Server health |
+| `/settings`       | Settings      |
 
 Dialog-auto-open: `navigate('/path', { state: { openEditDialog: true } })`, read in mount-only `useEffect`, clear with `window.history.replaceState`.
 
@@ -114,7 +116,7 @@ src/
 │   ├── Batch/mutations/: create, delete, image, update, createRecipeFromBatch
 │   ├── Charts/: provider.tsx, batchProvider.tsx
 │   └── Toast.tsx
-├── hooks/                # useDashboard, useReadings, useBatchReadings, useServerHealth, useIsServerReachable, useAsyncWithToast
+├── hooks/                # useDashboard, useReadings, useBatchReadings, useServerHealth, useIsServerReachable, useAsyncWithToast, useSettings
 ├── layout/               # Page wrapper, Sidebar
 ├── pages/                # Route pages (default exports)
 │   │                       # ⚠️ Page components MUST live in <PageName>/index.tsx,
@@ -123,6 +125,8 @@ src/
 │   │   └── components/    # WarningsBanner, StatsRow, UnitCards, etc.
 │   ├── PicoUnit/          # Unit detail page at /pico-units/:id
 │   │   └── components/    # PicoUnitStatCards, PicoUnitDetailGrid, PicoUnitDevices, etc.
+│   ├── Settings/          # Settings page at /settings
+│   │   └── components/     # SettingsSkeleton (card skeleton)
 │   ├── PicoUnits/         # Units list page at /pico-units
 │   │   └── components/
 │   │       ├── ProvisioningIllustrations.tsx  # SVG illustrations for provisioning wizards
@@ -177,6 +181,8 @@ Chart data utilities in `~utils/charts`: `downsampleChartPoints`, `smartSampleCh
 - Soft-AP provisioning wizards reference `http://192.168.4.1:5000` (Pico AP mode) in user instructions only — no direct API calls to Pico units from the frontend. All communication goes through `mushpi-server`.
 - Server-down detection: `ServerDownBanner` (import from `~components`) renders a warning `Alert` at the top of the app when `GET /ping` fails. Uses `useIsServerReachable` hook (30s polling, `retry: false`). Fast-path: any successful server response from another query immediately clears the banner via `QueryCache.subscribe()` — no waiting for the next ping tick.
 - `/ping` vs `/health`: `/ping` returns bare `"pong"` — use for liveness polling (`retry: false`, low overhead). `/health` returns full `HealthCheckResponseDto` with server/database/service status — use for the Server page. The `monitoringControllerPing()` method exists on both `MonitoringApi` and `NoValidationApi` in the generated client; use `MonitoringApi` (consistent with `useServerHealth`).
+- **Sidebar icon for Server page**: `DnsIcon` (`@mui/icons-material/Dns`), not `SettingsIcon`. The gear icon belongs to Settings. Server originally used `SettingsIcon` — reassigned during Feature #15.
+- **Settings page**: Uses `SettingsApi` (manually wired in `src/api/client.ts`). `useSettings()` query + `useUpdateSettings()` mutation co-located in `src/hooks/useSettings.ts` (singleton resource pattern, not in entity mutations folder). Zod validation uses the generated `UpdateSettingsDto` schema.
 
 ## Feature Palettes & Domain Constants
 

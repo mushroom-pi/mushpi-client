@@ -14,6 +14,7 @@ import { ReadingsPage } from './pages/Readings';
 import RecipeDetail from './pages/Recipe';
 import RecipesPage from './pages/Recipes';
 import { Server } from './pages/Server';
+import { Settings } from './pages/Settings';
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/recipes/:id" element={<RecipeDetail />} />
           <Route path="/readings" element={<ReadingsPage />} />
           <Route path="/server" element={<Server />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </Box>
     </Box>
