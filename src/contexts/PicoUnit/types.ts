@@ -4,6 +4,8 @@ import type {
   ChangeSetupDto,
   ControlLoopDto,
   PicoUnit,
+  RebootDto,
+  RebootResponseDto,
   UpdatePicoUnitDto,
 } from '~api/generated';
 
@@ -46,6 +48,11 @@ export type PicoUnitCtx = {
   changeSetup?: {
     mutate: (vars: { picoUnitId: number; body: ChangeSetupDto }) => void;
     mutateAsync: (vars: { picoUnitId: number; body: ChangeSetupDto }) => Promise<any>;
+    isLoading: boolean;
+  };
+  rebootPico: {
+    mutate: (vars: { picoUnitId: number; body: RebootDto }) => void;
+    mutateAsync: (vars: { picoUnitId: number; body: RebootDto }) => Promise<RebootResponseDto>;
     isLoading: boolean;
   };
 };

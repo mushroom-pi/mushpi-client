@@ -51,6 +51,7 @@ Standard React Query patterns apply (see `frontend-react` skill). Project-specif
 - Context hooks: usePicoUnit (detail page via `PicoUnitProvider` + `usePicoUnitContext`), usePicoUnits (list page), useRecipe, useRecipes, useBatch, useBatches, useCharts
 - Mutations in entity's `mutations/` folder (one file per concern)
 - Optimistic updates via `createOptimisticMutation` factory in `src/contexts/PicoUnit/helpers.ts`
+- **One-shot server actions** (e.g. `/reboot`, `/poll` returning 202) use plain `useMutation` with `onSuccess` invalidation — NOT `createOptimisticMutation`. There is no optimistic client state to project (the Pico goes offline briefly, an immediate follow-up poll would fail), unlike control mutations (`/setpoints`, `/outputs`, `/control/loop`, `/setup`) which do use `createOptimisticMutation` + poll-on-settle
 - **On-demand hardware polling**: `usePollPicoUnit` mutation calls `POST /v1/pico-units/:id/poll` to trigger an immediate Pico poll (stores a new reading, returns updated `PicoUnit` with `latest_reading`). Exposed via `pollPico` on `PicoUnitCtx`. Used on page mount, after control mutations, and for periodic 60 s background refresh on the unit detail, readings, and batch pages.
 - Long-lived readings views (unit detail, readings board, batch detail) auto-refresh every 60 s via hardware poll on the unit detail page and `refetchInterval` on the readings/batch readings queries.
 - Dashboard uses `useDashboard` hook with `refetchInterval: 60_000` — single `GET /v1/dashboard/summary` call returns all aggregated data.
@@ -187,6 +188,7 @@ Chart data utilities in `~utils/charts`: `downsampleChartPoints`, `smartSampleCh
 - **`MappingInfo` card — content without `latest_reading`**: The pin mapping info card (`PicoUnitMapping/MappingInfo.tsx`) gates on `pico` only (not `latest_reading`), since pin mapping is independent of sensor readings. This is a separate pattern from Controls/Devices cards which require sensor data. Document as a distinct card category.
 - **Generated DTO naming collision**: Both the TypeScript interface and the Zod schema for DTOs like `ChangeSetupDto` share the same exported name. When importing both from `src/api/generated/`, rename one to avoid conflicts — e.g. `import { ChangeSetupDto, ChangeSetupDtoSchema } from '~api/generated/schemas'`. The schema rename convention appends `Schema` to the DTO name.
 - **`active_high` excluded from UI**: The `active_high` field (relay polarity) is deliberately excluded from the pin mapping dialog — it is relay configuration, not Pico pin mapping. It passes through in `devices` but the UI only exposes the 4 GPIO pin numbers.
+- **Dialog props beyond `DialogProps`**: The shared `DialogProps` interface (`open`/`onClose`/`closeOnSave?`) is a minimal convenience for `ModalForm`/`EditMetaDialog`-style dialogs. Dialogs needing extra typed props (e.g. target IDs, entity data, boolean flags) define a local interface alongside `open`/`onClose` — do not contort the shared interface to fit.
 
 ## Feature Palettes & Domain Constants
 

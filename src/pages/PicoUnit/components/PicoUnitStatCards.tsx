@@ -6,12 +6,13 @@ import {
   CardContent,
   CircularProgress,
   Grid,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import type React from 'react';
 
 import type { PicoUnit } from '~api/generated';
-import { isUnitHealthy } from '~utils/pico';
+import { isUnitHealthy, shouldShowRebootHint } from '~utils/pico';
 
 interface PicoUnitStatCardsProps {
   pico?: PicoUnit;
@@ -21,8 +22,12 @@ interface PicoUnitStatCardsProps {
 export const PicoUnitStatCards: React.FC<PicoUnitStatCardsProps> = ({ pico, isPolling }) => {
   const reading = pico?.latest_reading;
   const healthy = pico ? isUnitHealthy(pico) : true;
+  const showRebootHint = pico ? shouldShowRebootHint(pico) : false;
   const temperature = reading?.temperature;
   const humidity = reading?.humidity;
+
+  const tempValue = temperature != null && healthy ? `${temperature}°C` : '--°C';
+  const humValue = humidity != null && healthy ? `${humidity}%` : '--%';
 
   return (
     <Grid container spacing={2} mb={2}>
@@ -38,9 +43,17 @@ export const PicoUnitStatCards: React.FC<PicoUnitStatCardsProps> = ({ pico, isPo
               </Box>
               {isPolling && <CircularProgress size={16} />}
             </Box>
-            <Typography variant="h4" mt={1}>
-              {temperature != null && healthy ? `${temperature}°C` : '--°C'}
-            </Typography>
+            {showRebootHint ? (
+              <Tooltip title="Some readings failed. Try rebooting the unit if this persists.">
+                <Typography variant="h4" mt={1}>
+                  {tempValue}
+                </Typography>
+              </Tooltip>
+            ) : (
+              <Typography variant="h4" mt={1}>
+                {tempValue}
+              </Typography>
+            )}
           </CardContent>
         </Card>
       </Grid>
@@ -56,9 +69,17 @@ export const PicoUnitStatCards: React.FC<PicoUnitStatCardsProps> = ({ pico, isPo
               </Box>
               {isPolling && <CircularProgress size={16} />}
             </Box>
-            <Typography variant="h4" mt={1}>
-              {humidity != null && healthy ? `${humidity}%` : '--%'}
-            </Typography>
+            {showRebootHint ? (
+              <Tooltip title="Some readings failed. Try rebooting the unit if this persists.">
+                <Typography variant="h4" mt={1}>
+                  {humValue}
+                </Typography>
+              </Tooltip>
+            ) : (
+              <Typography variant="h4" mt={1}>
+                {humValue}
+              </Typography>
+            )}
           </CardContent>
         </Card>
       </Grid>

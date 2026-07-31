@@ -1,5 +1,6 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import WifiTetheringIcon from '@mui/icons-material/WifiTethering';
 import { Box, Button, IconButton, Stack, Tooltip } from '@mui/material';
@@ -14,12 +15,14 @@ type MetaButtonsProps = {
   setEditOpen: (open: boolean) => void;
   setDeleteOpen: (open: boolean) => void;
   onReconnect: () => void;
+  onRebootPico: () => void;
 };
 
 export const MetaButtons: React.FC<MetaButtonsProps> = ({
   setDeleteOpen,
   setEditOpen,
   onReconnect,
+  onRebootPico,
 }) => {
   const navigate = useNavigate();
   const { isLoading, refetch, pico } = usePicoUnitContext();
@@ -60,6 +63,19 @@ export const MetaButtons: React.FC<MetaButtonsProps> = ({
         >
           <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
             Reconnect
+          </Box>
+        </Button>
+      )}
+
+      {pico?.enabled && (
+        <Button
+          color="warning"
+          variant="outlined"
+          startIcon={<RestartAltIcon />}
+          onClick={onRebootPico}
+        >
+          <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+            Reboot
           </Box>
         </Button>
       )}

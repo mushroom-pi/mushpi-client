@@ -45,6 +45,23 @@ export const chipColorForFailedCalls = (failedCalls: number | null) => {
 };
 
 export const FAILS_READINGS_UNHEALTHY = 5;
+export const FAILS_READINGS_REBOOT_HINT = 3;
+
+/**
+ * Returns true when the unit is enabled, reachable, but has recurring sensor failures.
+ * Suggests a reboot may recover the sensor.
+ */
+export function shouldShowRebootHint(pico: {
+  enabled?: boolean;
+  failed_calls?: number;
+  failed_readings?: number;
+}): boolean {
+  return (
+    !!pico.enabled &&
+    (pico.failed_calls ?? 0) < OFFLINE_THRESHOLD &&
+    (pico.failed_readings ?? 0) >= FAILS_READINGS_REBOOT_HINT
+  );
+}
 
 /** Combines both failure signals — unit is healthy only if reachable AND sensor is good */
 export function isUnitHealthy(pico: {

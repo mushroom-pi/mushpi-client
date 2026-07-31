@@ -7,6 +7,7 @@ import {
   createChangeSetupMutation,
   createChangeTargetsMutation,
   createDeleteMutation,
+  createRebootMutation,
   createToggleControlLoopMutation,
   createUpdateMutation,
 } from './mutations';
@@ -36,6 +37,7 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
   const changeTargetsMutation = createChangeTargetsMutation(qc);
   const changeOutputsMutation = createChangeOutputsMutation(qc);
   const changeSetupMutation = createChangeSetupMutation(qc);
+  const rebootMutation = createRebootMutation(qc);
 
   const value = useMemo<PicoUnitCtx>(
     () => ({
@@ -79,6 +81,11 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
         mutateAsync: (vars) => changeSetupMutation.mutateAsync(vars),
         isLoading: changeSetupMutation.isPending,
       },
+      rebootPico: {
+        mutate: (vars) => rebootMutation.mutate(vars),
+        mutateAsync: (vars) => rebootMutation.mutateAsync(vars),
+        isLoading: rebootMutation.isPending,
+      },
     }),
     [
       pico,
@@ -93,6 +100,7 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
       changeTargetsMutation,
       changeOutputsMutation,
       changeSetupMutation,
+      rebootMutation,
     ],
   );
 
