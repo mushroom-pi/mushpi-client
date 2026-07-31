@@ -1,6 +1,6 @@
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
-import StorageIcon from '@mui/icons-material/Storage';
+import LayersIcon from '@mui/icons-material/Layers';
 import { Chip, Stack, Typography } from '@mui/material';
 import type { FC } from 'react';
 
@@ -19,7 +19,7 @@ interface ServerDatabaseCardProps {
 }
 
 export const ServerDatabaseCard: FC<ServerDatabaseCardProps> = ({ serverHealth }) => (
-  <InfoCard title="Database" subtitle="SQLite storage" icon={<StorageIcon />}>
+  <InfoCard title="Database" subtitle="SQLite storage" icon={<LayersIcon />}>
     <InfoField label="Total size">
       {serverHealth.databases?.sqlite?.size?.totalMb != null ? (
         <BigDisplay content={`${serverHealth.databases.sqlite.size.totalMb.toFixed(2)} MB`} />
@@ -70,16 +70,16 @@ export const ServerDatabaseCard: FC<ServerDatabaseCardProps> = ({ serverHealth }
             </Stack>
           ))}
           {serverHealth.databases.sqlite.size.overheadMb != null &&
-           serverHealth.databases.sqlite.size.overheadMb > 0 && (
-            <Stack direction="row" justifyContent="space-between" alignItems="center" mt={0.5}>
-              <Typography variant="body2" noWrap color="text.secondary">
-                Overhead (WAL, free pages)
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {serverHealth.databases.sqlite.size.overheadMb.toFixed(2)} MB
-              </Typography>
-            </Stack>
-          )}
+            serverHealth.databases.sqlite.size.overheadMb > 0 && (
+              <Stack direction="row" justifyContent="space-between" alignItems="center" mt={0.5}>
+                <Typography variant="body2" noWrap color="text.secondary">
+                  Overhead (WAL, free pages)
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {serverHealth.databases.sqlite.size.overheadMb.toFixed(2)} MB
+                </Typography>
+              </Stack>
+            )}
         </>
       )}
   </InfoCard>

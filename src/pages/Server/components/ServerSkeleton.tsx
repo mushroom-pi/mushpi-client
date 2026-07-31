@@ -19,7 +19,7 @@ export function ServerSkeleton() {
 
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <CardSkeleton variant="card" lines={2} />
+          <CardSkeleton variant="card" lines={5} />
         </Grid>
 
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
@@ -34,8 +34,13 @@ export function ServerSkeleton() {
               </Stack>
               <Divider sx={{ my: 1 }} />
               <Skeleton variant="text" />
+              <Skeleton variant="text" />
               <Skeleton variant="rectangular" height={10} sx={{ borderRadius: 2, mb: 1 }} />
               <Skeleton variant="rectangular" height={10} sx={{ borderRadius: 2, mb: 1 }} />
+              <Skeleton variant="rectangular" height={10} sx={{ borderRadius: 2, mb: 1 }} />
+              <Skeleton variant="text" />
+              <Skeleton variant="rectangular" height={10} sx={{ borderRadius: 2, mb: 1 }} />
+              <Skeleton variant="text" />
               <Skeleton variant="rectangular" height={10} sx={{ borderRadius: 2 }} />
             </CardContent>
           </Card>

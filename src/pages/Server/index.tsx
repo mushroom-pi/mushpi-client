@@ -17,8 +17,7 @@ export const Server: FC = () => {
 
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
   const docsPath = import.meta.env.VITE_DOCS_PATH as string | undefined;
-  const docsUrl =
-    apiBaseUrl && docsPath ? `${apiBaseUrl}/${docsPath}` : undefined;
+  const docsUrl = apiBaseUrl && docsPath ? `${apiBaseUrl}/${docsPath}` : undefined;
 
   let content: React.ReactNode;
 
@@ -41,15 +40,15 @@ export const Server: FC = () => {
         </Stack>
 
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <ServerOverviewCard serverHealth={serverHealth} />
           </Grid>
 
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 4.5 }}>
             <ServerResourcesCard serverHealth={serverHealth} />
           </Grid>
 
-          <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+          <Grid size={{ xs: 12, sm: 6, md: 4.5 }}>
             <ServerDatabaseCard serverHealth={serverHealth} />
           </Grid>
         </Grid>
