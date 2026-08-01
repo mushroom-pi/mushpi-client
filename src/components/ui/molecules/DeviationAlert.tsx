@@ -1,7 +1,7 @@
 import { Alert } from '@mui/material';
 import type React from 'react';
 
-export const TEMP_DEVIATION_THRESHOLD = 5;
+export const TEMP_DEVIATION_THRESHOLD = 2;
 export const HUMIDITY_DEVIATION_THRESHOLD = 10;
 
 interface DeviationAlertProps {
