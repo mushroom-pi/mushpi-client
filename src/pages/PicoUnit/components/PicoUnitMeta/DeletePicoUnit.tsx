@@ -15,7 +15,10 @@ export const DeletePicoUnit: React.FC<DialogProps> = ({ open, onClose }) => {
 
   async function doDeletePico() {
     if (!pico) return;
-    await run(() => Promise.all([deletePico.mutateAsync(pico.id), navigate(-1)]), {
+    await run(async () => {
+      await deletePico.mutateAsync(pico.id);
+      navigate(-1);
+    }, {
       successMessage: 'Pico unit deleted permanently',
       fallbackErrorMessage: 'Failed to remove pico unit',
       onSuccess: () => onClose(),
