@@ -30,6 +30,7 @@ export function useListPicoUnits(
       return resp as unknown as PicoUnitListResponseDto;
     },
     placeholderData: (previousData?: PicoUnitListResponseDto) => previousData,
+    refetchInterval: 60_000, // Refresh list every 60s (provider is globally mounted)
     ...queryOptions,
   });
 }
