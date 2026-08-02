@@ -109,7 +109,7 @@ src/
 │   ├── atoms/            # Stateless presentational
 │   ├── molecules/        # Composed (may use context/hooks)
 │   │   ├── ImageManager/  # Shared image gallery/upload/remove (used by Recipe + Batch)
-│   │   └── DeviationAlert # Temp/humidity deviation warning (used by Dashboard + PicoUnit detail)
+│   │   └── DeviationAlert # Temp/humidity deviation warning
 │   └── index.ts
 ├── contexts/             # Context + hooks + mutations per entity
 │   ├── PicoUnit/mutations/: changeSetup, controlLoop, delete, outputs, setPoints, update

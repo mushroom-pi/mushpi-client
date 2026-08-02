@@ -1,4 +1,10 @@
 export const OFFLINE_THRESHOLD = 3;
+
+/** Temperature must be within ±2°C of target before a deviation warning fires */
+export const TEMP_DEVIATION_THRESHOLD = 2;
+/** Humidity must be within ±10% of target before a deviation warning fires */
+export const HUMIDITY_DEVIATION_THRESHOLD = 10;
+
 export const PROVISION_AP_PREFIX = 'mushpi-provision-';
 export const PROVISION_AP_URL = 'http://192.168.4.1:5000';
 export const POLL_INTERVAL_MS = 3000;

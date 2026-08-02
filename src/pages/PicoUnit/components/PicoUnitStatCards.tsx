@@ -4,7 +4,7 @@ import { Grid } from '@mui/material';
 import type React from 'react';
 
 import type { PicoUnit } from '~api/generated';
-import { HUMIDITY_DEVIATION_THRESHOLD, TEMP_DEVIATION_THRESHOLD } from '~components';
+import { HUMIDITY_DEVIATION_THRESHOLD, TEMP_DEVIATION_THRESHOLD } from '~utils/pico';
 import { isUnitHealthy, shouldShowRebootHint } from '~utils/pico';
 
 import { MeasurementStatCard } from './MeasurementStatCard';
