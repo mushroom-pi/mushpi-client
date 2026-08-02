@@ -17,7 +17,6 @@ export function useListPicoUnits(
 ) {
   const page = params?.page ?? 1;
   const limit = params?.limit ?? 20;
-  const enabled = params?.enabled ?? true;
 
   // mark as readonly tuple to satisfy queryKey typing
   const queryKey = picoUnitsKeys.list(params);
@@ -31,7 +30,6 @@ export function useListPicoUnits(
       return resp as unknown as PicoUnitListResponseDto;
     },
     placeholderData: (previousData?: PicoUnitListResponseDto) => previousData,
-    enabled,
     ...queryOptions,
   });
 }

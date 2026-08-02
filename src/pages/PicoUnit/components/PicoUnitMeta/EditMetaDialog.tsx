@@ -1,4 +1,4 @@
-import { Box, Stack, Switch, TextField, Typography } from '@mui/material';
+import { Box, FormHelperText, Stack, Switch, TextField, Typography } from '@mui/material';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import type { UpdatePicoUnitDto } from '~api/generated';
@@ -27,7 +27,7 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
 
   const [editName, setEditName] = useState<string>('');
   const [editDescription, setEditDescription] = useState<string>('');
-  const [editEnabled, setEditEnabled] = useState<boolean>(false);
+  const [editMonitored, setEditMonitored] = useState<boolean>(false);
   const [editFaceColor, setEditFaceColor] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,15 +35,15 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
     if (!pico) {
       setEditName('');
       setEditDescription('');
-      setEditEnabled(false);
+      setEditMonitored(false);
       setEditFaceColor(null);
       return;
     }
     setEditName(pico.name ?? '');
     setEditDescription(pico.description ?? '');
-    setEditEnabled(!!pico.enabled);
+    setEditMonitored(!!pico.monitored);
     setEditFaceColor(pico.face_color ?? null);
-  }, [open, pico?.id, pico?.name, pico?.description, pico?.enabled, pico?.face_color]);
+  }, [open, pico?.id, pico?.name, pico?.description, pico?.monitored, pico?.face_color]);
 
   // detect changes to enable/disable Save button
   const hasChanges = useMemo(() => {
@@ -51,10 +51,10 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
     return (
       (editName ?? '') !== (pico.name ?? '') ||
       (editDescription ?? '') !== (pico.description ?? '') ||
-      !!editEnabled !== !!pico.enabled ||
+      !!editMonitored !== !!pico.monitored ||
       (editFaceColor ?? null) !== (pico.face_color ?? null)
     );
-  }, [pico, editName, editDescription, editEnabled, editFaceColor]);
+  }, [pico, editName, editDescription, editMonitored, editFaceColor]);
 
   const errors = useMemo(() => {
     const result = schemas.UpdatePicoUnitDto.safeParse({
@@ -77,7 +77,7 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
     const body: UpdatePicoUnitDto = {
       name: editName,
       description: editDescription,
-      enabled: !!editEnabled,
+      monitored: !!editMonitored,
       face_color: editFaceColor,
     };
 
@@ -94,12 +94,12 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
     if (pico) {
       setEditName(pico.name ?? '');
       setEditDescription(pico.description ?? '');
-      setEditEnabled(!!pico.enabled);
+      setEditMonitored(!!pico.monitored);
       setEditFaceColor(pico.face_color ?? null);
     } else {
       setEditName('');
       setEditDescription('');
-      setEditEnabled(false);
+      setEditMonitored(false);
       setEditFaceColor(null);
     }
     onClose();
@@ -144,13 +144,17 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
           </Box>
 
           <Box display="flex" alignItems="center" gap={2}>
-            <Typography variant="body2">Enabled</Typography>
+            <Typography variant="body2">Monitored</Typography>
             <Switch
-              checked={!!editEnabled}
-              onChange={(e) => setEditEnabled(e.target.checked)}
-              inputProps={{ 'aria-label': 'enabled-toggle' }}
+              checked={!!editMonitored}
+              onChange={(e) => setEditMonitored(e.target.checked)}
+              inputProps={{ 'aria-label': 'monitored-toggle' }}
             />
           </Box>
+          <FormHelperText>
+            When monitoring is disabled, the server stops collecting readings for this unit.
+            The Pico continues running its control loop independently.
+          </FormHelperText>
         </Stack>
       </PicoUnitForm>
     )

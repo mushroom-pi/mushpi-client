@@ -7,7 +7,6 @@ import { Error, Invalid, ItemPage, UnitHealthIcon } from '~components';
 import { PicoUnitProvider, usePicoUnitContext } from '~ctx/PicoUnit';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { ReconnectPicoDialog } from '~pages/PicoUnits/components/ReconnectPicoDialog';
-import { isUnitOffline } from '~utils/pico';
 
 import { PicoUnitDetailGrid as DetailGrid } from './components/PicoUnitDetailGrid';
 import { PicoUnitDetailSkeleton } from './components/PicoUnitDetailSkeleton';
@@ -47,7 +46,7 @@ function PicoUnitDetailInner() {
       {pollPico.isLoading && <LinearProgress />}
       <ItemPage
         title={pico.name ?? 'No name'}
-        titleAdornment={<UnitHealthIcon pico={pico} rebootHint />}
+        titleAdornment={<UnitHealthIcon status={pico.status} />}
         actions={
           <MetaButtons
             setEditOpen={setEditOpen}
@@ -60,8 +59,18 @@ function PicoUnitDetailInner() {
           <>
             <Stack direction="row" spacing={2} alignItems="center" mb={2}>
               <Chip
-                label={pico.enabled ? 'Enabled' : 'Disabled'}
-                color={pico.enabled ? 'info' : 'default'}
+                label={
+                  pico.status === 'healthy' ? 'Healthy' :
+                  pico.status === 'degraded' ? 'Degraded' :
+                  pico.status === 'offline' ? 'Offline' :
+                  'Paused'
+                }
+                color={
+                  pico.status === 'healthy' ? 'success' :
+                  pico.status === 'degraded' ? 'warning' :
+                  pico.status === 'offline' ? 'error' :
+                  'default'
+                }
                 size="small"
               />
               <Typography variant="subtitle2" color="text.secondary">
@@ -82,7 +91,7 @@ function PicoUnitDetailInner() {
           open={rebootOpen}
           onClose={() => setRebootOpen(false)}
           picoUnitId={pico.id}
-          isOffline={isUnitOffline(pico)}
+          isOffline={pico.status === 'offline'}
         />
         <ReconnectPicoDialog pico={reconnectPico} onClose={() => setReconnectPico(null)} />
       </ItemPage>

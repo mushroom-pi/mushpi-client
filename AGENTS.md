@@ -108,8 +108,7 @@ src/
 ├── components/ui/
 │   ├── atoms/            # Stateless presentational
 │   ├── molecules/        # Composed (may use context/hooks)
-│   │   ├── ImageManager/  # Shared image gallery/upload/remove (used by Recipe + Batch)
-│   │   └── DeviationAlert # Temp/humidity deviation warning
+│   │   └── ImageManager/  # Shared image gallery/upload/remove (used by Recipe + Batch)
 │   └── index.ts
 ├── contexts/             # Context + hooks + mutations per entity
 │   ├── PicoUnit/mutations/: changeSetup, controlLoop, delete, outputs, setPoints, update
@@ -140,7 +139,7 @@ src/
 ├── types/charts.ts
 └── utils/
     ├── methods.ts        # Generic: date formatting, bytes, percentages
-    ├── pico.ts           # Pico: provisioning constants, health helpers, LED_STATES
+    ├── pico.ts           # Pico: provisioning constants, LED_STATES, chip color helpers
     └── charts.ts         # Chart: samplers, downsampling, RLE dedup
 ```
 
@@ -175,9 +174,10 @@ Chart data utilities in `~utils/charts`: `downsampleChartPoints`, `smartSampleCh
 - `schemas.ts` sometimes uses `Array<z>` instead of `Array<string>` — fixed by `Fix 1b` in `scripts/fix-array-types.mjs` (generator bug in `openapi-zod-client` v1.18.3)
 - `PicoUnitCard.tsx` `friendlyDate` uses `new Date().toLocaleString()` instead of `dayjs` — pre-existing deviation from the "Use dayjs for dates" rule
 - Grep tool skips `src/api/generated/` (gitignored) — always use `read` or bash `grep`/`rg` directly to discover generated method signatures
-- Offline Pico detection: `isUnitOffline(pico)` checks `failed_calls >= 3` (import from `~utils/pico`). This is the canonical health signal — derived from the server's cron polling failures.
-- Combined health check: `isUnitHealthy(pico)` checks both `failed_calls >= 3` (unreachable) and `failed_readings >= 5` (sensor fault). Import from `~utils/pico`. Orthogonal to `isUnitOffline` — a unit can be reachable but have a faulty sensor.
-- Health icon: `UnitHealthIcon` (import from `~components`) renders a ✓/⚠ icon with a tooltip explaining the specific failure mode. Used in `PicoUnitCard` (list page) and as `titleAdornment` on the unit detail page.
+- **PicoUnit.status is the canonical health signal** — server provides `'unmonitored'|'healthy'|'degraded'|'offline'`. Client-side health helpers (`isUnitOffline`, `isUnitHealthy`, `shouldShowRebootHint`) removed. Use `pico.status` directly.
+- **PicoUnit TS interface is incomplete** — many fields (`id`, `name`, `handle`, `monitored`, `last_seen`, etc.) are passthrough from zod. Access via `pico.<field>` works at runtime but lacks strict typing.
+- **`useListPicoUnits` conflation fix**: The first argument is the API filter params (e.g. `{ monitored: true }`); the second argument is React Query options (e.g. `{ enabled: open }`). The RQ run-flag (`enabled`) must come from `queryOptions`, not entity filter params. The hook no longer defaults to filtering by `monitored: true` — callers must pass it explicitly if they want only monitored units.
+- Health icon: `UnitHealthIcon` (import from `~components`) renders a status icon (✓/⚠/✗/⏸) with a tooltip. Accepts `{ status: 'unmonitored'|'healthy'|'degraded'|'offline' }`. Used in `PicoUnitCard` (list page) and as `titleAdornment` on the unit detail page.
 - `PicoUnit.mac` (nullable string) stores the Pico's Wi‑Fi MAC address. Used client-side to derive the AP provisioning SSID (`mushpi-provision-XXXX` from last 4 hex chars). Set once by the server during the first successful cron poll; never updated.
 - Soft-AP provisioning wizards reference `http://192.168.4.1:5000` (Pico AP mode) in user instructions only — no direct API calls to Pico units from the frontend. All communication goes through `mushpi-server`.
 - Server-down detection: `ServerDownBanner` (import from `~components`) renders a warning `Alert` at the top of the app when `GET /ping` fails. Uses `useIsServerReachable` hook (30s polling, `retry: false`). Fast-path: any successful server response from another query immediately clears the banner via `QueryCache.subscribe()` — no waiting for the next ping tick.

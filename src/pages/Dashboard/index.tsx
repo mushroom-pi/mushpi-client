@@ -51,6 +51,7 @@ export default function Dashboard() {
           <WarningsBanner warnings={warnings} unitNames={unitNames} />
           <StatsRow
             units={units.total}
+            paused={units.paused}
             activeBatches={batches.active}
             totalBatches={batches.total}
             totalReadings={stats.totalReadings}

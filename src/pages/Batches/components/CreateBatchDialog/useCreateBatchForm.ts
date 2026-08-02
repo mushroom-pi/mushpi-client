@@ -46,7 +46,7 @@ export function useCreateBatchForm({
     resetFields,
   } = useBatchFormFields();
 
-  const { data: picoUnitsData } = useListPicoUnits({ limit: 100, enabled: true }, { enabled: open });
+  const { data: picoUnitsData } = useListPicoUnits({ limit: 100, monitored: true }, { enabled: open });
   const { data: recipesData } = useListRecipes({ limit: 100 }, { enabled: open });
   const { data: activeBatchesData } = useListBatches(
     { status: BatchesControllerListV1StatusEnum.InProgress, limit: 100 },

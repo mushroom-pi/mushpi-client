@@ -12,8 +12,8 @@ export function DashboardSkeleton() {
 
       {/* Stats row */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        {Array.from({ length: 4 }, (_, i) => (
-          <Grid key={i} size={{ xs: 6, sm: 3 }}>
+        {Array.from({ length: 5 }, (_, i) => (
+          <Grid key={i} size={{ xs: 6, sm: 2.4 }}>
             <Paper sx={{ p: 2, textAlign: 'center', borderRadius: 2 }}>
               <Skeleton variant="text" sx={{ fontSize: '2rem' }} width="60%" />
               <Skeleton variant="text" width="80%" />

@@ -1,5 +1,3 @@
-export const OFFLINE_THRESHOLD = 3;
-
 /** Temperature must be within ±2°C of target before a deviation warning fires */
 export const TEMP_DEVIATION_THRESHOLD = 2;
 /** Humidity must be within ±10% of target before a deviation warning fires */
@@ -9,10 +7,6 @@ export const PROVISION_AP_PREFIX = 'mushpi-provision-';
 export const PROVISION_AP_URL = 'http://192.168.4.1:5000';
 export const POLL_INTERVAL_MS = 3000;
 export const POLL_STALE_MS = 15 * 60 * 1000;
-
-export function isUnitOffline(pico: { failed_calls?: number }): boolean {
-  return (pico.failed_calls ?? 0) >= OFFLINE_THRESHOLD;
-}
 
 export function deriveApSsidFromMac(mac?: string | null): string | null {
   if (!mac) return null;
@@ -51,31 +45,6 @@ export const chipColorForFailedCalls = (failedCalls: number | null) => {
 };
 
 export const FAILS_READINGS_UNHEALTHY = 5;
-export const FAILS_READINGS_REBOOT_HINT = 3;
-
-/**
- * Returns true when the unit is enabled, reachable, but has recurring sensor failures.
- * Suggests a reboot may recover the sensor.
- */
-export function shouldShowRebootHint(pico: {
-  enabled?: boolean;
-  failed_calls?: number;
-  failed_readings?: number;
-}): boolean {
-  return (
-    !!pico.enabled &&
-    (pico.failed_calls ?? 0) < OFFLINE_THRESHOLD &&
-    (pico.failed_readings ?? 0) >= FAILS_READINGS_REBOOT_HINT
-  );
-}
-
-/** Combines both failure signals — unit is healthy only if reachable AND sensor is good */
-export function isUnitHealthy(pico: {
-  failed_calls?: number;
-  failed_readings?: number;
-}): boolean {
-  return (pico.failed_calls ?? 0) < 3 && (pico.failed_readings ?? 0) < FAILS_READINGS_UNHEALTHY;
-}
 
 /** Color for the failed_readings chip: 0=success(green), 1-4=warning(yellow), 5+=error(red) */
 export const chipColorForFailedReadings = (failedReadings: number | null | undefined) => {

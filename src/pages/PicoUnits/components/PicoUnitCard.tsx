@@ -18,7 +18,6 @@ import { useNavigate } from 'react-router-dom';
 
 import type { PicoUnit } from '~api/generated';
 import { UnitHealthIcon } from '~components';
-import { isUnitOffline } from '~utils/pico';
 
 export default function PicoUnitCard({
   pico,
@@ -30,7 +29,7 @@ export default function PicoUnitCard({
   onReconnect?: (pico: PicoUnit) => void;
 }) {
   const navigate = useNavigate();
-  const offline = isUnitOffline(pico);
+  const offline = pico.status === 'offline';
 
   function friendlyDate(ts?: string) {
     if (!ts) return '—';
@@ -80,7 +79,7 @@ export default function PicoUnitCard({
           }
           subheader={
             <Box display="flex" alignItems="center" gap={0.5}>
-              <UnitHealthIcon pico={pico} />
+              <UnitHealthIcon status={pico.status} />
               <Typography variant="caption" color="text.secondary">
                 Last seen: {friendlyDate(pico.last_seen)}
               </Typography>
@@ -103,10 +102,10 @@ export default function PicoUnitCard({
       <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2 }}>
         <Box display="flex" alignItems="center">
           <Typography variant="body2" sx={{ mr: 1 }}>
-            Enabled
+            Monitored
           </Typography>
           {/* display only, disabled */}
-          <Switch checked={!!pico.enabled} disabled />
+          <Switch checked={!!pico.monitored} disabled />
         </Box>
 
         <Box display="flex" alignItems="center" gap={0.5}>

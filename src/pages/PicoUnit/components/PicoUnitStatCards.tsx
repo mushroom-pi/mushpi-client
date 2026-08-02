@@ -5,7 +5,6 @@ import type React from 'react';
 
 import type { PicoUnit } from '~api/generated';
 import { HUMIDITY_DEVIATION_THRESHOLD, TEMP_DEVIATION_THRESHOLD } from '~utils/pico';
-import { isUnitHealthy, shouldShowRebootHint } from '~utils/pico';
 
 import { MeasurementStatCard } from './MeasurementStatCard';
 
@@ -16,8 +15,8 @@ interface PicoUnitStatCardsProps {
 
 export const PicoUnitStatCards: React.FC<PicoUnitStatCardsProps> = ({ pico, isPolling }) => {
   const reading = pico?.latest_reading;
-  const healthy = pico ? isUnitHealthy(pico) : true;
-  const showRebootHint = pico ? shouldShowRebootHint(pico) : false;
+  const healthy = pico ? pico.status === 'healthy' : true;
+  const showRebootHint = pico ? pico.status === 'degraded' : false;
 
   const temperature = reading?.temperature;
   const tempSet = reading?.temperature_set;

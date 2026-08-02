@@ -18,8 +18,8 @@ import type {
 export const picoUnitsKeys = {
   all: ['picoUnits'] as const,
   list: (params?: Partial<ListPicoUnitsParams>) => {
-    const { page = 1, limit = 20, q } = params ?? {};
-    return ['picoUnits', page, limit, q] as const;
+    const { page = 1, limit = 20, q, monitored } = params ?? {};
+    return ['picoUnits', page, limit, q, monitored] as const;
   },
 };
 

@@ -1,5 +1,6 @@
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
+import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 import WarningIcon from '@mui/icons-material/Warning';
 import { Box, Card, CardContent, Chip, Grid, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +20,7 @@ interface UnitCardsProps {
 function StatusIcon({ status }: { status: string }) {
   if (status === 'offline') return <ErrorIcon color="error" fontSize="small" />;
   if (status === 'degraded') return <WarningIcon color="warning" fontSize="small" />;
+  if (status === 'unmonitored') return <PauseCircleIcon color="disabled" fontSize="small" />;
   return <CheckCircleIcon color="success" fontSize="small" />;
 }
 
@@ -28,10 +30,10 @@ export function UnitCards({ items, healthy, degraded, offline, total }: UnitCard
   return (
     <Box sx={{ mb: 3 }}>
       <Typography variant="h6" gutterBottom>
-        Enabled Pico Units
+        Monitored Pico Units
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        {healthy} healthy · {degraded} degraded · {offline} offline ({total} total) — disabled units not shown
+        {healthy} healthy · {degraded} degraded · {offline} offline ({total} total) — paused units not shown
       </Typography>
 
       <Grid container spacing={2}>

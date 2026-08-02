@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router-dom';
 
 import { DeleteButton, EditButton } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
-import { isUnitOffline } from '~utils/pico';
 
 type MetaButtonsProps = {
   setEditOpen: (open: boolean) => void;
@@ -54,7 +53,7 @@ export const MetaButtons: React.FC<MetaButtonsProps> = ({
         </Box>
       </Button>
 
-      {pico && isUnitOffline(pico) && (
+      {pico && pico.status === 'offline' && (
         <Button
           color="warning"
           variant="outlined"
@@ -67,7 +66,7 @@ export const MetaButtons: React.FC<MetaButtonsProps> = ({
         </Button>
       )}
 
-      {pico?.enabled && (
+      {pico?.monitored && (
         <Button
           color="warning"
           variant="outlined"

@@ -6,7 +6,6 @@ import { PicoUnits } from '~api/client';
 import type { PicoUnitListResponseDto } from '~api/generated';
 import { picoUnitsKeys } from '~api/queryKeys';
 import {
-  isUnitOffline,
   POLL_FINISH_INTERVAL_MS,
   POLL_FINISH_MAX_ATTEMPTS,
 } from '~utils/pico';
@@ -38,7 +37,7 @@ export function useReconnectPoll(picoUnitId: number | undefined) {
     if (recoveredRef.current || picoUnitId == null || !query.data) return;
 
     const unit = query.data.items.find((u) => u.id === picoUnitId);
-    if (unit && !isUnitOffline(unit)) {
+    if (unit && unit.status !== 'offline') {
       recoveredRef.current = true;
       setRecovered(true);
       qc.invalidateQueries({ queryKey: picoUnitsKeys.all });
