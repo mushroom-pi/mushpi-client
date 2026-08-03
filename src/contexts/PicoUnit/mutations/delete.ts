@@ -2,6 +2,7 @@ import { useMutation, type useQueryClient } from '@tanstack/react-query';
 
 import { unwrap } from '~api/adapter';
 import { PicoUnits } from '~api/client';
+import { picoUnitKeys, picoUnitsKeys } from '~api/queryKeys';
 
 import { removeItemFromAllPages } from '../helpers';
 
@@ -11,32 +12,12 @@ export const createDeleteMutation = (qc: ReturnType<typeof useQueryClient>) =>
       await unwrap(PicoUnits.picoUnitIdControllerRemoveV1({ picoUnitId: id }));
       return id;
     },
-    onMutate: async (id) => {
-      await qc.cancelQueries({ queryKey: ['picoUnit', id] });
-      await qc.cancelQueries({ queryKey: ['picoUnits'] });
-
-      const snapshotItem = qc.getQueryData(['picoUnit', id]);
-      const snapshotLists = qc.getQueryData(['picoUnits']);
-
-      // remove single-item cache
-      qc.removeQueries({ queryKey: ['picoUnit', id], exact: true });
-
-      // remove from all pages
+    onSuccess: (_data, id) => {
+      qc.removeQueries({ queryKey: picoUnitKeys.detail(id), exact: true });
       removeItemFromAllPages(qc, id);
-
-      return { snapshotItem, snapshotLists };
+      qc.invalidateQueries({ queryKey: picoUnitsKeys.all });
     },
-    onError: (_err, id, context: any) => {
-      if (context?.snapshotItem) {
-        qc.setQueryData(['picoUnit', id], context.snapshotItem);
-      } else {
-        qc.invalidateQueries({ queryKey: ['picoUnit', id] });
-      }
-      if (context?.snapshotLists) {
-        qc.invalidateQueries({ queryKey: ['picoUnits'] });
-      }
-    },
-    onSettled: () => {
-      qc.invalidateQueries({ queryKey: ['picoUnits'] });
+    onError: (_err, id) => {
+      qc.invalidateQueries({ queryKey: picoUnitKeys.detail(id) });
     },
   });
