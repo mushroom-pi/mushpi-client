@@ -61,8 +61,11 @@ export function useBuildQueryForm() {
     setParams(merged);
   };
 
-  const onPicoUnitChange = (val: number) =>
-    setLocalParams((prev) => ({ ...prev, picoUnitId: val }));
+  const onPicoUnitChange = (val: number) => {
+    const next = { ...localParams, picoUnitId: val };
+    setLocalParams(next);
+    update(next);
+  };
 
   const onStartChange = (v: Dayjs | null) => setLocalParams((prev) => ({ ...prev, start: v }));
 
