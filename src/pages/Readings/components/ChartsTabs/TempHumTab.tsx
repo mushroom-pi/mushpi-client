@@ -53,7 +53,6 @@ export const TempHumTab: React.FC = () => {
           unit="°C"
           label="Temperature"
           showXAxis
-          showBrush
           height={panelHeight}
         />
       </IconChartRow>

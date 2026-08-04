@@ -1,8 +1,8 @@
 import { useTheme } from '@mui/material';
+import dayjs from 'dayjs';
 import type React from 'react';
 import { useMemo } from 'react';
 import {
-  Brush,
   CartesianGrid,
   Legend,
   Line,
@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 
 import { useChartsContext } from '~ctx/Charts';
+import { createTickFormatter, isLongSpan } from '~utils/chartLabels';
 
 import { FallbackChart } from './FallbackChart';
 
@@ -26,12 +27,8 @@ export interface ReadingsTargetChartProps {
   unit: string;
   label: string;
   showXAxis?: boolean;
-  showBrush?: boolean;
   height?: number;
 }
-
-const BRUSH_HEIGHT = 20;
-const BRUSH_COMPENSATION = 24;
 
 const getLineColors = (
   actualKey: ActualKey,
@@ -61,15 +58,18 @@ export const ReadingsTargetChart: React.FC<ReadingsTargetChartProps> = ({
   unit,
   label,
   showXAxis = false,
-  showBrush = false,
   height,
 }) => {
-  const { chartsData: data, commonTicks } = useChartsContext();
+  const { chartsData: data } = useChartsContext();
   const { palette } = useTheme();
 
-  const baseHeight = height ?? (showXAxis ? 220 : 200);
-  const chartHeight = baseHeight + (showBrush ? BRUSH_COMPENSATION : 0);
+  const showDate = isLongSpan(data);
+
+  const axisCompensation = showXAxis ? (showDate ? 60 : 50) : 0;
+  const chartHeight = (height ?? 200) + axisCompensation;
   const colors = getLineColors(actualKey, palette);
+
+  const tickFormatter = useMemo(() => createTickFormatter(data), [data]);
 
   const yDomain = useMemo((): [number, number] | ['auto', 'auto'] => {
     if (!data.length) return ['auto', 'auto'];
@@ -94,9 +94,21 @@ export const ReadingsTargetChart: React.FC<ReadingsTargetChartProps> = ({
           syncId="anyId"
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="label" hide={!showXAxis} ticks={commonTicks} />
+          <XAxis
+            dataKey="ts"
+            type="number"
+            domain={['dataMin', 'dataMax']}
+            scale="time"
+            tickFormatter={tickFormatter}
+            hide={!showXAxis}
+            angle={showDate ? -30 : undefined}
+            textAnchor={showDate ? 'end' : undefined}
+            height={showDate ? 60 : 50}
+            tickMargin={4}
+            minTickGap={30}
+          />
           <YAxis unit={unit} tickCount={5} domain={yDomain} />
-          <Tooltip />
+          <Tooltip labelFormatter={(ts) => dayjs(ts).format('MMM DD HH:mm')} />
           <Line
             name="Readings"
             type="monotone"
@@ -115,8 +127,7 @@ export const ReadingsTargetChart: React.FC<ReadingsTargetChartProps> = ({
             dot={false}
             strokeWidth={2}
           />
-          {showBrush && <Brush dataKey="label" height={BRUSH_HEIGHT} />}
-          <Legend />
+          <Legend verticalAlign="top" />
         </LineChart>
       </ResponsiveContainer>
     </FallbackChart>

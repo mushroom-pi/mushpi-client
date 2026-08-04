@@ -29,11 +29,14 @@ export const BatchChartsProvider: React.FC<React.PropsWithChildren<BatchChartsPr
     end: batch.finish_at ?? undefined,
     page: 1,
     limit: 500,
+    order: 'DESC',
   });
 
   const chartsData = useMemo(() => {
     if (!query.data) return [];
-    const points = toChartPoints(query.data.items);
+    // Server returns DESC (newest first); reverse for left-to-right chronological chart order
+    const items = [...query.data.items].reverse();
+    const points = toChartPoints(items);
     return smartSampleChartPoints(points, displayPoints);
   }, [query.data, displayPoints]);
 

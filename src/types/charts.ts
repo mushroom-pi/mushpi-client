@@ -12,6 +12,7 @@ export type ChartLabel =
 
 export type ChartPoint = {
   label: string;
+  ts: number;
   temperature?: number;
   humidity?: number;
   temperature_target?: number;

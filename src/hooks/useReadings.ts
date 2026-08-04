@@ -11,10 +11,10 @@ import type {
 import { readingsKeys } from '~api/queryKeys';
 
 export const useListPicoUnitReadings = (
-  { start, end, page = 1, limit = 500, picoUnitId }: Partial<ListPicoUnitReadingsParams>,
+  { start, end, page = 1, limit = 500, picoUnitId, order }: Partial<ListPicoUnitReadingsParams>,
   enabled: boolean = true,
 ) => {
-  const queryKey = readingsKeys.list(picoUnitId ?? 0, start, end, page, limit);
+  const queryKey = readingsKeys.list(picoUnitId ?? 0, start, end, page, limit, order);
 
   return useQuery<ReadingsListResponseDto, unknown, ReadingsListResponseDto>({
     queryKey,
@@ -22,6 +22,7 @@ export const useListPicoUnitReadings = (
       const params: Record<string, any> = { picoUnitId, page, limit };
       if (start) params.start = typeof start === 'string' ? start : new Date(start).toISOString();
       if (end) params.end = typeof end === 'string' ? end : new Date(end).toISOString();
+      if (order) params.order = order;
 
       const resp = await unwrap(
         Readings.picoUnitIdReadingsControllerListForUnitV1(params as ListPicoUnitReadingsParams),

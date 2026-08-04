@@ -45,7 +45,7 @@ export const DevicesTab: React.FC = () => {
         iconColWidth={iconColWidth}
         iconOffset={iconOffset}
       >
-        <OnOffChart dataKey="heater" showXAxis showBrush height={panelHeight} />
+        <OnOffChart dataKey="heater" showXAxis height={panelHeight} />
       </IconChartRow>
     </Box>
   );

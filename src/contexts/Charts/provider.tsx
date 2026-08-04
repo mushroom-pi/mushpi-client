@@ -34,7 +34,10 @@ export const ChartsProvider = ({
   children,
   initialParams,
 }: React.PropsWithChildren<ChartsContextProps>) => {
-  const [params, setParams] = useState<ListPicoUnitReadingsParams>(initialParams);
+  const [params, setParams] = useState<ListPicoUnitReadingsParams>(() => ({
+    order: 'DESC',
+    ...initialParams,
+  }));
   const [displayPoints, setDisplayPoints] = useState(50);
 
   useEffect(() => {

@@ -57,6 +57,7 @@ export function useBuildQueryForm() {
       end: resolveBoundaryParam(source.end, params?.end),
       page: source?.page ?? params?.page,
       limit: source?.limit ?? params?.limit,
+      order: 'DESC',
     };
     setParams(merged);
   };

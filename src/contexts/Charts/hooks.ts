@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { useMemo } from 'react';
 
 import type {
@@ -24,6 +25,7 @@ export const fmtTsShort = (iso?: string) => {
 export const toChartPoints = (items: Readings[]): ChartPoint[] =>
   items.map((it) => ({
     label: fmtTsShort(it.ts),
+    ts: dayjs(it.ts).valueOf(),
     temperature: it.temperature,
     humidity: it.humidity,
     temperature_target: it.temperature_set,
@@ -42,7 +44,7 @@ export function useCharts(
   enabled: boolean = true,
   displayPoints: number = 50,
 ) {
-  const { picoUnitId, start, end, page = 1, limit = 500 } = params;
+  const { picoUnitId, start, end, page = 1, limit = 500, order } = params;
 
   const query = useListPicoUnitReadings(
     {
@@ -51,13 +53,16 @@ export function useCharts(
       end: end?.toString() ?? undefined,
       page,
       limit,
+      order,
     },
     enabled,
   );
 
   const chartsData = useMemo<ChartPoint[]>(() => {
     if (!query.data) return [];
-    const points = toChartPoints(query.data.items);
+    // Server returns DESC (newest first); reverse for left-to-right chronological chart order
+    const items = [...query.data.items].reverse();
+    const points = toChartPoints(items);
     return smartSampleChartPoints(points, displayPoints);
   }, [query.data, displayPoints]);
 

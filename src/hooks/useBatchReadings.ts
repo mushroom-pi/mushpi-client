@@ -11,10 +11,10 @@ import type {
 import { batchKeys } from '~api/queryKeys';
 
 export const useListBatchReadings = (
-  { batchId, start, end, page = 1, limit = 500 }: Partial<ListBatchReadingsParams>,
+  { batchId, start, end, page = 1, limit = 500, order }: Partial<ListBatchReadingsParams>,
   enabled: boolean = true,
 ) => {
-  const queryKey = batchKeys.readings(batchId ?? 0, start, end, page, limit);
+  const queryKey = batchKeys.readings(batchId ?? 0, start, end, page, limit, order);
 
   return useQuery<ReadingsListResponseDto, unknown, ReadingsListResponseDto>({
     queryKey,
@@ -27,6 +27,7 @@ export const useListBatchReadings = (
           ? { start: typeof start === 'string' ? start : new Date(start).toISOString() }
           : {}),
         ...(end ? { end: typeof end === 'string' ? end : new Date(end).toISOString() } : {}),
+        ...(order ? { order } : {}),
       };
 
       const resp = await unwrap<ReadingsListResponseDto>(

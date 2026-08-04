@@ -36,8 +36,17 @@ export const readingsKeys = {
     end?: string | null,
     page?: number,
     limit?: number,
+    order?: string,
   ) =>
-    ['picoReadings', picoUnitId, start || 'none', end || 'none', page ?? 1, limit ?? 500] as const,
+    [
+      'picoReadings',
+      picoUnitId,
+      start || 'none',
+      end || 'none',
+      page ?? 1,
+      limit ?? 500,
+      order ?? 'ASC',
+    ] as const,
   export: (picoUnitId: number, start?: string | null, end?: string | null) =>
     ['exportPicoReadings', picoUnitId, start, end] as const,
 };
@@ -83,7 +92,17 @@ export const batchKeys = {
     end?: string | null,
     page?: number,
     limit?: number,
-  ) => ['batchReadings', batchId, start || 'none', end || 'none', page ?? 1, limit ?? 500] as const,
+    order?: string,
+  ) =>
+    [
+      'batchReadings',
+      batchId,
+      start || 'none',
+      end || 'none',
+      page ?? 1,
+      limit ?? 500,
+      order ?? 'ASC',
+    ] as const,
 };
 
 export const dashboardKeys = {
