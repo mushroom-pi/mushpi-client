@@ -1,6 +1,7 @@
-import DownloadIcon from '@mui/icons-material/Download';
-import { Button, Stack, type SxProps, type Theme } from '@mui/material';
+import { Stack, type SxProps, type Theme } from '@mui/material';
 import React from 'react';
+
+import { ReadingsCsvDownloadButton } from '~components';
 
 import { AlignedButton } from './AlignedButton';
 import { DisplayPointsSelect } from './DisplayPointsSelect';
@@ -93,29 +94,13 @@ export const BuildQueryForm: React.FC = () => {
           sx={controlSx}
         />
 
-        <AlignedButton tooltip={downloadTooltip}>
-          <span>
-            <Button
-              variant="contained"
-              onClick={download}
-              disabled={isDownloadDisabled || isFetchingCsv}
-              startIcon={<DownloadIcon />}
-              aria-label="download"
-              size="medium"
-              color="secondary"
-              sx={{
-                minHeight: DATE_TIME_PICKER_HEIGHT,
-                paddingLeft: 2,
-                paddingRight: 2,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                lineHeight: 1,
-              }}
-            >
-              {isFetchingCsv ? 'Fetching...' : 'CSV'}
-            </Button>
-          </span>
+        <AlignedButton>
+          <ReadingsCsvDownloadButton
+            onClick={download}
+            isLoading={isFetchingCsv}
+            disabled={isDownloadDisabled}
+            tooltip={downloadTooltip}
+          />
         </AlignedButton>
       </Stack>
     </Stack>

@@ -5,11 +5,11 @@ export const AlignedButton = ({
   tooltip,
   children,
 }: {
-  tooltip: string;
+  tooltip?: string;
   children: ReactElement;
 }) => (
   <Stack>
-    <Tooltip title={tooltip}>{children}</Tooltip>
+    {tooltip ? <Tooltip title={tooltip}>{children}</Tooltip> : children}
     <Box flex={1} sx={{ minHeight: '1.2em' }} />
   </Stack>
 );

@@ -10,9 +10,11 @@ import {
   Invalid,
   ItemPage,
   PageTitle,
+  ReadingsCsvDownloadButton,
 } from '~components';
 import { BatchProvider, useBatchContext } from '~ctx/Batch';
 import { BatchChartsProvider } from '~ctx/Charts';
+import { useExportBatchReadingsCmd } from '~hook/useBatchReadings';
 import { StatusChip } from '~pages/Batches/components/StatusChip';
 import { ChartsTabs } from '~pages/Readings/components/ChartsTabs';
 
@@ -28,6 +30,8 @@ function BatchDetailInner() {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [saveRecipeOpen, setSaveRecipeOpen] = useState(false);
+  const [isFetchingCsv, setIsFetchingCsv] = useState(false);
+  const exportCsv = useExportBatchReadingsCmd();
 
   if (isLoading) {
     return <BatchDetailSkeleton />;
@@ -36,6 +40,31 @@ function BatchDetailInner() {
   if (isError || !batch) {
     return <Error item="batch" error={error} refetch={refetch} />;
   }
+
+  const downloadBatchCsv = async () => {
+    if (!batch) return;
+    setIsFetchingCsv(true);
+    try {
+      const blob = await exportCsv({
+        batchId: batch.id,
+        start: batch.start_at,
+        ...(batch.finish_at ? { end: batch.finish_at } : {}),
+      });
+
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = `readings-batch-${batch.id}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(objectUrl);
+    } catch (err) {
+      console.error('Download failed', err);
+    } finally {
+      setIsFetchingCsv(false);
+    }
+  };
 
   return (
     <ItemPage
@@ -59,7 +88,19 @@ function BatchDetailInner() {
     >
       <BatchMeta />
       <Box mt={3}>
-        <PageTitle mb={2}>Batch Readings</PageTitle>
+        <PageTitle
+          mb={2}
+          actions={
+            <ReadingsCsvDownloadButton
+              onClick={downloadBatchCsv}
+              isLoading={isFetchingCsv}
+              disabled={!batch.start_at}
+              tooltip="Downloads all raw readings for this batch — no aggregation applied"
+            />
+          }
+        >
+          Batch Readings
+        </PageTitle>
         <BatchChartsProvider batchId={batch.id} batch={batch}>
           <ChartsTabs />
         </BatchChartsProvider>
