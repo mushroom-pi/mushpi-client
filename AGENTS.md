@@ -140,21 +140,21 @@ src/
 └── utils/
     ├── methods.ts        # Generic: date formatting, bytes, percentages
     ├── pico.ts           # Pico: provisioning constants, LED_STATES, chip color helpers
-    └── charts.ts         # Chart: samplers, downsampling, RLE dedup
+    └── charts.ts         # (removed — server handles aggregation)
 ```
 
 ## Charts (Recharts)
 
 Three chart tabs in `/readings` and `/batches/:id`:
 
-- `TempHumTab` — temperature + humidity line chart
-- `DevicesTab` — binary on/off for fan, humidifier, heater
-- `ControlLoopTab` — binary on/off for control loop
+- `TempHumTab` — temperature + humidity with avg line, min-max range band (`Area`), and target setpoint (`Line` with dashed stroke)
+- `DevicesTab` — binary step-area on/off for fan, humidifier, heater (majority vote per bucket)
+- `ControlLoopTab` — binary step-area on/off for control loop enabled (majority vote per bucket)
 
 Unit readings (`/readings`): shared query params from `ChartsProvider` (`useCharts()`).
 Batch readings (`/batches/:id`): `BatchChartsProvider` sources data from `useBatchReadings`, provides same context shape — chart tabs work unchanged for both.
 
-Chart data utilities in `~utils/charts`: `downsampleChartPoints`, `smartSampleChartPoints`, `rleDeduplicateOnOffPoints`.
+Server-side aggregation via `points` parameter (default 200, min 10, max 2000). `AggregatedChartPoint` carries per-bucket stats: avg, min, max, relay majority votes, setpoints, and `readingCount`. The `DisplayPointsSelect` drives the server `points` value; "Auto" derives it from container width via `useChartContainerWidth`. Client-side smoothing utilities removed — server handles all aggregation.
 
 ### Chart Layout Conventions
 

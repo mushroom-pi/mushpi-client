@@ -1,12 +1,13 @@
-import { useTheme } from '@mui/material';
+import { alpha, useTheme } from '@mui/material';
 import dayjs from 'dayjs';
 import type React from 'react';
 import { useMemo } from 'react';
 import {
+  Area,
   CartesianGrid,
+  ComposedChart,
   Legend,
   Line,
-  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -19,11 +20,12 @@ import { createTickFormatter, isLongSpan } from '~utils/chartLabels';
 import { FallbackChart } from './FallbackChart';
 
 type ActualKey = 'temperature' | 'humidity';
-type TargetKey = 'temperature_target' | 'humidity_target';
+type RangeKey = 'tempRange' | 'humidityRange';
+type SetpointKey = 'temperatureSet' | 'humiditySet';
 
 export interface ReadingsTargetChartProps {
   actualKey: ActualKey;
-  targetKey: TargetKey;
+  rangeKey: RangeKey;
   unit: string;
   label: string;
   showXAxis?: boolean;
@@ -42,19 +44,21 @@ const getLineColors = (
   if (actualKey === 'humidity') {
     return {
       readings: palette.info.main,
+      band: palette.info.main,
       target: palette.success.main,
     };
   }
 
   return {
     readings: palette.primary.main,
+    band: palette.primary.main,
     target: palette.secondary.main,
   };
 };
 
 export const ReadingsTargetChart: React.FC<ReadingsTargetChartProps> = ({
   actualKey,
-  targetKey,
+  rangeKey,
   unit,
   label,
   showXAxis = false,
@@ -69,21 +73,31 @@ export const ReadingsTargetChart: React.FC<ReadingsTargetChartProps> = ({
   const chartHeight = (height ?? 200) + axisCompensation;
   const colors = getLineColors(actualKey, palette);
 
+  // Derive setpoint key from actualKey
+  const setpointKey: SetpointKey = actualKey === 'temperature' ? 'temperatureSet' : 'humiditySet';
+
   const tickFormatter = useMemo(() => createTickFormatter(data), [data]);
 
   const yDomain = useMemo((): [number, number] | ['auto', 'auto'] => {
     if (!data.length) return ['auto', 'auto'];
     const values = data
-      .flatMap((p) => [p[actualKey] as number | undefined, p[targetKey] as number | undefined])
+      .flatMap((p) => {
+        const range = p[rangeKey];
+        return [
+          p[actualKey] as number | undefined | null,
+          p[setpointKey] as number | undefined | null,
+          ...(range ?? []),
+        ];
+      })
       .filter((v): v is number => v != null && isFinite(v));
     if (!values.length) return ['auto', 'auto'];
     return [Math.min(...values) - 3, Math.max(...values) + 3];
-  }, [data, actualKey, targetKey]);
+  }, [data, actualKey, rangeKey, setpointKey]);
 
   return (
     <FallbackChart item={label}>
       <ResponsiveContainer width="100%" height={chartHeight}>
-        <LineChart
+        <ComposedChart
           data={data}
           margin={{
             top: 4,
@@ -108,7 +122,16 @@ export const ReadingsTargetChart: React.FC<ReadingsTargetChartProps> = ({
             minTickGap={30}
           />
           <YAxis unit={unit} tickCount={5} domain={yDomain} />
-          <Tooltip labelFormatter={(ts) => dayjs(ts).format('MMM DD HH:mm')} />
+          <Tooltip
+            labelFormatter={(ts) => dayjs(ts).format('MMM DD HH:mm')}
+          />
+          <Area
+            name="Range"
+            dataKey={rangeKey}
+            stroke="none"
+            fill={alpha(colors.band, 0.25)}
+            fillOpacity={1}
+          />
           <Line
             name="Readings"
             type="monotone"
@@ -117,18 +140,18 @@ export const ReadingsTargetChart: React.FC<ReadingsTargetChartProps> = ({
             dot={{ r: 3 }}
             activeDot={{ r: 5 }}
             strokeWidth={2}
-            strokeDasharray="5 5"
           />
           <Line
             name="Target"
             type="monotone"
-            dataKey={targetKey}
+            dataKey={setpointKey}
             stroke={colors.target}
             dot={false}
             strokeWidth={2}
+            strokeDasharray="5 5"
           />
           <Legend verticalAlign="top" />
-        </LineChart>
+        </ComposedChart>
       </ResponsiveContainer>
     </FallbackChart>
   );

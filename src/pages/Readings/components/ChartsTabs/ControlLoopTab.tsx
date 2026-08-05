@@ -20,7 +20,7 @@ export const ControlLoopTab: React.FC = () => {
       <Box display="flex" alignItems="center" width="100%" gap={1}>
         <Box width={iconColWidth} flexShrink={0} />
         <Box flex={1} minWidth={0}>
-          <OnOffChart dataKey="control_loop" showXAxis height={chartHeight} />
+          <OnOffChart dataKey="controlLoopEnabled" showXAxis height={chartHeight} />
         </Box>
       </Box>
     </Box>

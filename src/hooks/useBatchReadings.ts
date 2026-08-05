@@ -4,33 +4,31 @@ import { useCallback } from 'react';
 import { unwrap } from '~api/adapter';
 import { Readings } from '~api/client';
 import type {
+  AggregatedReadingsResponseDto,
   ReadingsApiBatchIdReadingsControllerExportCsvForUnitV1Request as ExportBatchReadingsParams,
   ReadingsApiBatchIdReadingsControllerListForBatchV1Request as ListBatchReadingsParams,
-  ReadingsListResponseDto,
 } from '~api/generated';
 import { batchKeys } from '~api/queryKeys';
 
 export const useListBatchReadings = (
-  { batchId, start, end, page = 1, limit = 500, order }: Partial<ListBatchReadingsParams>,
+  { batchId, start, end, points = 200 }: Partial<ListBatchReadingsParams>,
   enabled: boolean = true,
 ) => {
-  const queryKey = batchKeys.readings(batchId ?? 0, start, end, page, limit, order);
+  const queryKey = batchKeys.readings(batchId ?? 0, start, end, points);
 
-  return useQuery<ReadingsListResponseDto, unknown, ReadingsListResponseDto>({
+  return useQuery<AggregatedReadingsResponseDto, unknown, AggregatedReadingsResponseDto>({
     queryKey,
     queryFn: async () => {
       const apiParams: ListBatchReadingsParams = {
         batchId: batchId!,
-        page,
-        limit,
+        points,
         ...(start
           ? { start: typeof start === 'string' ? start : new Date(start).toISOString() }
           : {}),
         ...(end ? { end: typeof end === 'string' ? end : new Date(end).toISOString() } : {}),
-        ...(order ? { order } : {}),
       };
 
-      const resp = await unwrap<ReadingsListResponseDto>(
+      const resp = await unwrap<AggregatedReadingsResponseDto>(
         Readings.batchIdReadingsControllerListForBatchV1(apiParams),
       );
       return resp;

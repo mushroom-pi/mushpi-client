@@ -4,32 +4,31 @@ import { useCallback } from 'react';
 import { unwrap } from '~api/adapter';
 import { Readings } from '~api/client';
 import type {
+  AggregatedReadingsResponseDto,
   ReadingsApiPicoUnitIdReadingsControllerExportCsvForUnitV1Request as ExportPicoUnitReadingsParams,
   ReadingsApiPicoUnitIdReadingsControllerListForUnitV1Request as ListPicoUnitReadingsParams,
-  ReadingsListResponseDto,
 } from '~api/generated';
 import { readingsKeys } from '~api/queryKeys';
 
 export const useListPicoUnitReadings = (
-  { start, end, page = 1, limit = 500, picoUnitId, order }: Partial<ListPicoUnitReadingsParams>,
+  { start, end, points = 200, picoUnitId }: Partial<ListPicoUnitReadingsParams>,
   enabled: boolean = true,
 ) => {
-  const queryKey = readingsKeys.list(picoUnitId ?? 0, start, end, page, limit, order);
+  const queryKey = readingsKeys.list(picoUnitId ?? 0, start, end, points);
 
-  return useQuery<ReadingsListResponseDto, unknown, ReadingsListResponseDto>({
+  return useQuery<AggregatedReadingsResponseDto, unknown, AggregatedReadingsResponseDto>({
     queryKey,
     queryFn: async () => {
-      const params: Record<string, any> = { picoUnitId, page, limit };
+      const params: Record<string, any> = { picoUnitId, points };
       if (start) params.start = typeof start === 'string' ? start : new Date(start).toISOString();
       if (end) params.end = typeof end === 'string' ? end : new Date(end).toISOString();
-      if (order) params.order = order;
 
       const resp = await unwrap(
         Readings.picoUnitIdReadingsControllerListForUnitV1(params as ListPicoUnitReadingsParams),
       );
-      return resp as unknown as ReadingsListResponseDto;
+      return resp as unknown as AggregatedReadingsResponseDto;
     },
-    enabled: picoUnitId != null && enabled, // This makes sure that the query is called ONLY if there is a picoUnitId
+    enabled: picoUnitId != null && enabled,
     refetchInterval: 60_000,
   });
 };

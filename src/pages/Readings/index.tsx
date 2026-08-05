@@ -61,7 +61,7 @@ export const ReadingsPage = () => {
   } else {
     content = (
       <ChartsProvider
-        initialParams={{ picoUnitId: selectedId, page: 1, limit: 500, order: 'DESC' }}
+        initialParams={{ picoUnitId: selectedId, points: 200 }}
       >
         <BuildQueryForm />
         <ChartsTabs />

@@ -2,15 +2,16 @@ import { omit } from 'lodash';
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import type {
+  AggregatedReadingsResponseDto,
   ReadingsApiPicoUnitIdReadingsControllerListForUnitV1Request as ListPicoUnitReadingsParams,
-  ReadingsListResponseDto,
 } from '~api/generated';
-import type { ChartPoint } from '~type/charts';
+import { useChartContainerWidth } from '~hook/useChartContainerWidth';
+import type { AggregatedChartPoint } from '~type/charts';
 
 import { useCharts } from './hooks';
 
 export type ChartsContextValue = {
-  chartsData: ChartPoint[];
+  chartsData: AggregatedChartPoint[];
   labels: string[];
   commonTicks: string[];
   isLoading: boolean;
@@ -19,9 +20,9 @@ export type ChartsContextValue = {
   error?: unknown;
   params?: ListPicoUnitReadingsParams;
   setParams: (p: ListPicoUnitReadingsParams) => void;
-  queryData: Omit<ReadingsListResponseDto, 'items'> | null;
-  displayPoints: number;
-  setDisplayPoints: (n: number) => void;
+  queryData: Omit<AggregatedReadingsResponseDto, 'data'> | null;
+  points: number | 'auto';
+  setPoints: (n: number | 'auto') => void;
 };
 
 interface ChartsContextProps {
@@ -34,11 +35,15 @@ export const ChartsProvider = ({
   children,
   initialParams,
 }: React.PropsWithChildren<ChartsContextProps>) => {
+  const { points: autoPoints } = useChartContainerWidth();
+  const [points, setPoints] = useState<number | 'auto'>(200);
+
+  const resolvedPoints = points === 'auto' ? autoPoints : points;
+
   const [params, setParams] = useState<ListPicoUnitReadingsParams>(() => ({
-    order: 'DESC',
+    points: resolvedPoints,
     ...initialParams,
   }));
-  const [displayPoints, setDisplayPoints] = useState(50);
 
   useEffect(() => {
     if (initialParams?.picoUnitId != null && initialParams.picoUnitId !== params.picoUnitId) {
@@ -46,9 +51,14 @@ export const ChartsProvider = ({
     }
   }, [initialParams?.picoUnitId]);
 
-  const query = useCharts(params, true, displayPoints);
+  // Keep query points in sync when auto-resolved value changes
+  useEffect(() => {
+    setParams((prev) => ({ ...prev, points: resolvedPoints }));
+  }, [resolvedPoints]);
+
+  const query = useCharts(params, true);
   const { chartsData, raw, labels, commonTicks, isLoading, isFetching, isError, error } = query;
-  const queryData = useMemo(() => omit(raw, 'items'), [raw]);
+  const queryData = useMemo(() => (raw ? omit(raw, 'data') : null), [raw]);
 
   const contextValue: ChartsContextValue = useMemo(
     () => ({
@@ -62,8 +72,8 @@ export const ChartsProvider = ({
       queryData,
       params,
       setParams,
-      displayPoints,
-      setDisplayPoints,
+      points,
+      setPoints,
     }),
     [
       chartsData,
@@ -75,7 +85,7 @@ export const ChartsProvider = ({
       error,
       queryData,
       params,
-      displayPoints,
+      points,
     ],
   );
 

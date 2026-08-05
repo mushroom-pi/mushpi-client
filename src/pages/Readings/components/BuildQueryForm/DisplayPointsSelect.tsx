@@ -1,15 +1,21 @@
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import {
   FormControl,
   FormHelperText,
   InputLabel,
   MenuItem,
   Select,
+  Tooltip,
   type SelectChangeEvent,
   type SxProps,
   type Theme,
 } from '@mui/material';
 
-const DISPLAY_POINT_OPTIONS = [25, 50, 100, 200];
+const AGGREGATION_POINT_OPTIONS = [50, 100, 200, 500, 1000, 2000];
+const AUTO_VALUE = 'auto';
+
+const AGGREGATION_INFO_TEXT =
+  'Readings are grouped into buckets and averaged. Each point shows the min, max, and average within its time bucket. Full raw data is available via Download CSV.';
 
 export const DisplayPointsSelect = ({
   value,
@@ -17,19 +23,35 @@ export const DisplayPointsSelect = ({
   height,
   sx,
 }: {
-  value: number;
-  onChange: (n: number) => void;
+  value: number | 'auto';
+  onChange: (n: number | 'auto') => void;
   height?: number;
   sx?: SxProps<Theme>;
 }) => (
-  <FormControl sx={{ minWidth: 140, width: { xs: '100%', xl: 'auto' }, ...sx }} size="medium">
-    <InputLabel id="display-points-label">Display points</InputLabel>
+  <FormControl sx={{ minWidth: 160, width: { xs: '100%', xl: 'auto' }, ...sx }} size="medium">
+    <InputLabel id="display-points-label">
+      Aggregation points
+      <Tooltip title={AGGREGATION_INFO_TEXT} arrow placement="top">
+        <InfoOutlinedIcon
+          sx={{
+            fontSize: 14,
+            marginLeft: 0.5,
+            verticalAlign: 'middle',
+            color: 'text.secondary',
+            cursor: 'help',
+          }}
+        />
+      </Tooltip>
+    </InputLabel>
     <Select
       labelId="display-points-label"
       value={String(value)}
-      label="Display points"
+      label="Aggregation points"
       size="medium"
-      onChange={(e: SelectChangeEvent) => onChange(Number(e.target.value))}
+      onChange={(e: SelectChangeEvent) => {
+        const v = e.target.value;
+        onChange(v === AUTO_VALUE ? AUTO_VALUE : Number(v));
+      }}
       sx={{
         '& .MuiSelect-select': {
           height,
@@ -40,7 +62,8 @@ export const DisplayPointsSelect = ({
         },
       }}
     >
-      {DISPLAY_POINT_OPTIONS.map((n) => (
+      <MenuItem value={AUTO_VALUE}>Auto</MenuItem>
+      {AGGREGATION_POINT_OPTIONS.map((n) => (
         <MenuItem key={n} value={String(n)}>
           {n}
         </MenuItem>

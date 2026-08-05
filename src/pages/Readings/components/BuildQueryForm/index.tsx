@@ -41,8 +41,8 @@ const controlSx: SxProps<Theme> = {
 export const BuildQueryForm: React.FC = () => {
   const {
     picoUnits,
-    displayPoints,
-    setDisplayPoints,
+    points,
+    setPoints,
     currentPicoUnitValue,
     currentStartValue,
     currentEndValue,
@@ -87,8 +87,8 @@ export const BuildQueryForm: React.FC = () => {
         />
 
         <DisplayPointsSelect
-          value={displayPoints}
-          onChange={setDisplayPoints}
+          value={points}
+          onChange={setPoints}
           height={SELECTORS_HEIGHT}
           sx={controlSx}
         />

@@ -2,13 +2,11 @@ import dayjs from 'dayjs';
 import { useMemo } from 'react';
 
 import type {
+  AggregatedReadingDto,
   ReadingsApiPicoUnitIdReadingsControllerListForUnitV1Request as ListPicoUnitReadingsParams,
-  Readings,
 } from '~api/generated';
 import { useListPicoUnitReadings } from '~hook/useReadings';
-import type { ChartPoint } from '~type/charts';
-import { smartSampleChartPoints } from '~utils/charts';
-import { bytesToMB } from '~utils/methods';
+import type { AggregatedChartPoint } from '~type/charts';
 
 export const fmtTsShort = (iso?: string) => {
   if (!iso) return '';
@@ -22,49 +20,70 @@ export const fmtTsShort = (iso?: string) => {
   });
 };
 
-export const toChartPoints = (items: Readings[]): ChartPoint[] =>
-  items.map((it) => ({
-    label: fmtTsShort(it.ts),
-    ts: dayjs(it.ts).valueOf(),
-    temperature: it.temperature,
-    humidity: it.humidity,
-    temperature_target: it.temperature_set,
-    humidity_target: it.humidity_set,
-    board_used_mem: bytesToMB(it.board_used_mem),
-    fan: it.fan_on ? 1 : 0,
-    humidifier: it.humidifier_on ? 1 : 0,
-    heater: it.heater_on ? 1 : 0,
-    control_loop: it.control_loop_enabled ? 1 : 0,
-  }));
+export const toAggregatedChartPoints = (items: AggregatedReadingDto[]): AggregatedChartPoint[] =>
+  items.map((it) => {
+    const tempRange =
+      it.tempMin != null && it.tempMax != null ? ([it.tempMin, it.tempMax] as [number, number]) : undefined;
+    const humidityRange =
+      it.humidityMin != null && it.humidityMax != null
+        ? ([it.humidityMin, it.humidityMax] as [number, number])
+        : undefined;
+
+    const fanOnCount = it.fanOnCount ?? 0;
+    const humidifierOnCount = it.humidifierOnCount ?? 0;
+    const heaterOnCount = it.heaterOnCount ?? 0;
+    const controlLoopEnabledCount = it.controlLoopEnabledCount ?? 0;
+    const halfCount = it.readingCount / 2;
+
+    return {
+      label: fmtTsShort(it.timestamp),
+      ts: dayjs(it.timestamp).valueOf(),
+      temperature: it.temperature,
+      humidity: it.humidity,
+      tempMin: it.tempMin,
+      tempMax: it.tempMax,
+      humidityMin: it.humidityMin,
+      humidityMax: it.humidityMax,
+      readingCount: it.readingCount,
+      fanOnCount,
+      humidifierOnCount,
+      heaterOnCount,
+      controlLoopEnabledCount,
+      temperatureSet: it.temperatureSet ?? null,
+      humiditySet: it.humiditySet ?? null,
+      tempRange,
+      humidityRange,
+      fanOn: fanOnCount > halfCount ? 1 : 0,
+      humidifierOn: humidifierOnCount > halfCount ? 1 : 0,
+      heaterOn: heaterOnCount > halfCount ? 1 : 0,
+      controlLoopEnabled: controlLoopEnabledCount > halfCount ? 1 : 0,
+    };
+  });
 
 const SAMPLE_TICK_COUNT = 5;
 
 export function useCharts(
   params: ListPicoUnitReadingsParams,
   enabled: boolean = true,
-  displayPoints: number = 50,
 ) {
-  const { picoUnitId, start, end, page = 1, limit = 500, order } = params;
+  const { picoUnitId, start, end, points } = params;
 
   const query = useListPicoUnitReadings(
     {
       picoUnitId,
       start: start?.toString() ?? undefined,
       end: end?.toString() ?? undefined,
-      page,
-      limit,
-      order,
+      points,
     },
     enabled,
   );
 
-  const chartsData = useMemo<ChartPoint[]>(() => {
+  const chartsData = useMemo<AggregatedChartPoint[]>(() => {
     if (!query.data) return [];
-    // Server returns DESC (newest first); reverse for left-to-right chronological chart order
-    const items = [...query.data.items].reverse();
-    const points = toChartPoints(items);
-    return smartSampleChartPoints(points, displayPoints);
-  }, [query.data, displayPoints]);
+    // Server returns newest-first; reverse for left-to-right chronological chart order
+    const items = [...query.data.data].reverse();
+    return toAggregatedChartPoints(items);
+  }, [query.data]);
 
   const labels = useMemo(() => chartsData.map((d) => d.label ?? ''), [chartsData]);
 

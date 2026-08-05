@@ -3,12 +3,12 @@ import React, { useMemo, useState } from 'react';
 
 import type { Batch } from '~api/generated';
 import { useListBatchReadings } from '~hook/useBatchReadings';
-import { smartSampleChartPoints } from '~utils/charts';
+import { useChartContainerWidth } from '~hook/useChartContainerWidth';
 
-import { toChartPoints } from './hooks';
+import { toAggregatedChartPoints } from './hooks';
 import { ChartsContext, type ChartsContextValue } from './provider';
 
-const DEFAULT_DISPLAY_POINTS = 100;
+const DEFAULT_POINTS = 200;
 const SAMPLE_TICK_COUNT = 5;
 
 interface BatchChartsProviderProps {
@@ -21,24 +21,24 @@ export const BatchChartsProvider: React.FC<React.PropsWithChildren<BatchChartsPr
   batch,
   children,
 }) => {
-  const [displayPoints, setDisplayPoints] = useState(DEFAULT_DISPLAY_POINTS);
+  const { points: autoPoints } = useChartContainerWidth();
+  const [points, setPoints] = useState<number | 'auto'>(DEFAULT_POINTS);
+
+  const resolvedPoints = points === 'auto' ? autoPoints : points;
 
   const query = useListBatchReadings({
     batchId,
     start: batch.start_at,
     end: batch.finish_at ?? undefined,
-    page: 1,
-    limit: 500,
-    order: 'DESC',
+    points: resolvedPoints,
   });
 
   const chartsData = useMemo(() => {
     if (!query.data) return [];
-    // Server returns DESC (newest first); reverse for left-to-right chronological chart order
-    const items = [...query.data.items].reverse();
-    const points = toChartPoints(items);
-    return smartSampleChartPoints(points, displayPoints);
-  }, [query.data, displayPoints]);
+    // Server returns newest-first; reverse for left-to-right chronological chart order
+    const items = [...query.data.data].reverse();
+    return toAggregatedChartPoints(items);
+  }, [query.data]);
 
   const labels = useMemo(() => chartsData.map((d) => d.label ?? ''), [chartsData]);
 
@@ -54,7 +54,10 @@ export const BatchChartsProvider: React.FC<React.PropsWithChildren<BatchChartsPr
     return ticks;
   }, [labels]);
 
-  const queryData = useMemo(() => (query.data ? omit(query.data, 'items') : null), [query.data]);
+  const queryData = useMemo(
+    () => (query.data ? omit(query.data, 'data') : null),
+    [query.data],
+  );
 
   const value = useMemo<ChartsContextValue>(
     () => ({
@@ -68,8 +71,8 @@ export const BatchChartsProvider: React.FC<React.PropsWithChildren<BatchChartsPr
       queryData: queryData ?? null,
       params: undefined,
       setParams: () => {},
-      displayPoints,
-      setDisplayPoints,
+      points,
+      setPoints,
     }),
     [
       chartsData,
@@ -80,7 +83,7 @@ export const BatchChartsProvider: React.FC<React.PropsWithChildren<BatchChartsPr
       query.isError,
       query.error,
       queryData,
-      displayPoints,
+      points,
     ],
   );
 

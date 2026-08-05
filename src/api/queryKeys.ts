@@ -5,7 +5,7 @@
  * Usage:
  *   queryKey: picoUnitsKeys.list({ page: 1 })
  *   queryKey: picoUnitKeys.detail(123)
- *   queryKey: readingsKeys.list({ picoUnitId: 1, start: '2025-01-01' })
+ *   queryKey: readingsKeys.list(1, '2025-01-01', undefined, 200)
  *   queryKey: recipeKeys.detail(1)
  *   queryKey: batchKeys.list({ status: 'in-progress', picoUnitId: 2 })
  */
@@ -30,22 +30,13 @@ export const picoUnitKeys = {
 
 export const readingsKeys = {
   all: ['picoReadings'] as const,
-  list: (
-    picoUnitId: number,
-    start?: string | null,
-    end?: string | null,
-    page?: number,
-    limit?: number,
-    order?: string,
-  ) =>
+  list: (picoUnitId: number, start?: string | null, end?: string | null, points?: number) =>
     [
       'picoReadings',
       picoUnitId,
       start || 'none',
       end || 'none',
-      page ?? 1,
-      limit ?? 500,
-      order ?? 'ASC',
+      points ?? 200,
     ] as const,
   export: (picoUnitId: number, start?: string | null, end?: string | null) =>
     ['exportPicoReadings', picoUnitId, start, end] as const,
@@ -86,22 +77,13 @@ export const batchKeys = {
     return ['batches', 'unit', picoUnitId, page, limit, status] as const;
   },
   currentForUnit: (picoUnitId: number) => ['batches', 'unit', picoUnitId, 'current'] as const,
-  readings: (
-    batchId: number,
-    start?: string | null,
-    end?: string | null,
-    page?: number,
-    limit?: number,
-    order?: string,
-  ) =>
+  readings: (batchId: number, start?: string | null, end?: string | null, points?: number) =>
     [
       'batchReadings',
       batchId,
       start || 'none',
       end || 'none',
-      page ?? 1,
-      limit ?? 500,
-      order ?? 'ASC',
+      points ?? 200,
     ] as const,
 };
 

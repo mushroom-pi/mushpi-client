@@ -11,7 +11,7 @@ import { buildInitialLocalParams, resolveBoundaryParam } from './methods';
 
 export function useBuildQueryForm() {
   const { units: picoUnits = [] } = usePicoUnitsContext();
-  const { params, setParams, displayPoints, setDisplayPoints } = useChartsContext();
+  const { params, setParams, points, setPoints } = useChartsContext();
 
   const [localParams, setLocalParams] = useState<LocalParams>(() =>
     buildInitialLocalParams(params),
@@ -21,7 +21,7 @@ export function useBuildQueryForm() {
   // Keep local draft in sync when applied params change externally (e.g. initial unit selection)
   useEffect(() => {
     setLocalParams(buildInitialLocalParams(params));
-  }, [params?.start, params?.end, params?.picoUnitId, params?.page, params?.limit]);
+  }, [params?.start, params?.end, params?.picoUnitId, params?.points]);
 
   const start = localParams.start ?? null;
   const end = localParams.end ?? null;
@@ -39,7 +39,7 @@ export function useBuildQueryForm() {
   const downloadTooltip =
     !params?.start || !params?.end
       ? 'Apply a time window to the charts first to enable CSV download'
-      : 'Download displayed data as CSV file';
+      : 'Downloads all raw readings for the selected time period — no aggregation applied';
 
   const currentPicoUnitValue = String(localParams?.picoUnitId ?? params?.picoUnitId ?? '');
 
@@ -55,9 +55,7 @@ export function useBuildQueryForm() {
       picoUnitId,
       start: resolveBoundaryParam(source.start, params?.start),
       end: resolveBoundaryParam(source.end, params?.end),
-      page: source?.page ?? params?.page,
-      limit: source?.limit ?? params?.limit,
-      order: 'DESC',
+      points: source?.points ?? params?.points,
     };
     setParams(merged);
   };
@@ -113,9 +111,9 @@ export function useBuildQueryForm() {
   return {
     // data
     picoUnits,
-    // display points
-    displayPoints,
-    setDisplayPoints,
+    // aggregation points
+    points,
+    setPoints,
     // derived UI values
     currentPicoUnitValue,
     currentStartValue: start,

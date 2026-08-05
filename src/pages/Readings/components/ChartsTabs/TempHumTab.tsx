@@ -34,7 +34,7 @@ export const TempHumTab: React.FC = () => {
       >
         <ReadingsTargetChart
           actualKey="humidity"
-          targetKey="humidity_target"
+          rangeKey="humidityRange"
           unit="%"
           label="Humidity"
           height={panelHeight}
@@ -49,7 +49,7 @@ export const TempHumTab: React.FC = () => {
       >
         <ReadingsTargetChart
           actualKey="temperature"
-          targetKey="temperature_target"
+          rangeKey="tempRange"
           unit="°C"
           label="Temperature"
           showXAxis
