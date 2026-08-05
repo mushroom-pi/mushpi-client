@@ -159,10 +159,10 @@ Chart data utilities in `~utils/charts`: `downsampleChartPoints`, `smartSampleCh
 ### Chart Layout Conventions
 
 - **Two chart components** serve all three tabs: `ReadingsTargetChart` (temp/humidity with target lines) and `OnOffChart` (binary step lines). Both wrap in `<ResponsiveContainer>` with `syncId="anyId"` for cross-chart tooltip linking.
-- **Stacked layout**: only the bottom chart per tab shows `showXAxis`. Top charts use `hide={!showXAxis}`. `axisCompensation` (calculated as `showXAxis ? (showDate ? 60 : 50) : 0`) is added to the chart height so all plot areas remain equal regardless of axis visibility.
+- **Stacked layout**: only the bottom chart per tab shows `showXAxis`. Top charts use `hide={!showXAxis}`. `axisCompensation` (calculated as `showXAxis ? 60 : 0`) is added to the chart height so all plot areas remain equal regardless of axis visibility.
 - **Data sort order**: chart providers default to `order: 'DESC'` for queries (newest first). Items are reversed to ASC before charting so Recharts renders left-to-right chronologically.
 - **XAxis**: uses numeric `dataKey="ts"` (epoch ms) with `type="number" scale="time"`. The Brush has been removed — it was decorative only (no controlled state). Time-range filtering is done via `BuildQueryForm`.
-- **Label formatting**: shared in `~utils/chartLabels` (`isLongSpan()`, `createTickFormatter()`). Spans ≤24h show flat `"HH:mm"` labels; spans >24h show rotated (-30°) `"MMM DD HH:mm"` labels. The conditional rotation is computed per chart from data.
+- **Label formatting**: shared in `~utils/chartLabels` (`isLongSpan()`, `createTickFormatter()`). All spans show rotated (-30°) `"MMM DD HH:mm"` labels unconditionally. Axis compensation is always 60px for bottom charts.
 - **Tooltip**: uses `labelFormatter={(ts) => dayjs(ts).format('MMM DD HH:mm')}` to render human-readable timestamps instead of raw epoch ms.
 - **Legend**: positioned at `verticalAlign="top"` on `ReadingsTargetChart` to avoid competing with XAxis labels. `OnOffChart` has no legend (single-line charts).
 - **Skeleton**: `ChartsTabsSkeleton` renders a single 360px rectangle — does not mirror the stacked layout. This is a known gap.
