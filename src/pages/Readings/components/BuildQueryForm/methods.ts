@@ -1,7 +1,8 @@
 import dayjs, { type Dayjs } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
-import type { ReadingsApiPicoUnitIdReadingsControllerListForUnitV1Request as ListPicoUnitReadingsParams } from '~api/generated';
+import type { ChartsReadingsParams } from '~ctx/Charts';
+import { dayjsFromTimeWindow, type RangePreset, type TimeWindow } from '~utils/timeWindow';
 
 import type { LocalParams } from './interfaces';
 
@@ -10,17 +11,30 @@ dayjs.extend(utc);
 export const dayjsToBackendIso = (d?: Dayjs | null): string | undefined =>
   d ? dayjs(d).utc().format('YYYY-MM-DDTHH:mm:ss[Z]') : undefined;
 
-export const resolveBoundaryParam = (
-  value: Dayjs | null | undefined,
-  previous?: string,
-): string | undefined => {
-  if (value === null) return undefined;
-  if (value === undefined) return previous;
-  return dayjsToBackendIso(value);
+/** Build a TimeWindow from local UI draft values */
+export const buildTimeWindowFromLocal = (
+  preset: RangePreset | 'recent' | 'custom' | undefined,
+  start: Dayjs | null,
+  end: Dayjs | null,
+): TimeWindow => {
+  if (preset === 'recent' || (preset === undefined && !start && !end)) return { kind: 'none' };
+  if (preset && preset !== 'custom') return { kind: 'preset', preset };
+  return {
+    kind: 'custom',
+    ...(start ? { start: dayjs.utc(start).format('YYYY-MM-DDTHH:mm:ss[Z]') } : {}),
+    ...(end ? { end: dayjs.utc(end).format('YYYY-MM-DDTHH:mm:ss[Z]') } : {}),
+  };
 };
 
-export const buildInitialLocalParams = (params?: ListPicoUnitReadingsParams): LocalParams => ({
-  ...(params ?? {}),
-  start: params?.start ? dayjs(params.start) : undefined,
-  end: params?.end ? dayjs(params.end) : undefined,
-});
+/** Build initial LocalParams from applied ChartsReadingsParams */
+export const buildInitialLocalParams = (params?: ChartsReadingsParams): LocalParams => {
+  if (!params) return {};
+  const { start, end, preset } = dayjsFromTimeWindow(params.timeWindow);
+  return {
+    picoUnitId: params.picoUnitId,
+    points: params.points,
+    start,
+    end,
+    preset,
+  };
+};

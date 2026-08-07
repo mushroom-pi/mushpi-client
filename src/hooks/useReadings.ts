@@ -9,19 +9,25 @@ import type {
   ReadingsApiPicoUnitIdReadingsControllerListForUnitV1Request as ListPicoUnitReadingsParams,
 } from '~api/generated';
 import { readingsKeys } from '~api/queryKeys';
+import { resolveTimeBounds, type TimeWindow } from '~utils/timeWindow';
 
 export const useListPicoUnitReadings = (
-  { start, end, points = 200, picoUnitId }: Partial<ListPicoUnitReadingsParams>,
+  { picoUnitId, timeWindow, points = 200 }: {
+    picoUnitId?: number;
+    timeWindow: TimeWindow;
+    points?: number;
+  },
   enabled: boolean = true,
 ) => {
-  const queryKey = readingsKeys.list(picoUnitId ?? 0, start, end, points);
+  const queryKey = readingsKeys.list(picoUnitId ?? 0, timeWindow, points);
 
   return useQuery<AggregatedReadingsResponseDto, unknown, AggregatedReadingsResponseDto>({
     queryKey,
     queryFn: async () => {
+      const { start, end } = resolveTimeBounds(timeWindow);
       const params: Record<string, any> = { picoUnitId, points };
-      if (start) params.start = typeof start === 'string' ? start : new Date(start).toISOString();
-      if (end) params.end = typeof end === 'string' ? end : new Date(end).toISOString();
+      if (start) params.start = start;
+      if (end) params.end = end;
 
       const resp = await unwrap(
         Readings.picoUnitIdReadingsControllerListForUnitV1(params as ListPicoUnitReadingsParams),
@@ -30,6 +36,7 @@ export const useListPicoUnitReadings = (
     },
     enabled: picoUnitId != null && enabled,
     refetchInterval: 60_000,
+    refetchIntervalInBackground: true,
   });
 };
 
@@ -43,35 +50,39 @@ export const useListPicoUnitReadings = (
  *
  * Usage:
  *   const exportCsv = useExportPicoUnitReadingsCmd();
- *   const blob = await exportCsv({ picoUnitId: 1, start, end });
+ *   const blob = await exportCsv({ picoUnitId: 1, timeWindow: { kind: 'preset', preset: '1h' } });
  */
 export const useExportPicoUnitReadingsCmd = () => {
-  return useCallback(async (params: Partial<ExportPicoUnitReadingsParams>): Promise<Blob> => {
-    const { start, end, picoUnitId } = params;
-    if (!picoUnitId) throw new Error('picoUnitId is required');
+  return useCallback(
+    async (params: { picoUnitId: number; timeWindow: TimeWindow }): Promise<Blob> => {
+      const { timeWindow, picoUnitId } = params;
+      if (!picoUnitId) throw new Error('picoUnitId is required');
 
-    const apiParams: Record<string, any> = { picoUnitId };
-    if (start) apiParams.start = typeof start === 'string' ? start : new Date(start).toISOString();
-    if (end) apiParams.end = typeof end === 'string' ? end : new Date(end).toISOString();
+      const { start, end } = resolveTimeBounds(timeWindow);
+      const apiParams: Record<string, any> = { picoUnitId };
+      if (start) apiParams.start = start;
+      if (end) apiParams.end = end;
 
-    const resp = await unwrap(
-      Readings.picoUnitIdReadingsControllerExportCsvForUnitV1(
-        apiParams as ExportPicoUnitReadingsParams,
-        { responseType: 'blob' },
-      ),
-    );
+      const resp = await unwrap(
+        Readings.picoUnitIdReadingsControllerExportCsvForUnitV1(
+          apiParams as ExportPicoUnitReadingsParams,
+          { responseType: 'blob' },
+        ),
+      );
 
-    // Normalize into a Blob no matter how the client returns it:
-    if (resp instanceof Blob) return resp;
+      // Normalize into a Blob no matter how the client returns it:
+      if (resp instanceof Blob) return resp;
 
-    // axios sometimes returns an object like { data: Blob }
-    if (resp && typeof resp === 'object' && 'data' in (resp as any)) {
-      const data = (resp as any).data;
-      if (data instanceof Blob) return data;
-      return new Blob([data], { type: 'text/csv' });
-    }
+      // axios sometimes returns an object like { data: Blob }
+      if (resp && typeof resp === 'object' && 'data' in (resp as any)) {
+        const data = (resp as any).data;
+        if (data instanceof Blob) return data;
+        return new Blob([data], { type: 'text/csv' });
+      }
 
-    // fallback: if it's ArrayBuffer / string etc.
-    return new Blob([resp as any], { type: 'text/csv' });
-  }, []);
+      // fallback: if it's ArrayBuffer / string etc.
+      return new Blob([resp as any], { type: 'text/csv' });
+    },
+    [],
+  );
 };

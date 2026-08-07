@@ -1,7 +1,9 @@
-import { Stack, type SxProps, type Theme } from '@mui/material';
+import { Box, Stack, type SxProps, type Theme } from '@mui/material';
 import React from 'react';
 
-import { ReadingsCsvDownloadButton } from '~components';
+import { ReadingsCsvDownloadButton, RefreshButton } from '~components';
+import { useChartsContext } from '~ctx/Charts';
+import { usePollPicoUnit } from '~ctx/PicoUnit';
 
 import { AlignedButton } from './AlignedButton';
 import { DisplayPointsSelect } from './DisplayPointsSelect';
@@ -47,6 +49,7 @@ export const BuildQueryForm: React.FC = () => {
     currentPicoUnitValue,
     currentStartValue,
     currentEndValue,
+    preset,
     isEndBeforeStart,
     isUpdateDisabled,
     isDownloadDisabled,
@@ -56,9 +59,13 @@ export const BuildQueryForm: React.FC = () => {
     onStartChange,
     onEndChange,
     onUpdateClick,
+    onPresetChange,
     onApplyPresetRange,
     download,
   } = useBuildQueryForm();
+
+  const { params } = useChartsContext();
+  const pollPico = usePollPicoUnit();
 
   return (
     <Stack spacing={1.5} mb={0.25} sx={{ '& > *': { flexShrink: 0 } }}>
@@ -78,11 +85,13 @@ export const BuildQueryForm: React.FC = () => {
         <TimeWindowSelect
           start={currentStartValue}
           end={currentEndValue}
+          rangePreset={preset}
           isEndBeforeStart={isEndBeforeStart}
           isUpdateDisabled={isUpdateDisabled}
           onStartChange={onStartChange}
           onEndChange={onEndChange}
           onUpdateClick={onUpdateClick}
+          onPresetChange={onPresetChange}
           onApplyPresetRange={onApplyPresetRange}
           height={SELECTORS_HEIGHT}
         />
@@ -100,6 +109,19 @@ export const BuildQueryForm: React.FC = () => {
             isLoading={isFetchingCsv}
             disabled={isDownloadDisabled}
             tooltip={downloadTooltip}
+          />
+        </AlignedButton>
+
+        <Box sx={{ flexGrow: 1 }} />
+
+        <AlignedButton>
+          <RefreshButton
+            onClick={() => {
+              const id = params?.picoUnitId;
+              if (id) pollPico.mutate({ picoUnitId: id });
+            }}
+            isLoading={pollPico.isPending}
+            tooltip="Poll Pico and refresh charts"
           />
         </AlignedButton>
       </Stack>

@@ -1,14 +1,18 @@
 import { omit } from 'lodash';
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-import type {
-  AggregatedReadingsResponseDto,
-  ReadingsApiPicoUnitIdReadingsControllerListForUnitV1Request as ListPicoUnitReadingsParams,
-} from '~api/generated';
+import type { AggregatedReadingsResponseDto } from '~api/generated';
 import { useChartContainerWidth } from '~hook/useChartContainerWidth';
 import type { AggregatedChartPoint } from '~type/charts';
+import type { TimeWindow } from '~utils/timeWindow';
 
 import { useCharts } from './hooks';
+
+export type ChartsReadingsParams = {
+  picoUnitId: number;
+  points: number;
+  timeWindow: TimeWindow;
+};
 
 export type ChartsContextValue = {
   chartsData: AggregatedChartPoint[];
@@ -18,15 +22,15 @@ export type ChartsContextValue = {
   isFetching: boolean;
   isError?: boolean;
   error?: unknown;
-  params?: ListPicoUnitReadingsParams;
-  setParams: (p: ListPicoUnitReadingsParams) => void;
+  params?: ChartsReadingsParams;
+  setParams: (p: ChartsReadingsParams) => void;
   queryData: Omit<AggregatedReadingsResponseDto, 'data'> | null;
   points: number | 'auto';
   setPoints: (n: number | 'auto') => void;
 };
 
 interface ChartsContextProps {
-  initialParams: ListPicoUnitReadingsParams;
+  initialParams: { picoUnitId: number; points?: number };
 }
 
 export const ChartsContext = createContext<ChartsContextValue | undefined>(undefined);
@@ -40,20 +44,23 @@ export const ChartsProvider = ({
 
   const resolvedPoints = points === 'auto' ? autoPoints : points;
 
-  const [params, setParams] = useState<ListPicoUnitReadingsParams>(() => ({
+  const [params, setParams] = useState<ChartsReadingsParams>(() => ({
+    picoUnitId: initialParams.picoUnitId,
     points: resolvedPoints,
-    ...initialParams,
+    timeWindow: { kind: 'none' },
   }));
 
   useEffect(() => {
     if (initialParams?.picoUnitId != null && initialParams.picoUnitId !== params.picoUnitId) {
-      setParams((prev: ListPicoUnitReadingsParams) => ({ ...prev, ...initialParams }));
+      setParams((prev: ChartsReadingsParams) => ({ ...prev, picoUnitId: initialParams.picoUnitId }));
     }
   }, [initialParams?.picoUnitId]);
 
   // Keep query points in sync when auto-resolved value changes
   useEffect(() => {
-    setParams((prev) => ({ ...prev, points: resolvedPoints }));
+    setParams((prev) =>
+      prev.points === resolvedPoints ? prev : { ...prev, points: resolvedPoints },
+    );
   }, [resolvedPoints]);
 
   const query = useCharts(params, true);

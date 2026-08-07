@@ -1,8 +1,11 @@
 import type { Dayjs } from 'dayjs';
 
-import type { ReadingsApiPicoUnitIdReadingsControllerListForUnitV1Request as ListPicoUnitReadingsParams } from '~api/generated';
+import type { RangePreset } from '~utils/timeWindow';
 
-export type LocalParams = Partial<Omit<ListPicoUnitReadingsParams, 'start' | 'end'>> & {
+export type LocalParams = {
+  picoUnitId?: number;
+  points?: number;
   start?: Dayjs | null;
   end?: Dayjs | null;
+  preset?: RangePreset | 'recent' | 'custom';
 };

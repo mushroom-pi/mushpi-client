@@ -5,10 +5,12 @@
  * Usage:
  *   queryKey: picoUnitsKeys.list({ page: 1 })
  *   queryKey: picoUnitKeys.detail(123)
- *   queryKey: readingsKeys.list(1, '2025-01-01', undefined, 200)
+ *   queryKey: readingsKeys.list(1, { kind: 'preset', preset: '1h' }, 200)
  *   queryKey: recipeKeys.detail(1)
  *   queryKey: batchKeys.list({ status: 'in-progress', picoUnitId: 2 })
  */
+import type { TimeWindow } from '~utils/timeWindow';
+
 import type {
   BatchesApiBatchesControllerListV1Request as ListBatchesParams,
   PicoUnitsApiPicoUnitsControllerListV1Request as ListPicoUnitsParams,
@@ -30,16 +32,10 @@ export const picoUnitKeys = {
 
 export const readingsKeys = {
   all: ['picoReadings'] as const,
-  list: (picoUnitId: number, start?: string | null, end?: string | null, points?: number) =>
-    [
-      'picoReadings',
-      picoUnitId,
-      start || 'none',
-      end || 'none',
-      points ?? 200,
-    ] as const,
-  export: (picoUnitId: number, start?: string | null, end?: string | null) =>
-    ['exportPicoReadings', picoUnitId, start, end] as const,
+  list: (picoUnitId: number, timeWindow: TimeWindow, points?: number) =>
+    ['picoReadings', picoUnitId, timeWindow, points ?? 200] as const,
+  export: (picoUnitId: number, timeWindow: TimeWindow) =>
+    ['exportPicoReadings', picoUnitId, timeWindow] as const,
 };
 
 export const serverHealthKeys = {

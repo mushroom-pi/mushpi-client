@@ -71,7 +71,9 @@ export const ReadingsPage = () => {
 
   return (
     <Page>
-      <PageTitle mb={2.5}>Readings</PageTitle>
+      <PageTitle mb={2.5}>
+        Readings
+      </PageTitle>
       {content}
     </Page>
   );

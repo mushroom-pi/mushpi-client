@@ -35,6 +35,7 @@ export const useListBatchReadings = (
     },
     enabled: batchId != null && enabled,
     refetchInterval: 60_000,
+    refetchIntervalInBackground: true,
   });
 };
 

@@ -1,12 +1,11 @@
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
 
-import type {
-  AggregatedReadingDto,
-  ReadingsApiPicoUnitIdReadingsControllerListForUnitV1Request as ListPicoUnitReadingsParams,
-} from '~api/generated';
+import type { AggregatedReadingDto } from '~api/generated';
 import { useListPicoUnitReadings } from '~hook/useReadings';
 import type { AggregatedChartPoint } from '~type/charts';
+
+import type { ChartsReadingsParams } from './provider';
 
 export const fmtTsShort = (iso?: string) => {
   if (!iso) return '';
@@ -63,18 +62,13 @@ export const toAggregatedChartPoints = (items: AggregatedReadingDto[]): Aggregat
 const SAMPLE_TICK_COUNT = 5;
 
 export function useCharts(
-  params: ListPicoUnitReadingsParams,
+  params: ChartsReadingsParams,
   enabled: boolean = true,
 ) {
-  const { picoUnitId, start, end, points } = params;
+  const { picoUnitId, timeWindow, points } = params;
 
   const query = useListPicoUnitReadings(
-    {
-      picoUnitId,
-      start: start?.toString() ?? undefined,
-      end: end?.toString() ?? undefined,
-      points,
-    },
+    { picoUnitId, timeWindow, points },
     enabled,
   );
 

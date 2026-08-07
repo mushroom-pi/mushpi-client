@@ -15,6 +15,9 @@ const clamp = (val: number, min: number, max: number) => Math.min(max, Math.max(
 export const useChartContainerWidth = () => {
   const ref = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(DEFAULT_WIDTH);
+  const [points, setPoints] = useState(() =>
+    clamp(Math.round(DEFAULT_WIDTH / 10) * 10, MIN_POINTS, MAX_POINTS),
+  );
 
   useEffect(() => {
     const el = ref.current;
@@ -38,7 +41,13 @@ export const useChartContainerWidth = () => {
     };
   }, []);
 
-  const points = clamp(width, MIN_POINTS, MAX_POINTS);
+  // Quantize to nearest 10 to prevent 1-px ResizeObserver jitter from
+  // producing a new queryKey (and therefore a new query observer that
+  // resets refetchInterval).
+  useEffect(() => {
+    const quantized = clamp(Math.round(width / 10) * 10, MIN_POINTS, MAX_POINTS);
+    setPoints((prev) => (prev === quantized ? prev : quantized));
+  }, [width]);
 
   return { ref, width, points };
 };
