@@ -4,7 +4,6 @@ import {
   FormHelperText,
   MenuItem,
   Paper,
-  Popper,
   Select,
   type SxProps,
   type Theme,
@@ -110,7 +109,7 @@ export const PeriodSelect = ({
 
   return (
     <FormControl
-      sx={{ minWidth: { xs: 200, xl: 430 }, width: { xs: '100%', xl: 'auto' }, ...sx }}
+      sx={{ position: 'relative', minWidth: { xs: 200, xl: 430 }, width: { xs: '100%', xl: 'auto' }, ...sx }}
       size="medium"
     >
       {isSmallScreen ? (
@@ -136,27 +135,24 @@ export const PeriodSelect = ({
           </Select>
           <FormHelperText sx={{ minHeight: '1.2em' }}> </FormHelperText>
 
-          <Popper
-            open={isCustomOpen}
-            anchorEl={selectRef.current}
-            placement="bottom"
-            modifiers={[
-              {
-                name: 'offset',
-                options: {
-                  offset: [0, 8],
-                },
-              },
-            ]}
-            sx={{ zIndex: (theme) => theme.zIndex.modal }}
-          >
-            <Paper elevation={4} sx={{ p: 2 }}>
-              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                Select your time window
-              </Typography>
-              <Box sx={{ minWidth: { xs: 280, md: 'auto' } }}>{customContent}</Box>
-            </Paper>
-          </Popper>
+          {isCustomOpen && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                mt: 1,
+                zIndex: (theme) => theme.zIndex.modal,
+              }}
+            >
+              <Paper elevation={4} sx={{ p: 2 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                  Select your time window
+                </Typography>
+                <Box sx={{ minWidth: { xs: 280, md: 'auto' } }}>{customContent}</Box>
+              </Paper>
+            </Box>
+          )}
         </>
       ) : (
         <>
@@ -195,27 +191,24 @@ export const PeriodSelect = ({
           </ToggleButtonGroup>
           <FormHelperText sx={{ minHeight: '1.2em' }}> </FormHelperText>
 
-          <Popper
-            open={isCustomOpen}
-            anchorEl={customButtonRef.current}
-            placement="bottom"
-            modifiers={[
-              {
-                name: 'offset',
-                options: {
-                  offset: [0, 8],
-                },
-              },
-            ]}
-            sx={{ zIndex: (theme) => theme.zIndex.modal }}
-          >
-            <Paper elevation={4} sx={{ p: 2 }}>
-              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-                Select your time window
-              </Typography>
-              <Box sx={{ minWidth: { xs: 280, md: 'auto' } }}>{customContent}</Box>
-            </Paper>
-          </Popper>
+          {isCustomOpen && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                mt: 1,
+                zIndex: (theme) => theme.zIndex.modal,
+              }}
+            >
+              <Paper elevation={4} sx={{ p: 2 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+                  Select your time window
+                </Typography>
+                <Box sx={{ minWidth: { xs: 280, md: 'auto' } }}>{customContent}</Box>
+              </Paper>
+            </Box>
+          )}
         </>
       )}
     </FormControl>
