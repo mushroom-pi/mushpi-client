@@ -12,17 +12,16 @@ import type { DialogProps } from '~int/dialogProps';
 export const DevicesDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSave = true }) => {
   const { pico, changeOutputs } = usePicoUnitContext();
   const { run } = useAsyncWithToast();
-  if (!pico || !pico.latest_reading) return;
 
-  const { latest_reading: lr } = pico;
+  const lr = pico?.latest_reading;
 
-  const [humidifierOn, setHumidifierOn] = useState<boolean | null>(lr.humidifier_on ?? null);
-  const [fanOn, setFanOn] = useState<boolean | null>(lr.fan_on ?? null);
-  const [heaterOn, setHeaterOn] = useState<boolean | null>(lr.heater_on ?? null);
+  const [humidifierOn, setHumidifierOn] = useState<boolean | null>(lr?.humidifier_on ?? null);
+  const [fanOn, setFanOn] = useState<boolean | null>(lr?.fan_on ?? null);
+  const [heaterOn, setHeaterOn] = useState<boolean | null>(lr?.heater_on ?? null);
 
   useEffect(() => {
     if (!open) return;
-    if (!pico || !lr) {
+    if (!lr) {
       setHumidifierOn(null);
       setFanOn(null);
       setHeaterOn(null);
@@ -31,22 +30,23 @@ export const DevicesDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSav
     setHumidifierOn(lr.humidifier_on);
     setFanOn(lr.fan_on);
     setHeaterOn(lr.heater_on);
-  }, [open, lr.heater_on, lr.fan_on, lr.humidifier_on]);
+  }, [open, lr?.heater_on, lr?.fan_on, lr?.humidifier_on]);
 
   const hasChanges = useMemo(() => {
-    if (!pico || !lr) return false;
+    if (!lr) return false;
     return humidifierOn !== lr.humidifier_on || fanOn !== lr.fan_on || heaterOn !== lr.heater_on;
-  }, [pico, fanOn, heaterOn, humidifierOn]);
+  }, [lr, fanOn, heaterOn, humidifierOn]);
+
+  if (!pico || !lr) return null;
 
   async function doSaveChanges() {
-    if (!pico || !lr) return;
     const body: ChangeOutputsDto = {
       humidifier: humidifierOn === null ? undefined : humidifierOn,
       fan: fanOn === null ? undefined : fanOn,
       heater: heaterOn === null ? undefined : heaterOn,
     };
 
-    await run(() => changeOutputs!.mutateAsync({ picoUnitId: pico.id, body }), {
+    await run(() => changeOutputs!.mutateAsync({ picoUnitId: pico!.id, body }), {
       successMessage: "Devices' outputs changed successfully",
       fallbackErrorMessage: "Failed to change the devices' outputs",
       onSuccess: () => {
@@ -56,15 +56,9 @@ export const DevicesDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSav
   }
 
   function handleCancel() {
-    if (pico && lr) {
-      setHumidifierOn(lr.humidifier_on);
-      setFanOn(lr.fan_on);
-      setHeaterOn(lr.heater_on);
-    } else {
-      setHumidifierOn(null);
-      setFanOn(null);
-      setHeaterOn(null);
-    }
+    setHumidifierOn(lr!.humidifier_on);
+    setFanOn(lr!.fan_on);
+    setHeaterOn(lr!.heater_on);
     onClose();
   }
 

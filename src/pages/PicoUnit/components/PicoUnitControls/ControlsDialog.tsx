@@ -11,18 +11,17 @@ import type { DialogProps } from '~int/dialogProps';
 export const ControlsDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSave = true }) => {
   const { pico, changeTargets, toggleControlLoop } = usePicoUnitContext();
   const { run } = useAsyncWithToast();
-  if (!pico || !pico.latest_reading) return;
 
-  const { latest_reading: lr } = pico;
+  const lr = pico?.latest_reading;
   const isSaving = changeTargets?.isLoading && toggleControlLoop?.isLoading;
 
-  const [enabled, setEnabled] = useState<boolean>(lr.control_loop_enabled);
-  const [targetTemp, setTargetTemp] = useState<number | null>(lr.temperature_set ?? null);
-  const [targetHum, setTargetHum] = useState<number | null>(lr.humidity_set ?? null);
+  const [enabled, setEnabled] = useState<boolean>(lr?.control_loop_enabled ?? false);
+  const [targetTemp, setTargetTemp] = useState<number | null>(lr?.temperature_set ?? null);
+  const [targetHum, setTargetHum] = useState<number | null>(lr?.humidity_set ?? null);
 
   useEffect(() => {
     if (!open) return;
-    if (!pico || !lr) {
+    if (!lr) {
       setEnabled(false);
       setTargetTemp(null);
       setTargetHum(null);
@@ -31,25 +30,26 @@ export const ControlsDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSa
     setEnabled(lr.control_loop_enabled);
     setTargetTemp(lr.temperature_set ?? null);
     setTargetHum(lr.humidity_set ?? null);
-  }, [open, lr.control_loop_enabled, lr.temperature_set, lr.humidity_set]);
+  }, [open, lr?.control_loop_enabled, lr?.temperature_set, lr?.humidity_set]);
 
   const changesControlLoop = useMemo(() => {
-    if (!pico || !lr) return false;
+    if (!lr) return false;
     return enabled !== lr.control_loop_enabled;
-  }, [pico, enabled]);
+  }, [lr, enabled]);
 
   const changesTargets = useMemo(() => {
-    if (!pico || !lr) return false;
+    if (!lr) return false;
     return targetTemp !== lr.temperature_set || targetHum !== lr.humidity_set;
-  }, [pico, targetHum, targetTemp]);
+  }, [lr, targetHum, targetTemp]);
 
   const hasChanges = useMemo(() => {
-    if (!pico || !lr) return false;
+    if (!lr) return false;
     return changesTargets || changesControlLoop;
-  }, [pico, changesTargets, changesControlLoop]);
+  }, [lr, changesTargets, changesControlLoop]);
+
+  if (!pico || !lr) return null;
 
   async function doSaveChanges() {
-    if (!pico || !lr) return;
     const toggleControlLoopBody: ControlLoopDto = { enabled };
     const changeTargetsBody: ChangeSetPointsDto = {
       temperature: targetTemp ?? undefined,
@@ -61,11 +61,11 @@ export const ControlsDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSa
         const promises = [];
         if (changesControlLoop)
           promises.push(
-            toggleControlLoop?.mutateAsync({ picoUnitId: pico.id, body: toggleControlLoopBody }),
+            toggleControlLoop?.mutateAsync({ picoUnitId: pico!.id, body: toggleControlLoopBody }),
           );
         if (changesTargets)
           promises.push(
-            changeTargets?.mutateAsync({ picoUnitId: pico.id, body: changeTargetsBody }),
+            changeTargets?.mutateAsync({ picoUnitId: pico!.id, body: changeTargetsBody }),
           );
         return Promise.all(promises);
       },
@@ -80,15 +80,9 @@ export const ControlsDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSa
   }
 
   function handleCancel() {
-    if (pico && lr) {
-      setEnabled(lr.control_loop_enabled ?? true);
-      setTargetTemp(lr.temperature_set ?? null);
-      setTargetHum(lr.humidity_set ?? null);
-    } else {
-      setEnabled(true);
-      setTargetTemp(null);
-      setTargetHum(null);
-    }
+    setEnabled(lr!.control_loop_enabled ?? true);
+    setTargetTemp(lr!.temperature_set ?? null);
+    setTargetHum(lr!.humidity_set ?? null);
     onClose();
   }
 

@@ -179,7 +179,17 @@ Server-side aggregation via `points` parameter (default 200, min 10, max 2000). 
 - `npx vite build` — builds without typecheck
 - `yarn lint` / `yarn lint:fix` — ESLint
 - `yarn format` / `yarn format:check` — Prettier
+- `yarn test` / `yarn test:watch` / `yarn test:coverage` — Vitest
 - Husky pre-commit: lint-staged (eslint --fix + prettier)
+
+## Testing
+
+- **Test runner**: Vitest 3.x with jsdom environment. Config lives in `vitest.config.ts` (separate file — merging into `vite.config.ts` causes type conflicts between Vitest's bundled vite and the project's `@vitejs/plugin-react`).
+- **Global setup**: `src/test/setup.ts` auto-applies `@testing-library/jest-dom` matchers and runs `cleanup()` after each test via `afterEach`.
+- **Shared fixtures**: `src/test/fixtures.tsx` exports `makePicoUnit()` (factory), `renderWithProviders()` (QueryClientProvider wrapper), and other shared test helpers.
+- **What to test**: Pure utilities (`methods.ts`), custom hooks with logic (`useAsyncWithToast`), mutation factories (`createOptimisticMutation`), ErrorBoundary, and dialogs that send hardware commands (`DevicesDialog`). Skip pass-through React Query wrappers, generated API code, and presentational-only components.
+- **Globals**: `describe`, `it`, `expect`, `vi`, `beforeEach`, `afterEach` are available without imports (in `.test.*` files). Import `render`, `screen`, `waitFor` from `@testing-library/react` and `userEvent` from `@testing-library/user-event`.
+- **Never test generated code** in `src/api/generated/`.
 
 ## Known Quirks
 

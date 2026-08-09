@@ -18,7 +18,10 @@
     "gen:schemas": "openapi-zod-client ${OPENAPI_SPEC:-./openapi.json} -o src/api/generated/schemas.ts -t scripts/zod-schemas.hbs -p .prettierrc --export-schemas && yarn gen:fix-array-types",
     "gen:fix-array-types": "node scripts/fix-array-types.mjs",
     "gen:schemas:remote": "OPENAPI_SPEC=http://localhost:3000/contract-json yarn gen:schemas",
-    "gen:all:remote": "OPENAPI_SPEC=http://localhost:3000/contract-json yarn gen:client && yarn gen:schemas:remote"
+    "gen:all:remote": "OPENAPI_SPEC=http://localhost:3000/contract-json yarn gen:client && yarn gen:schemas:remote",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -40,6 +43,10 @@
   "devDependencies": {
     "@eslint/js": "^9.37.0",
     "@openapitools/openapi-generator-cli": "^2.24.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/axios": "^0.14.4",
     "@types/lodash": "^4",
@@ -47,10 +54,11 @@
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.1.9",
     "@types/react-router-dom": "^5.3.3",
-    "@zodios/core": "^10.9.6",
     "@typescript-eslint/eslint-plugin": "^8.46.1",
     "@typescript-eslint/parser": "^8.46.1",
     "@vitejs/plugin-react": "^5.0.4",
+    "@vitest/coverage-v8": "^3.2.4",
+    "@zodios/core": "^10.9.6",
     "eslint": "^9.37.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
@@ -61,12 +69,14 @@
     "eslint-plugin-react-refresh": "^0.4.22",
     "globals": "^16.4.0",
     "husky": "^9.1.7",
+    "jsdom": "^26.1.0",
     "lint-staged": "^16.2.3",
     "openapi-zod-client": "^1.18.3",
     "prettier": "^3.6.2",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.45.0",
-    "vite": "^7.1.7"
+    "vite": "^7.1.7",
+    "vitest": "^3.2.4"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
