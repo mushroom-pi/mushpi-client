@@ -14,6 +14,7 @@ import {
 } from '~components';
 import { BatchProvider, useBatchContext } from '~ctx/Batch';
 import { BatchChartsProvider } from '~ctx/Charts';
+import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 import { useExportBatchReadingsCmd } from '~hook/useBatchReadings';
 import { StatusChip } from '~pages/Batches/components/StatusChip';
 import { ChartsTabs } from '~pages/Readings/components/ChartsTabs';
@@ -32,6 +33,7 @@ function BatchDetailInner() {
   const [saveRecipeOpen, setSaveRecipeOpen] = useState(false);
   const [isFetchingCsv, setIsFetchingCsv] = useState(false);
   const exportCsv = useExportBatchReadingsCmd();
+  const { run } = useAsyncWithToast();
 
   if (isLoading) {
     return <BatchDetailSkeleton />;
@@ -45,22 +47,27 @@ function BatchDetailInner() {
     if (!batch) return;
     setIsFetchingCsv(true);
     try {
-      const blob = await exportCsv({
-        batchId: batch.id,
-        start: batch.start_at,
-        ...(batch.finish_at ? { end: batch.finish_at } : {}),
-      });
+      await run(
+        async () => {
+          const blob = await exportCsv({
+            batchId: batch.id,
+            start: batch.start_at,
+            ...(batch.finish_at ? { end: batch.finish_at } : {}),
+          });
 
-      const objectUrl = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = objectUrl;
-      a.download = `readings-batch-${batch.id}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(objectUrl);
-    } catch (err) {
-      console.error('Download failed', err);
+          const objectUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = objectUrl;
+          a.download = `readings-batch-${batch.id}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(objectUrl);
+        },
+        { fallbackErrorMessage: 'Failed to download CSV', rethrow: true },
+      );
+    } catch {
+      // run() already showed the error toast
     } finally {
       setIsFetchingCsv(false);
     }

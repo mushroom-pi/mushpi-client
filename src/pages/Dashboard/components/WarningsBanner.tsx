@@ -1,5 +1,5 @@
 import { Alert, Stack } from '@mui/material';
-import { useMemo } from 'react';
+import { useMemo, type KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import type { DashboardWarningDto } from '~api/generated';
@@ -7,6 +7,16 @@ import type { DashboardWarningDto } from '~api/generated';
 interface WarningsBannerProps {
   warnings: DashboardWarningDto[];
   unitNames?: Map<number, string>;
+}
+
+function handleAlertKeyDown(
+  e: KeyboardEvent<HTMLDivElement>,
+  navigate: () => void,
+) {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    navigate();
+  }
 }
 
 export function WarningsBanner({ warnings, unitNames }: WarningsBannerProps) {
@@ -58,8 +68,11 @@ export function WarningsBanner({ warnings, unitNames }: WarningsBannerProps) {
           key="offline"
           severity="error"
           variant="filled"
+          role="button"
+          tabIndex={0}
           sx={{ cursor: 'pointer' }}
           onClick={() => navigate('/pico-units')}
+          onKeyDown={(e) => handleAlertKeyDown(e, () => navigate('/pico-units'))}
         >
           {consolidated.offlineNames.length === 1
             ? `${consolidated.offlineNames[0]} is unreachable`
@@ -71,8 +84,11 @@ export function WarningsBanner({ warnings, unitNames }: WarningsBannerProps) {
           key="deviations"
           severity="warning"
           variant="filled"
+          role="button"
+          tabIndex={0}
           sx={{ cursor: 'pointer' }}
           onClick={() => navigate('/pico-units')}
+          onKeyDown={(e) => handleAlertKeyDown(e, () => navigate('/pico-units'))}
         >
           {consolidated.deviationCount === 1
             ? '1 unit shows readings apart from its targets and needs your attention'
@@ -86,8 +102,13 @@ export function WarningsBanner({ warnings, unitNames }: WarningsBannerProps) {
             key={`${warning.type}-${warning.unitId}-${idx}`}
             severity={warning.severity}
             variant="filled"
+            role="button"
+            tabIndex={0}
             sx={{ cursor: 'pointer' }}
             onClick={() => navigate(`/pico-units/${warning.unitId}`)}
+            onKeyDown={(e) =>
+              handleAlertKeyDown(e, () => navigate(`/pico-units/${warning.unitId}`))
+            }
           >
             {unitName}: {warning.message}
           </Alert>

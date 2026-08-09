@@ -29,6 +29,32 @@ export const BatchProvider: React.FC<React.PropsWithChildren<{ batchId: number }
   const uploadImagesMutation = createUploadBatchImagesMutation(qc);
   const removeImageMutation = createRemoveBatchImageMutation(qc);
 
+  // Destructure stable parts — mutate/mutateAsync are referentially stable,
+  // but the wrapper object returned by useMutation changes identity every render.
+  const updateMutate = updateMutation.mutate;
+  const updateMutateAsync = updateMutation.mutateAsync;
+  const updateIsPending = updateMutation.isPending;
+
+  const deleteMutate = deleteMutation.mutate;
+  const deleteMutateAsync = deleteMutation.mutateAsync;
+  const deleteIsPending = deleteMutation.isPending;
+
+  const createMutate = createMutation.mutate;
+  const createMutateAsync = createMutation.mutateAsync;
+  const createIsPending = createMutation.isPending;
+
+  const recipeMutate = createRecipeMutation.mutate;
+  const recipeMutateAsync = createRecipeMutation.mutateAsync;
+  const recipeIsPending = createRecipeMutation.isPending;
+
+  const uploadMutate = uploadImagesMutation.mutate;
+  const uploadMutateAsync = uploadImagesMutation.mutateAsync;
+  const uploadIsPending = uploadImagesMutation.isPending;
+
+  const removeMutate = removeImageMutation.mutate;
+  const removeMutateAsync = removeImageMutation.mutateAsync;
+  const removeIsPending = removeImageMutation.isPending;
+
   const value = useMemo<BatchCtx>(
     () => ({
       batch,
@@ -37,34 +63,34 @@ export const BatchProvider: React.FC<React.PropsWithChildren<{ batchId: number }
       error,
       refetch: () => void refetch(),
       updateBatch: {
-        mutate: (vars) => updateMutation.mutate(vars),
-        mutateAsync: (vars) => updateMutation.mutateAsync(vars),
-        isLoading: updateMutation.isPending,
+        mutate: updateMutate,
+        mutateAsync: updateMutateAsync,
+        isLoading: updateIsPending,
       },
       deleteBatch: {
-        mutate: (id) => deleteMutation.mutate(id),
-        mutateAsync: (id) => deleteMutation.mutateAsync(id),
-        isLoading: deleteMutation.isPending,
+        mutate: deleteMutate,
+        mutateAsync: deleteMutateAsync,
+        isLoading: deleteIsPending,
       },
       createBatch: {
-        mutate: (body) => createMutation.mutate(body),
-        mutateAsync: (body) => createMutation.mutateAsync(body),
-        isLoading: createMutation.isPending,
+        mutate: createMutate,
+        mutateAsync: createMutateAsync,
+        isLoading: createIsPending,
       },
       createRecipeFromBatch: {
-        mutate: (vars) => createRecipeMutation.mutate(vars),
-        mutateAsync: (vars) => createRecipeMutation.mutateAsync(vars),
-        isLoading: createRecipeMutation.isPending,
+        mutate: recipeMutate,
+        mutateAsync: recipeMutateAsync,
+        isLoading: recipeIsPending,
       },
       uploadImages: {
-        mutate: (vars) => uploadImagesMutation.mutate(vars),
-        mutateAsync: (vars) => uploadImagesMutation.mutateAsync(vars),
-        isLoading: uploadImagesMutation.isPending,
+        mutate: uploadMutate,
+        mutateAsync: uploadMutateAsync,
+        isLoading: uploadIsPending,
       },
       removeImage: {
-        mutate: (vars) => removeImageMutation.mutate(vars),
-        mutateAsync: (vars) => removeImageMutation.mutateAsync(vars),
-        isLoading: removeImageMutation.isPending,
+        mutate: removeMutate,
+        mutateAsync: removeMutateAsync,
+        isLoading: removeIsPending,
       },
     }),
     [
@@ -73,12 +99,24 @@ export const BatchProvider: React.FC<React.PropsWithChildren<{ batchId: number }
       isError,
       error,
       refetch,
-      updateMutation,
-      deleteMutation,
-      createMutation,
-      createRecipeMutation,
-      uploadImagesMutation,
-      removeImageMutation,
+      updateMutate,
+      updateMutateAsync,
+      updateIsPending,
+      deleteMutate,
+      deleteMutateAsync,
+      deleteIsPending,
+      createMutate,
+      createMutateAsync,
+      createIsPending,
+      recipeMutate,
+      recipeMutateAsync,
+      recipeIsPending,
+      uploadMutate,
+      uploadMutateAsync,
+      uploadIsPending,
+      removeMutate,
+      removeMutateAsync,
+      removeIsPending,
     ],
   );
 

@@ -16,7 +16,7 @@ export const percentage = (part?: number, total?: number): number => {
     part === null ||
     total === null ||
     Number.isNaN(part) ||
-    Number.isNaN(part)
+    Number.isNaN(total)
   )
     return 0;
 

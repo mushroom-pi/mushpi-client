@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { ChartsReadingsParams } from '~ctx/Charts';
 import { useChartsContext } from '~ctx/Charts';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
+import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 import { useExportPicoUnitReadingsCmd } from '~hook/useReadings';
 import type { RangePreset } from '~utils/timeWindow';
 import { dayjsFromTimeWindow } from '~utils/timeWindow';
@@ -55,6 +56,7 @@ export function useBuildQueryForm() {
   const currentPicoUnitValue = String(localParams?.picoUnitId ?? params?.picoUnitId ?? '');
 
   const exportCsv = useExportPicoUnitReadingsCmd();
+  const { run } = useAsyncWithToast();
 
   const update = (overrideParams?: LocalParams, overridePreset?: PresetState) => {
     const source = overrideParams ?? localParams;
@@ -111,21 +113,26 @@ export function useBuildQueryForm() {
 
     setIsFetchingCsv(true);
     try {
-      const blob = await exportCsv({
-        picoUnitId: params.picoUnitId,
-        timeWindow: params.timeWindow,
-      });
+      await run(
+        async () => {
+          const blob = await exportCsv({
+            picoUnitId: params.picoUnitId,
+            timeWindow: params.timeWindow,
+          });
 
-      const objectUrl = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = objectUrl;
-      a.download = `readings-${params.picoUnitId}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(objectUrl);
-    } catch (err) {
-      console.error('Download failed', err);
+          const objectUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = objectUrl;
+          a.download = `readings-${params.picoUnitId}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(objectUrl);
+        },
+        { fallbackErrorMessage: 'Failed to download CSV', rethrow: true },
+      );
+    } catch {
+      // run() already showed the error toast
     } finally {
       setIsFetchingCsv(false);
     }

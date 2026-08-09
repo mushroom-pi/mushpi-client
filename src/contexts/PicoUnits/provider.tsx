@@ -1,4 +1,4 @@
-import { omit } from 'lodash';
+import omit from 'lodash/omit';
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 
 import type {
@@ -20,7 +20,6 @@ type PicoUnitsContextType = {
   error: unknown;
   refetch: () => Promise<unknown>;
   getById: (id: string | number) => PicoUnit | undefined;
-  updateLocal: (unit: PicoUnit) => void;
   setParams: (p: ListPicoUnitsParams | undefined) => void;
   params?: ListPicoUnitsParams;
   queryData: Omit<PicoUnitListResponseDto, 'items'> | null;
@@ -50,13 +49,6 @@ export const PicoUnitsProvider = ({
     [units],
   );
 
-  const updateLocal = useCallback((_unit: PicoUnit) => {
-    // This now updates React Query's cache directly instead of maintaining separate state.
-    // The mutation helpers in PicoUnit context handle optimistic updates via createOptimisticMutation,
-    // which manages the cache lifecycle. updateLocal is kept for backwards compatibility.
-    // Consider deprecating in favor of directly using mutations or queryClient.setQueryData.
-  }, []);
-
   const refetch = useCallback(async () => {
     // delegate to react-query's refetch
     if (query.refetch) {
@@ -73,7 +65,6 @@ export const PicoUnitsProvider = ({
       error: query.isError ? query.error : undefined,
       refetch,
       getById,
-      updateLocal,
       setParams,
       params,
       queryData,
@@ -87,7 +78,6 @@ export const PicoUnitsProvider = ({
       query.error,
       refetch,
       getById,
-      updateLocal,
       params,
       queryData,
       selectedUnitId,

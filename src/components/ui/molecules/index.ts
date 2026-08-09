@@ -9,6 +9,7 @@ export type { ConfirmDialogProps } from './ConfirmDialog';
 export { OnOffInfo } from './OnOffInfo';
 export { OnOffInput } from './OnOffInput';
 export { Error } from './Error';
+export { ErrorBoundary } from './ErrorBoundary';
 export { Invalid } from './Invalid';
 export { GraphTab } from './GraphTab';
 export { DataTable } from './DataTable';

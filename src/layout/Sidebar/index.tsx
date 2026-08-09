@@ -53,7 +53,11 @@ export default function Sidebar() {
           </span>
         </Box>
 
-        <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main', fontSize: 18 }}>
+        <Typography
+          variant="h6"
+          component="div"
+          sx={{ fontWeight: 700, color: 'primary.main', fontSize: 18 }}
+        >
           MushPi
         </Typography>
 
@@ -119,6 +123,7 @@ export default function Sidebar() {
 
             <Typography
               variant="h6"
+              component="div"
               sx={{ ml: 1, fontWeight: 700, color: 'primary.main', fontSize: 16 }}
             >
               MushPi

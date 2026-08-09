@@ -1,4 +1,4 @@
-import { omit } from 'lodash';
+import omit from 'lodash/omit';
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import type { AggregatedReadingsResponseDto } from '~api/generated';

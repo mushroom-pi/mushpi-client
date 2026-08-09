@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { Route, Routes } from 'react-router-dom';
 
-import { ServerDownBanner } from '~components';
+import { ErrorBoundary, ServerDownBanner } from '~components';
 
 import Sidebar from './layout/Sidebar';
 import { drawerWidth } from './layout/Sidebar/constants';
@@ -29,18 +29,20 @@ export default function App() {
         }}
       >
         <ServerDownBanner />
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/pico-units" element={<PicoUnits />} />
-          <Route path="/pico-units/:id" element={<PicoUnitDetail />} />
-          <Route path="/batches" element={<BatchesPage />} />
-          <Route path="/batches/:id" element={<BatchDetail />} />
-          <Route path="/recipes" element={<RecipesPage />} />
-          <Route path="/recipes/:id" element={<RecipeDetail />} />
-          <Route path="/readings" element={<ReadingsPage />} />
-          <Route path="/server" element={<Server />} />
-          <Route path="/settings" element={<Settings />} />
-        </Routes>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/pico-units" element={<PicoUnits />} />
+            <Route path="/pico-units/:id" element={<PicoUnitDetail />} />
+            <Route path="/batches" element={<BatchesPage />} />
+            <Route path="/batches/:id" element={<BatchDetail />} />
+            <Route path="/recipes" element={<RecipesPage />} />
+            <Route path="/recipes/:id" element={<RecipeDetail />} />
+            <Route path="/readings" element={<ReadingsPage />} />
+            <Route path="/server" element={<Server />} />
+            <Route path="/settings" element={<Settings />} />
+          </Routes>
+        </ErrorBoundary>
       </Box>
     </Box>
   );

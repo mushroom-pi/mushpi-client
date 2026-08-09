@@ -12,12 +12,7 @@ import {
 } from './generated';
 
 // Build a configuration object for runtime values
-const apiBase =
-  import.meta.env.VITE_API_BASE_URL ??
-  (typeof process !== 'undefined'
-    ? (process.env.REACT_APP_API_BASE_URL as string | undefined)
-    : undefined) ??
-  'http://localhost:3000';
+const apiBase = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
 
 const configuration = new Configuration({
   basePath: apiBase,

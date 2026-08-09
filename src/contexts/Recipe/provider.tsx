@@ -28,6 +28,28 @@ export const RecipeProvider: React.FC<React.PropsWithChildren<{ recipeId: number
   const uploadImageMutation = createUploadRecipeImageMutation(qc);
   const deleteImageMutation = createDeleteRecipeImageMutation(qc);
 
+  // Destructure stable parts — mutate/mutateAsync are referentially stable,
+  // but the wrapper object returned by useMutation changes identity every render.
+  const updateMutate = updateMutation.mutate;
+  const updateMutateAsync = updateMutation.mutateAsync;
+  const updateIsPending = updateMutation.isPending;
+
+  const deleteMutate = deleteMutation.mutate;
+  const deleteMutateAsync = deleteMutation.mutateAsync;
+  const deleteIsPending = deleteMutation.isPending;
+
+  const createMutate = createMutation.mutate;
+  const createMutateAsync = createMutation.mutateAsync;
+  const createIsPending = createMutation.isPending;
+
+  const uploadMutate = uploadImageMutation.mutate;
+  const uploadMutateAsync = uploadImageMutation.mutateAsync;
+  const uploadIsPending = uploadImageMutation.isPending;
+
+  const deleteImgMutate = deleteImageMutation.mutate;
+  const deleteImgMutateAsync = deleteImageMutation.mutateAsync;
+  const deleteImgIsPending = deleteImageMutation.isPending;
+
   const value = useMemo<RecipeCtx>(
     () => ({
       recipe,
@@ -38,29 +60,29 @@ export const RecipeProvider: React.FC<React.PropsWithChildren<{ recipeId: number
       recipeBatches: batchesData?.items,
       isBatchesLoading,
       updateRecipe: {
-        mutate: (vars) => updateMutation.mutate(vars),
-        mutateAsync: (vars) => updateMutation.mutateAsync(vars),
-        isLoading: updateMutation.isPending,
+        mutate: updateMutate,
+        mutateAsync: updateMutateAsync,
+        isLoading: updateIsPending,
       },
       deleteRecipe: {
-        mutate: (id) => deleteMutation.mutate(id),
-        mutateAsync: (id) => deleteMutation.mutateAsync(id),
-        isLoading: deleteMutation.isPending,
+        mutate: deleteMutate,
+        mutateAsync: deleteMutateAsync,
+        isLoading: deleteIsPending,
       },
       uploadImage: {
-        mutate: (vars) => uploadImageMutation.mutate(vars),
-        mutateAsync: (vars) => uploadImageMutation.mutateAsync(vars),
-        isLoading: uploadImageMutation.isPending,
+        mutate: uploadMutate,
+        mutateAsync: uploadMutateAsync,
+        isLoading: uploadIsPending,
       },
       deleteImage: {
-        mutate: (id) => deleteImageMutation.mutate(id),
-        mutateAsync: (id) => deleteImageMutation.mutateAsync(id),
-        isLoading: deleteImageMutation.isPending,
+        mutate: deleteImgMutate,
+        mutateAsync: deleteImgMutateAsync,
+        isLoading: deleteImgIsPending,
       },
       createRecipe: {
-        mutate: (body) => createMutation.mutate(body),
-        mutateAsync: (body) => createMutation.mutateAsync(body),
-        isLoading: createMutation.isPending,
+        mutate: createMutate,
+        mutateAsync: createMutateAsync,
+        isLoading: createIsPending,
       },
     }),
     [
@@ -71,11 +93,21 @@ export const RecipeProvider: React.FC<React.PropsWithChildren<{ recipeId: number
       refetch,
       batchesData,
       isBatchesLoading,
-      updateMutation,
-      deleteMutation,
-      createMutation,
-      uploadImageMutation,
-      deleteImageMutation,
+      updateMutate,
+      updateMutateAsync,
+      updateIsPending,
+      deleteMutate,
+      deleteMutateAsync,
+      deleteIsPending,
+      createMutate,
+      createMutateAsync,
+      createIsPending,
+      uploadMutate,
+      uploadMutateAsync,
+      uploadIsPending,
+      deleteImgMutate,
+      deleteImgMutateAsync,
+      deleteImgIsPending,
     ],
   );
 

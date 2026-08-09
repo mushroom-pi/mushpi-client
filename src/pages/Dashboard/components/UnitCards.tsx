@@ -18,10 +18,13 @@ interface UnitCardsProps {
 }
 
 function StatusIcon({ status }: { status: string }) {
-  if (status === 'offline') return <ErrorIcon color="error" fontSize="small" />;
-  if (status === 'degraded') return <WarningIcon color="warning" fontSize="small" />;
-  if (status === 'unmonitored') return <PauseCircleIcon color="disabled" fontSize="small" />;
-  return <CheckCircleIcon color="success" fontSize="small" />;
+  if (status === 'offline')
+    return <ErrorIcon color="error" fontSize="small" aria-label="Offline" />;
+  if (status === 'degraded')
+    return <WarningIcon color="warning" fontSize="small" aria-label="Degraded" />;
+  if (status === 'unmonitored')
+    return <PauseCircleIcon color="disabled" fontSize="small" aria-label="Unmonitored" />;
+  return <CheckCircleIcon color="success" fontSize="small" aria-label="Healthy" />;
 }
 
 export function UnitCards({ items, healthy, degraded, offline, total }: UnitCardsProps) {

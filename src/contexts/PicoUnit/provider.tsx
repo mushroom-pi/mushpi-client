@@ -39,6 +39,40 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
   const changeSetupMutation = createChangeSetupMutation(qc);
   const rebootMutation = createRebootMutation(qc);
 
+  // Destructure stable parts — mutate/mutateAsync are referentially stable,
+  // but the wrapper object returned by useMutation changes identity every render.
+  const pollMutate = pollMutation.mutate;
+  const pollMutateAsync = pollMutation.mutateAsync;
+  const pollIsPending = pollMutation.isPending;
+
+  const updateMutate = updateMutation.mutate;
+  const updateMutateAsync = updateMutation.mutateAsync;
+  const updateIsPending = updateMutation.isPending;
+
+  const deleteMutate = deleteMutation.mutate;
+  const deleteMutateAsync = deleteMutation.mutateAsync;
+  const deleteIsPending = deleteMutation.isPending;
+
+  const toggleMutate = toggleControlLoopMutation.mutate;
+  const toggleMutateAsync = toggleControlLoopMutation.mutateAsync;
+  const toggleIsPending = toggleControlLoopMutation.isPending;
+
+  const targetsMutate = changeTargetsMutation.mutate;
+  const targetsMutateAsync = changeTargetsMutation.mutateAsync;
+  const targetsIsPending = changeTargetsMutation.isPending;
+
+  const outputsMutate = changeOutputsMutation.mutate;
+  const outputsMutateAsync = changeOutputsMutation.mutateAsync;
+  const outputsIsPending = changeOutputsMutation.isPending;
+
+  const setupMutate = changeSetupMutation.mutate;
+  const setupMutateAsync = changeSetupMutation.mutateAsync;
+  const setupIsPending = changeSetupMutation.isPending;
+
+  const rebootMutate = rebootMutation.mutate;
+  const rebootMutateAsync = rebootMutation.mutateAsync;
+  const rebootIsPending = rebootMutation.isPending;
+
   const value = useMemo<PicoUnitCtx>(
     () => ({
       pico,
@@ -47,44 +81,44 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
       error,
       refetch: () => void refetch(),
       pollPico: {
-        mutate: (params) => pollMutation.mutate(params),
-        mutateAsync: (params) => pollMutation.mutateAsync(params),
-        isLoading: pollMutation.isPending,
+        mutate: pollMutate,
+        mutateAsync: pollMutateAsync,
+        isLoading: pollIsPending,
       },
       updatePico: {
-        mutate: (vars) => updateMutation.mutate(vars),
-        mutateAsync: (vars) => updateMutation.mutateAsync(vars),
-        isLoading: updateMutation.isPending,
+        mutate: updateMutate,
+        mutateAsync: updateMutateAsync,
+        isLoading: updateIsPending,
       },
       deletePico: {
-        mutate: (id) => deleteMutation.mutate(id),
-        mutateAsync: (id) => deleteMutation.mutateAsync(id),
-        isLoading: deleteMutation.isPending,
+        mutate: deleteMutate,
+        mutateAsync: deleteMutateAsync,
+        isLoading: deleteIsPending,
       },
       toggleControlLoop: {
-        mutate: (vars) => toggleControlLoopMutation.mutate(vars),
-        mutateAsync: (vars) => toggleControlLoopMutation.mutateAsync(vars),
-        isLoading: toggleControlLoopMutation.isPending,
+        mutate: toggleMutate,
+        mutateAsync: toggleMutateAsync,
+        isLoading: toggleIsPending,
       },
       changeTargets: {
-        mutate: (vars) => changeTargetsMutation.mutate(vars),
-        mutateAsync: (vars) => changeTargetsMutation.mutateAsync(vars),
-        isLoading: changeTargetsMutation.isPending,
+        mutate: targetsMutate,
+        mutateAsync: targetsMutateAsync,
+        isLoading: targetsIsPending,
       },
       changeOutputs: {
-        mutate: (vars) => changeOutputsMutation.mutate(vars),
-        mutateAsync: (vars) => changeOutputsMutation.mutateAsync(vars),
-        isLoading: changeOutputsMutation.isPending,
+        mutate: outputsMutate,
+        mutateAsync: outputsMutateAsync,
+        isLoading: outputsIsPending,
       },
       changeSetup: {
-        mutate: (vars) => changeSetupMutation.mutate(vars),
-        mutateAsync: (vars) => changeSetupMutation.mutateAsync(vars),
-        isLoading: changeSetupMutation.isPending,
+        mutate: setupMutate,
+        mutateAsync: setupMutateAsync,
+        isLoading: setupIsPending,
       },
       rebootPico: {
-        mutate: (vars) => rebootMutation.mutate(vars),
-        mutateAsync: (vars) => rebootMutation.mutateAsync(vars),
-        isLoading: rebootMutation.isPending,
+        mutate: rebootMutate,
+        mutateAsync: rebootMutateAsync,
+        isLoading: rebootIsPending,
       },
     }),
     [
@@ -93,14 +127,30 @@ export const PicoUnitProvider: React.FC<React.PropsWithChildren<{ picoUnitId: nu
       isError,
       error,
       refetch,
-      pollMutation,
-      updateMutation,
-      deleteMutation,
-      toggleControlLoopMutation,
-      changeTargetsMutation,
-      changeOutputsMutation,
-      changeSetupMutation,
-      rebootMutation,
+      pollMutate,
+      pollMutateAsync,
+      pollIsPending,
+      updateMutate,
+      updateMutateAsync,
+      updateIsPending,
+      deleteMutate,
+      deleteMutateAsync,
+      deleteIsPending,
+      toggleMutate,
+      toggleMutateAsync,
+      toggleIsPending,
+      targetsMutate,
+      targetsMutateAsync,
+      targetsIsPending,
+      outputsMutate,
+      outputsMutateAsync,
+      outputsIsPending,
+      setupMutate,
+      setupMutateAsync,
+      setupIsPending,
+      rebootMutate,
+      rebootMutateAsync,
+      rebootIsPending,
     ],
   );
 
