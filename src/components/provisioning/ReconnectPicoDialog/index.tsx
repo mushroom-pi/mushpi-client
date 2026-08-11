@@ -18,15 +18,9 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import { HeaderAndIcon } from '~components';
+import { HeaderAndIcon, LedStateReference, JoinWifiIllustration, OpenBrowserIllustration, SuccessIllustration } from '~components';
 import { apSsidOrFallback, LED_STATES, POLL_FINISH_MAX_ATTEMPTS, PROVISION_AP_URL } from '~utils/pico';
 
-import { LedStateReference } from '../LedStateReference';
-import {
-  JoinWifiIllustration,
-  OpenBrowserIllustration,
-  SuccessIllustration,
-} from '../ProvisioningIllustrations';
 import type { ReconnectPicoDialogProps } from './interfaces';
 import { useReconnectPoll } from './useReconnectPoll';
 

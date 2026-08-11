@@ -3,10 +3,9 @@ import { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import type { PicoUnit } from '~api/generated';
-import { Error, Invalid, ItemPage, UnitHealthIcon } from '~components';
+import { Error, Invalid, ItemPage, ReconnectPicoDialog, UnitHealthIcon } from '~components';
 import { PicoUnitProvider, usePicoUnitContext } from '~ctx/PicoUnit';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
-import { ReconnectPicoDialog } from '~pages/PicoUnits/components/ReconnectPicoDialog';
 
 import { PicoUnitDetailGrid as DetailGrid } from './components/PicoUnitDetailGrid';
 import { PicoUnitDetailSkeleton } from './components/PicoUnitDetailSkeleton';

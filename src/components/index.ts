@@ -1,5 +1,6 @@
 // Top-level components barrel. Prefer importing components from here.
 export * from './ui';
+export * from './provisioning';
 
 // Larger more specific components that aren't just UI (e.g. BatchForm, RecipeForm).
 export { BatchForm } from './BatchForm';

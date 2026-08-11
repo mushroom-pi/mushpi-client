@@ -19,3 +19,4 @@ export { CardSkeleton } from './CardSkeleton';
 export type { CardSkeletonProps } from './CardSkeleton';
 export { RefreshButton } from './RefreshButton';
 export type { RefreshButtonProps } from './RefreshButton';
+export { StatusChip } from './StatusChip';

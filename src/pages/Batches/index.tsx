@@ -3,12 +3,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { BatchesControllerListV1StatusEnum } from '~api/generated';
-import { AddNew, Error, PageTitle, TableSkeleton } from '~components';
+import { AddNew, BatchesTable, CreateBatchDialog, Error, PageTitle, TableSkeleton } from '~components';
 import { useListBatches } from '~ctx/Batches';
 import { Page } from '~layout/Page';
-
-import { BatchesTable } from './components/BatchesTable';
-import { CreateBatchDialog } from './components/CreateBatchDialog';
 
 type BatchStatus =
   (typeof BatchesControllerListV1StatusEnum)[keyof typeof BatchesControllerListV1StatusEnum];

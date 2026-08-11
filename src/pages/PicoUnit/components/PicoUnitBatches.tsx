@@ -4,11 +4,9 @@ import dayjs from 'dayjs';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { InfoCard } from '~components';
+import { BatchesTable, CreateBatchDialog, InfoCard } from '~components';
 import { usePicoUnitBatches, usePicoUnitCurrentBatch } from '~ctx/Batches';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
-import { BatchesTable } from '~pages/Batches/components/BatchesTable';
-import { CreateBatchDialog } from '~pages/Batches/components/CreateBatchDialog';
 
 export const PicoUnitBatches: React.FC = () => {
   const navigate = useNavigate();

@@ -105,46 +105,56 @@ Dialog-auto-open: `navigate('/path', { state: { openEditDialog: true } })`, read
 
 ```
 src/
-├── api/                  # Client, generated code, query keys
-├── components/ui/
-│   ├── atoms/            # Stateless presentational
-│   ├── molecules/        # Composed (may use context/hooks)
-│   │   └── ImageManager/  # Shared image gallery/upload/remove (used by Recipe + Batch)
+├── api/                     # Client, generated code, query keys
+├── components/
+│   ├── BatchForm.tsx        # Shared batch form (consumed by Create + Edit dialogs)
+│   ├── PicoUnitForm.tsx     # Shared PicoUnit form
+│   ├── RecipeForm.tsx       # Shared recipe form
+│   ├── provisioning/        # Reconnect wizard, LED reference, provisioning illustrations
+│   │   ├── LedStateReference.tsx
+│   │   ├── ProvisioningIllustrations.tsx
+│   │   └── ReconnectPicoDialog/
+│   ├── ui/
+│   │   ├── atoms/           # Stateless presentational
+│   │   ├── molecules/       # Composed (may use context/hooks)
+│   │   │   ├── BatchesTable.tsx       # Shared batch table (consumed by Batches, PicoUnit, Recipe pages)
+│   │   │   ├── ChartsTabs/            # Shared chart tab suite (consumed by Readings + Batch pages)
+│   │   │   ├── CreateBatchDialog/     # Folder molecule (consumed by Batches, PicoUnit, Recipe pages)
+│   │   │   └── ImageManager/          # Shared image gallery/upload/remove (used by Recipe + Batch)
+│   │   └── index.ts
 │   └── index.ts
-├── contexts/             # Context + hooks + mutations per entity
+├── contexts/                # Context + hooks + mutations per entity
 │   ├── PicoUnit/mutations/: changeSetup, controlLoop, delete, outputs, setPoints, update
 │   ├── Recipe/mutations/: create, delete, image, update
 │   ├── Batch/mutations/: create, delete, image, update, createRecipeFromBatch
 │   ├── Charts/: provider.tsx, batchProvider.tsx
 │   └── Toast.tsx
-├── hooks/                # useDashboard, useReadings, useBatchReadings, useServerHealth, useIsServerReachable, useAsyncWithToast, useSettings
-├── layout/               # Page wrapper, Sidebar
-├── pages/                # Route pages (default exports)
+├── hooks/                   # useDashboard, useReadings, useBatchReadings, useServerHealth, useIsServerReachable, useAsyncWithToast, useSettings
+├── layout/                  # Page wrapper, Sidebar
+├── pages/                   # Route pages (default exports)
 │   │                       # ⚠️ Page components MUST live in <PageName>/index.tsx,
 │   │                       #   never as a bare <PageName>.tsx at the pages root.
-│   ├── Dashboard/         # Dashboard page at /
-│   │   └── components/    # WarningsBanner, StatsRow, UnitCards, etc.
-│   ├── PicoUnit/          # Unit detail page at /pico-units/:id
-│   │   └── components/    # PicoUnitStatCards, PicoUnitDetailGrid, PicoUnitDevices, etc.
-│   ├── Settings/          # Settings page at /settings
-│   │   └── components/     # SettingsSkeleton (card skeleton)
-│   ├── PicoUnits/         # Units list page at /pico-units
+│   ├── Dashboard/           # Dashboard page at /
+│   │   └── components/      # WarningsBanner, StatsRow, UnitCards, etc.
+│   ├── PicoUnit/            # Unit detail page at /pico-units/:id
+│   │   └── components/      # PicoUnitStatCards, PicoUnitDetailGrid, PicoUnitDevices, etc.
+│   ├── Settings/            # Settings page at /settings
+│   │   └── components/      # SettingsSkeleton (card skeleton)
+│   ├── PicoUnits/           # Units list page at /pico-units
 │   │   └── components/
-│   │       ├── ProvisioningIllustrations.tsx  # SVG illustrations for provisioning wizards
-│   │       ├── LedStateReference.tsx     # Collapsible LED diagnostic accordion
-│   │       ├── ConnectPicoWizard/        # Multi-step wizard for new Pico provisioning
-│       │   ├── ReconnectPicoDialog/      # Multi-step wizard for offline Pico recovery
-│       │   └── ManualRegisterDialog/     # Manual PicoUnit registration (mDNS-based)
-│   │   └── components/                   # Page-scoped widgets (NOT shared molecules)
+│   │       ├── ConnectPicoWizard/      # Multi-step wizard for new Pico provisioning
+│   │       └── ManualRegisterDialog/   # Manual PicoUnit registration (mDNS-based)
 ├── theme/mushroomTheme.ts
 ├── types/charts.ts
 └── utils/
-    ├── methods.ts        # Generic: date formatting, bytes, percentages
-    ├── pico.ts           # Pico: provisioning constants, LED_STATES, chip color helpers
-    └── charts.ts         # (removed — server handles aggregation)
+    ├── methods.ts           # Generic: date formatting, bytes, percentages
+    ├── pico.ts              # Pico: provisioning constants, LED_STATES, chip color helpers
+    └── charts.ts            # (removed — server handles aggregation)
 ```
 
 ## Charts (Recharts)
+
+Chart components live in `src/components/ui/molecules/ChartsTabs/`. Providers and the `useChartsContext()` hook live in `src/contexts/Charts/`.
 
 Three chart tabs in `/readings` and `/batches/:id`:
 
@@ -236,6 +246,7 @@ Standard conventions from `frontend-react` skill apply. Project-specific additio
 - Loading states: Prefer shape-matched MUI `<Skeleton>` components over the generic `<Loading />` spinner for data pages. See the `frontend-react` skill for the full pattern (hierarchy, gating on `isLoading`, page shell structure). Reusable skeletons live in atoms/molecules; page-scoped skeleton compositions live in `pages/<Page>/components/`.
 - **No dead props**: The ESLint config treats unused props/imports as errors (`@typescript-eslint/no-unused-vars`). Don't add props to an interface that the component body never uses — the build will fail. If a prop seems theoretically useful but has no consumer, drop it.
 - **Page-scoped presentational components**: A presentational (stateless) component used by only one page stays co-located in `pages/<Page>/components/`, not under `components/ui/atoms/`. The shared `atoms/` directory is for components reused across 2+ pages. If a page-scoped component later gains a second consumer, promote it to `components/ui/atoms/` at that time.
+- **No cross-page imports**: Never import from another page's folder via `~pages/<OtherPage>/...`. If a component, dialog, or utility is needed by 2+ pages, promote it to `~components`. Conversely, if you find an existing `~pages/<X>/...` import in a different page's file, report it — it's a code smell that needs a promotion PR.
 - **Error boundaries are the sole exception to functional components**: React's error boundary lifecycle methods (`getDerivedStateFromError`, `componentDidCatch`) only exist on class components — there is no functional hook equivalent. The `ErrorBoundary` component in `molecules/` is intentionally a class component. Wrap it around `<Routes>` only (not the app shell) so the sidebar and `ServerDownBanner` survive page crashes.
 - **Mutation identity in context `useMemo` deps**: React Query v5's `useMutation` returns a wrapper object that changes identity every render, but `mutate`/`mutateAsync` are referentially stable. In context-provider `useMemo` dependency arrays, **destructure** `mutate`, `mutateAsync`, and `isPending` from the mutation result and depend on those stable primitives — never the whole mutation wrapper object. Rebuilding the wrapper from stable parts keeps the memo honest and prevents cascading consumer re-renders.
 - **CSV download failures must surface via toast**: `useAsyncWithToast().run()` with `fallbackErrorMessage: 'Failed to download CSV'` and `rethrow: true`. Wrap the export+download logic inside `run()`. Server HTTP errors auto-surface; `fallbackErrorMessage` covers network/non-HTTP failures. Remove `console.error` calls from download catch blocks.

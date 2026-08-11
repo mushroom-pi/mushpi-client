@@ -2,14 +2,13 @@ import { Box, Button, Typography } from '@mui/material';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Error, PageTitle } from '~components';
+import { ChartsTabs, Error, PageTitle } from '~components';
 import { ChartsProvider } from '~ctx/Charts';
 import { usePollPicoUnit } from '~ctx/PicoUnit';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { Page } from '~layout/Page';
 
 import { BuildQueryForm } from './components/BuildQueryForm';
-import { ChartsTabs } from './components/ChartsTabs';
 import { ReadingsSkeleton } from './components/ReadingsSkeleton';
 
 export const ReadingsPage = () => {

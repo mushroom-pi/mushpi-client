@@ -22,16 +22,10 @@ import { useNavigate } from 'react-router-dom';
 
 import type { PicoUnitListResponseDto } from '~api/generated';
 import { picoUnitsKeys } from '~api/queryKeys';
-import { HeaderAndIcon } from '~components';
+import { HeaderAndIcon, LedStateReference, JoinWifiIllustration, OpenBrowserIllustration, SuccessIllustration } from '~components';
 import { LED_STATES, POLL_FINISH_MAX_ATTEMPTS, PROVISION_AP_URL } from '~utils/pico';
 
-import { LedStateReference } from '../LedStateReference';
 import { ManualRegisterDialog } from '../ManualRegisterDialog';
-import {
-  JoinWifiIllustration,
-  OpenBrowserIllustration,
-  SuccessIllustration,
-} from '../ProvisioningIllustrations';
 import type { ConnectPicoWizardProps } from './interfaces';
 import { useNewPicoPoll } from './useNewPicoPoll';
 

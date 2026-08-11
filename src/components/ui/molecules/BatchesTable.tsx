@@ -6,8 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Batch, BatchStatusEnum } from '~api/generated';
 import type { DataTableColumn } from '~components';
 import { DataTable } from '~components';
-import { ReadableTime } from '~components';
-import { StatusChip } from '~pages/Batches/components/StatusChip';
+import { ReadableTime, StatusChip } from '~components';
 
 const formatDateTime = (value?: string | null) => {
   if (!value) return '—';

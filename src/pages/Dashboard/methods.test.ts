@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { formatRelativeFromNow } from '~pages/Dashboard/methods';
+import { formatRelativeFromNow } from './methods';
 
 describe('formatRelativeFromNow', () => {
   afterEach(() => {

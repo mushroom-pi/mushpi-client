@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import {
+  ChartsTabs,
   DeleteButton,
   EditButton,
   Error,
@@ -11,13 +12,12 @@ import {
   ItemPage,
   PageTitle,
   ReadingsCsvDownloadButton,
+  StatusChip,
 } from '~components';
 import { BatchProvider, useBatchContext } from '~ctx/Batch';
 import { BatchChartsProvider } from '~ctx/Charts';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 import { useExportBatchReadingsCmd } from '~hook/useBatchReadings';
-import { StatusChip } from '~pages/Batches/components/StatusChip';
-import { ChartsTabs } from '~pages/Readings/components/ChartsTabs';
 
 import { BatchDetailSkeleton } from './components/BatchDetailSkeleton';
 import { BatchMeta } from './components/BatchMeta';

@@ -1,4 +1,6 @@
 // Barrel for reusable UI molecules.
+export { BatchesTable } from './BatchesTable';
+export { ChartsTabs } from './ChartsTabs';
 export { ImageManager } from './ImageManager';
 export type { ImageManagerImage, ImageManagerProps } from './ImageManager';
 export { ItemPage } from './ItemPage';
@@ -6,6 +8,8 @@ export { InfoCard } from './InfoCard';
 export { EditableInfoCard } from './EditableInfoCard';
 export { ConfirmDialog } from './ConfirmDialog';
 export type { ConfirmDialogProps } from './ConfirmDialog';
+export { CreateBatchDialog } from './CreateBatchDialog';
+export type { CreateBatchDialogProps } from './CreateBatchDialog/interfaces';
 export { OnOffInfo } from './OnOffInfo';
 export { OnOffInput } from './OnOffInput';
 export { Error } from './Error';

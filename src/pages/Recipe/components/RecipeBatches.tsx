@@ -6,10 +6,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { recipeKeys } from '~api/queryKeys';
-import { InfoCard } from '~components';
+import { BatchesTable, CreateBatchDialog, InfoCard } from '~components';
 import { useRecipeContext } from '~ctx/Recipe';
-import { BatchesTable } from '~pages/Batches/components/BatchesTable';
-import { CreateBatchDialog } from '~pages/Batches/components/CreateBatchDialog';
 
 export function RecipeBatches() {
   const navigate = useNavigate();

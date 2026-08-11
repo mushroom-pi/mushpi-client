@@ -2,13 +2,12 @@ import { Grid, Skeleton, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import type { PicoUnit } from '~api/generated';
-import { AddNew, CardGridSkeleton, Error, PageTitle } from '~components';
+import { AddNew, CardGridSkeleton, Error, PageTitle, ReconnectPicoDialog } from '~components';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
 import { Page } from '~layout/Page';
 
 import { ConnectPicoWizard } from './components/ConnectPicoWizard';
 import PicoUnitCard from './components/PicoUnitCard';
-import { ReconnectPicoDialog } from './components/ReconnectPicoDialog';
 
 export default function PicoUnitsPage() {
   const { units: items, isLoading, isError, error, refetch, queryData } = usePicoUnitsContext();

@@ -9,7 +9,7 @@ import {
 
 import { LED_STATES } from '~utils/pico';
 
-interface LedStateReferenceProps {
+export interface LedStateReferenceProps {
   compact?: boolean;
 }
 
