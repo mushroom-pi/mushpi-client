@@ -52,9 +52,12 @@ export const ChartsProvider = ({
 
   useEffect(() => {
     if (initialParams?.picoUnitId != null && initialParams.picoUnitId !== params.picoUnitId) {
-      setParams((prev: ChartsReadingsParams) => ({ ...prev, picoUnitId: initialParams.picoUnitId }));
+      setParams((prev: ChartsReadingsParams) => ({
+        ...prev,
+        picoUnitId: initialParams.picoUnitId,
+      }));
     }
-  }, [initialParams?.picoUnitId]);
+  }, [initialParams?.picoUnitId, params.picoUnitId]);
 
   // Keep query points in sync when auto-resolved value changes
   useEffect(() => {

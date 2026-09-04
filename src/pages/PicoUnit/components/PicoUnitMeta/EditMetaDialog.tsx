@@ -43,7 +43,7 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
     setEditDescription(pico.description ?? '');
     setEditMonitored(!!pico.monitored);
     setEditFaceColor(pico.face_color ?? null);
-  }, [open, pico?.id, pico?.name, pico?.description, pico?.monitored, pico?.face_color]);
+  }, [open, pico]);
 
   // detect changes to enable/disable Save button
   const hasChanges = useMemo(() => {
@@ -152,8 +152,8 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
             />
           </Box>
           <FormHelperText>
-            When monitoring is disabled, the server stops collecting readings for this unit.
-            The Pico continues running its control loop independently.
+            When monitoring is disabled, the server stops collecting readings for this unit. The
+            Pico continues running its control loop independently.
           </FormHelperText>
         </Stack>
       </PicoUnitForm>

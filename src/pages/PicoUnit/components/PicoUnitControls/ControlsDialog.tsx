@@ -12,7 +12,8 @@ export const ControlsDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSa
   const { pico, changeTargets, toggleControlLoop } = usePicoUnitContext();
   const { run } = useAsyncWithToast();
 
-  const lr = pico?.latest_reading;
+  // Memoize latest_reading so it only changes when pico changes (not every render)
+  const lr = useMemo(() => pico?.latest_reading, [pico]);
   const isSaving = changeTargets?.isLoading && toggleControlLoop?.isLoading;
 
   const [enabled, setEnabled] = useState<boolean>(lr?.control_loop_enabled ?? false);
@@ -30,7 +31,7 @@ export const ControlsDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSa
     setEnabled(lr.control_loop_enabled);
     setTargetTemp(lr.temperature_set ?? null);
     setTargetHum(lr.humidity_set ?? null);
-  }, [open, lr?.control_loop_enabled, lr?.temperature_set, lr?.humidity_set]);
+  }, [open, lr]);
 
   const changesControlLoop = useMemo(() => {
     if (!lr) return false;
@@ -43,9 +44,8 @@ export const ControlsDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSa
   }, [lr, targetHum, targetTemp]);
 
   const hasChanges = useMemo(() => {
-    if (!lr) return false;
     return changesTargets || changesControlLoop;
-  }, [lr, changesTargets, changesControlLoop]);
+  }, [changesTargets, changesControlLoop]);
 
   if (!pico || !lr) return null;
 

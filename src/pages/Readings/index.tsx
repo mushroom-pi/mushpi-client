@@ -1,5 +1,5 @@
 import { Box, Button, Typography } from '@mui/material';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 import { ChartsTabs, Error, PageTitle } from '~components';
@@ -26,14 +26,18 @@ export const ReadingsPage = () => {
 
   useEffect(() => {
     if (selectedUnitId == null && picoUnits?.length) setSelectedUnitId(picoUnits[0].id);
-  }, [picoUnits, selectedUnitId]);
+  }, [picoUnits, selectedUnitId, setSelectedUnitId]);
 
   const selectedId = selectedUnitId ?? picoUnits?.[0]?.id ?? null;
 
   // On-mount / on-unit-change poll to get fresh readings from the Pico
+  // Use ref for mutate to avoid re-triggering when pollPico.isLoading changes
+  const pollMutateRef = useRef(pollPico.mutate);
+  pollMutateRef.current = pollPico.mutate;
+
   useEffect(() => {
     if (selectedId) {
-      pollPico.mutate({ picoUnitId: selectedId });
+      pollMutateRef.current({ picoUnitId: selectedId });
     }
   }, [selectedId]);
 
@@ -59,9 +63,7 @@ export const ReadingsPage = () => {
     );
   } else {
     content = (
-      <ChartsProvider
-        initialParams={{ picoUnitId: selectedId, points: 200 }}
-      >
+      <ChartsProvider initialParams={{ picoUnitId: selectedId, points: 200 }}>
         <BuildQueryForm />
         <ChartsTabs />
       </ChartsProvider>
@@ -70,9 +72,7 @@ export const ReadingsPage = () => {
 
   return (
     <Page>
-      <PageTitle mb={2.5}>
-        Readings
-      </PageTitle>
+      <PageTitle mb={2.5}>Readings</PageTitle>
       {content}
     </Page>
   );

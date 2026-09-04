@@ -13,7 +13,8 @@ export const DevicesDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSav
   const { pico, changeOutputs } = usePicoUnitContext();
   const { run } = useAsyncWithToast();
 
-  const lr = pico?.latest_reading;
+  // Memoize latest_reading so it only changes when pico changes (not every render)
+  const lr = useMemo(() => pico?.latest_reading, [pico]);
 
   const [humidifierOn, setHumidifierOn] = useState<boolean | null>(lr?.humidifier_on ?? null);
   const [fanOn, setFanOn] = useState<boolean | null>(lr?.fan_on ?? null);
@@ -30,7 +31,7 @@ export const DevicesDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSav
     setHumidifierOn(lr.humidifier_on);
     setFanOn(lr.fan_on);
     setHeaterOn(lr.heater_on);
-  }, [open, lr?.heater_on, lr?.fan_on, lr?.humidifier_on]);
+  }, [open, lr]);
 
   const hasChanges = useMemo(() => {
     if (!lr) return false;

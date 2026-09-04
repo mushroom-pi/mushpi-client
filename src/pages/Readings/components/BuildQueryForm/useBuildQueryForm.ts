@@ -33,7 +33,7 @@ export function useBuildQueryForm() {
     if (params) {
       setPreset(dayjsFromTimeWindow(params.timeWindow).preset);
     }
-  }, [params?.timeWindow, params?.picoUnitId, params?.points]);
+  }, [params]);
 
   const start = localParams.start ?? null;
   const end = localParams.end ?? null;
@@ -64,7 +64,11 @@ export function useBuildQueryForm() {
     const picoUnitId = source?.picoUnitId != null ? Number(source.picoUnitId) : params?.picoUnitId;
     if (!picoUnitId) return;
 
-    const timeWindow = buildTimeWindowFromLocal(currentPreset, source.start ?? null, source.end ?? null);
+    const timeWindow = buildTimeWindowFromLocal(
+      currentPreset,
+      source.start ?? null,
+      source.end ?? null,
+    );
 
     const merged: ChartsReadingsParams = {
       picoUnitId,

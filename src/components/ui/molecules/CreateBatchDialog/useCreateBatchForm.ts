@@ -46,7 +46,10 @@ export function useCreateBatchForm({
     resetFields,
   } = useBatchFormFields();
 
-  const { data: picoUnitsData } = useListPicoUnits({ limit: 100, monitored: true }, { enabled: open });
+  const { data: picoUnitsData } = useListPicoUnits(
+    { limit: 100, monitored: true },
+    { enabled: open },
+  );
   const { data: recipesData } = useListRecipes({ limit: 100 }, { enabled: open });
   const { data: activeBatchesData } = useListBatches(
     { status: BatchesControllerListV1StatusEnum.InProgress, limit: 100 },
@@ -110,7 +113,6 @@ export function useCreateBatchForm({
   // When active-batch data loads after the dialog is already open, auto-adjust startAt if it
   // conflicts with the selected unit's active batch. recipeId and recipes are intentionally read
   // from the closure at effect-run time (not in deps) to avoid re-running on every Start keystroke.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!open || !picoUnitId) return;
     const active = activeBatchByUnitId.get(Number(picoUnitId));
@@ -124,7 +126,6 @@ export function useCreateBatchForm({
   // When recipe data loads after the dialog is already open with a pre-selected recipe,
   // compute finishAt if the user hasn't set it yet. startAt and finishAt are read from the
   // closure at effect-run time (not in deps) to avoid re-running on every field change.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!open || !recipeId || finishAt) return;
     handleStartAtChange(startAt, { recipeId, recipes });

@@ -1,5 +1,5 @@
 import { Box, Chip, LinearProgress, Stack, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import type { PicoUnit } from '~api/generated';
@@ -22,18 +22,23 @@ function PicoUnitDetailInner() {
   const [rebootOpen, setRebootOpen] = useState(false);
   const [reconnectPico, setReconnectPico] = useState<PicoUnit | null>(null);
   const location = useLocation();
+  const openEditDialog = (location.state as { openEditDialog?: boolean })?.openEditDialog;
 
   useEffect(() => {
-    if ((location.state as { openEditDialog?: boolean })?.openEditDialog) {
+    if (openEditDialog) {
       setEditOpen(true);
       window.history.replaceState({}, document.title);
     }
-  }, []);
+  }, [openEditDialog]);
 
   // On-mount poll to get fresh readings from the Pico
+  // Use ref for mutate to avoid re-triggering when pollPico.isLoading changes
+  const pollMutateRef = useRef(pollPico.mutate);
+  pollMutateRef.current = pollPico.mutate;
+
   useEffect(() => {
     if (pico?.id) {
-      pollPico.mutate({ picoUnitId: pico.id });
+      pollMutateRef.current({ picoUnitId: pico.id });
     }
   }, [pico?.id]);
 
@@ -59,16 +64,22 @@ function PicoUnitDetailInner() {
             <Stack direction="row" spacing={2} alignItems="center" mb={2}>
               <Chip
                 label={
-                  pico.status === 'healthy' ? 'Healthy' :
-                  pico.status === 'degraded' ? 'Degraded' :
-                  pico.status === 'offline' ? 'Offline' :
-                  'Paused'
+                  pico.status === 'healthy'
+                    ? 'Healthy'
+                    : pico.status === 'degraded'
+                      ? 'Degraded'
+                      : pico.status === 'offline'
+                        ? 'Offline'
+                        : 'Paused'
                 }
                 color={
-                  pico.status === 'healthy' ? 'success' :
-                  pico.status === 'degraded' ? 'warning' :
-                  pico.status === 'offline' ? 'error' :
-                  'default'
+                  pico.status === 'healthy'
+                    ? 'success'
+                    : pico.status === 'degraded'
+                      ? 'warning'
+                      : pico.status === 'offline'
+                        ? 'error'
+                        : 'default'
                 }
                 size="small"
               />
@@ -105,7 +116,7 @@ export default function PicoUnitDetail() {
 
   useEffect(() => {
     if (picoId) setSelectedUnitId(picoId);
-  }, [picoId]);
+  }, [picoId, setSelectedUnitId]);
 
   if (!picoId) return <Invalid item="pico unit id" />;
 

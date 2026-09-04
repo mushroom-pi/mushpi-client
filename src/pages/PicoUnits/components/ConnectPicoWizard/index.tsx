@@ -22,7 +22,13 @@ import { useNavigate } from 'react-router-dom';
 
 import type { PicoUnitListResponseDto } from '~api/generated';
 import { picoUnitsKeys } from '~api/queryKeys';
-import { HeaderAndIcon, LedStateReference, JoinWifiIllustration, OpenBrowserIllustration, SuccessIllustration } from '~components';
+import {
+  HeaderAndIcon,
+  JoinWifiIllustration,
+  LedStateReference,
+  OpenBrowserIllustration,
+  SuccessIllustration,
+} from '~components';
 import { LED_STATES, POLL_FINISH_MAX_ATTEMPTS, PROVISION_AP_URL } from '~utils/pico';
 
 import { ManualRegisterDialog } from '../ManualRegisterDialog';
@@ -131,9 +137,15 @@ export function ConnectPicoWizard({ open, onClose }: ConnectPicoWizardProps) {
     }
     return [];
     // Only recompute when dialog opens
-  }, [open]);
+  }, [open, qc]);
 
-  const { newUnit, detected, attempt, timedOut, reset: resetPoll } = useNewPicoPoll(baselineIds, {
+  const {
+    newUnit,
+    detected,
+    attempt,
+    timedOut,
+    reset: resetPoll,
+  } = useNewPicoPoll(baselineIds, {
     enabled: open && activeStep === STEPS.length - 1,
   });
 
@@ -185,14 +197,16 @@ export function ConnectPicoWizard({ open, onClose }: ConnectPicoWizardProps) {
         let meaning: string = state.meaning;
 
         if (state.id === 'provisioning') {
-          meaning = 'Provisioning mode. The Pico is waiting for Wi‑Fi credentials. Continue the setup below.';
+          meaning =
+            'Provisioning mode. The Pico is waiting for Wi‑Fi credentials. Continue the setup below.';
           action = (
             <Button size="small" variant="contained" onClick={() => setActiveStep(1)}>
               Next →
             </Button>
           );
         } else if (state.id === 'solid') {
-          meaning = "Connected to Wi‑Fi, but can't reach the hub. The hub URL may be wrong. Try registering manually.";
+          meaning =
+            "Connected to Wi‑Fi, but can't reach the hub. The hub URL may be wrong. Try registering manually.";
           action = (
             <Button
               size="small"

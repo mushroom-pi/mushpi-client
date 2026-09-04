@@ -18,11 +18,7 @@ import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 import type { DialogProps } from '~int/dialogProps';
 
 import { MappingPreview } from './MappingPreview';
-import {
-  DEFAULT_PINS,
-  PIN_RANGE,
-  PICO_PINOUT_DOC_URL,
-} from './picoPinout';
+import { DEFAULT_PINS, PICO_PINOUT_DOC_URL, PIN_RANGE } from './picoPinout';
 
 type PinKey = 'dht' | 'humidifier' | 'fan' | 'heater';
 
@@ -37,11 +33,11 @@ export const MappingDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSav
   const { pico, changeSetup } = usePicoUnitContext();
   const { run } = useAsyncWithToast();
 
-  if (!pico) return null;
-
-  const currentDevices = (pico as any).devices ?? {
-    pins: { ...DEFAULT_PINS },
-  };
+  // Memoize currentDevices so it only changes when pico changes (not every render)
+  const currentDevices = useMemo(
+    () => (pico as any)?.devices ?? { pins: { ...DEFAULT_PINS } },
+    [pico],
+  );
 
   const [acknowledged, setAcknowledged] = useState(false);
   const [pins, setPins] = useState<Record<PinKey, number>>({ ...DEFAULT_PINS });
@@ -110,6 +106,8 @@ export const MappingDialog: React.FC<DialogProps> = ({ open, onClose, closeOnSav
   }, [pins, currentDevices]);
 
   const canSubmit = acknowledged && hasChanges && isValid;
+
+  if (!pico) return null;
 
   function handlePinChange(key: PinKey, rawValue: string) {
     const num = rawValue === '' ? NaN : Number(rawValue);

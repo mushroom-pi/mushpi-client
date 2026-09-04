@@ -67,14 +67,20 @@ For one-shot actions that don't benefit from mutation caching (e.g., add-pico-un
 const { run } = useAsyncWithToast();
 
 await run(
-  async () => { /* execute async work */ },
+  async () => {
+    /* execute async work */
+  },
   {
-    successMessage: 'Done',           // shown as success toast
-    fallbackErrorMessage: 'Failed',   // shown if error is not an HttpException
-    rethrow: true,                    // re-throws after toast so outer catch can handle
-    skipErrorToast: false,            // set true to suppress error toast (caller handles)
-    onSuccess: () => { /* callback */ },
-    onError: (err) => { /* callback */ },
+    successMessage: 'Done', // shown as success toast
+    fallbackErrorMessage: 'Failed', // shown if error is not an HttpException
+    rethrow: true, // re-throws after toast so outer catch can handle
+    skipErrorToast: false, // set true to suppress error toast (caller handles)
+    onSuccess: () => {
+      /* callback */
+    },
+    onError: (err) => {
+      /* callback */
+    },
   },
 );
 ```
@@ -190,7 +196,9 @@ Server-side aggregation via `points` parameter (default 200, min 10, max 2000). 
 - `yarn lint` / `yarn lint:fix` — ESLint
 - `yarn format` / `yarn format:check` — Prettier
 - `yarn test` / `yarn test:watch` / `yarn test:coverage` — Vitest
-- Husky pre-commit: lint-staged (eslint --fix + prettier)
+- Husky pre-commit (v9): `.husky/pre-commit` runs `npx --no-install lint-staged`; wiring via `"prepare": "husky"` and `git config core.hooksPath=.husky/_`. lint-staged runs `eslint --fix` + `prettier --write` on staged files.
+  - **Exec-bit fragility**: `.husky/_/` is gitignored + generated, so its executable bits live only on the local filesystem. If a copy/archive/mount/umask strips them, git silently skips the hook (no lint, no error). Repair with `rm -rf .husky/_ && npx husky` (a bare `npx husky` re-run does not restore them). Verify `ls -la .husky/_/` shows `-rwxr-xr-x`.
+  - **Severity policy**: most rules are `warn`; only `import/no-unresolved` is `error`. Pre-commit runs `eslint --fix` (no `--max-warnings=0`), so **errors block commits, warnings do not**. Enforce zero-warnings as a CI gate (`eslint --max-warnings=0`) rather than at pre-commit.
 
 ## Testing
 

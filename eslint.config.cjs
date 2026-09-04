@@ -2,8 +2,13 @@ const ts = require('@typescript-eslint/eslint-plugin');
 const tsParser = require('@typescript-eslint/parser');
 const { group } = require('console');
 const importPlugin = require('eslint-plugin-import');
+const reactHooks = require('eslint-plugin-react-hooks');
 
 module.exports = [
+  // Global ignores — never lint build output
+  {
+    ignores: ['dist/**'],
+  },
   // Apply to TS/JS files in the project
   {
     files: ['**/*.{ts,tsx,js,jsx}'],
@@ -22,6 +27,7 @@ module.exports = [
     plugins: {
       '@typescript-eslint': ts,
       import: importPlugin,
+      'react-hooks': reactHooks,
     },
 
     settings: {
@@ -68,6 +74,9 @@ module.exports = [
       // typescript plugin rule recommendations — adapt to preference
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/explicit-function-return-type': 'off',
+
+      // react-hooks: enable exhaustive-deps so eslint-disable comments are meaningful
+      'react-hooks/exhaustive-deps': 'warn',
     },
   },
 ];
