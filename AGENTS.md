@@ -6,7 +6,7 @@ React 19 + Vite web dashboard served from Raspberry Pi 3 B+. Talks only to `mush
 
 ## Stack
 
-React 19 · TypeScript ~5.9 · Vite 7 · MUI v7 · TanStack React Query v5 · axios · React Router DOM v7 · Recharts v3 · dayjs · Yarn 1
+React 19 · TypeScript ~5.9 · Vite 7 · MUI v7 · TanStack React Query v5 · axios · React Router DOM v7 · Recharts v3 · dayjs · Yarn Berry 4
 
 ## Path Aliases
 
