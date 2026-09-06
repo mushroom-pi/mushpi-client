@@ -61,8 +61,8 @@ export const BatchesTable = ({
         key: 'unit',
         label: 'Unit',
         hidden: hideUnitColumn,
-        sortValue: (b) => b.pico_unit.name ?? b.pico_unit.handle,
-        renderCell: (b) => b.pico_unit.name ?? b.pico_unit.handle,
+        sortValue: (b) => b.pico_unit?.name ?? b.pico_unit?.handle ?? '',
+        renderCell: (b) => b.pico_unit?.name ?? b.pico_unit?.handle ?? '',
       },
       {
         key: 'description',

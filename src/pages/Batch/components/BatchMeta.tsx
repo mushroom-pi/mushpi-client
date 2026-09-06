@@ -24,8 +24,8 @@ export const BatchMeta = () => {
           <Stack spacing={1}>
             <InfoField label="Pico Unit">
               <Link to={`/pico-units/${batch.pico_unit_id}`}>
-                {batch.pico_unit.name ??
-                  batch.pico_unit.handle ??
+                {batch.pico_unit?.name ??
+                  batch.pico_unit?.handle ??
                   `Pico Unit #${batch.pico_unit_id}`}
               </Link>
             </InfoField>

@@ -56,7 +56,7 @@ export function useEditBatchForm({ open, onClose }: EditBatchDialogProps) {
 
     const body: UpdateBatchDto = {};
 
-    const newDescription = description.trim() || null;
+    const newDescription = description.trim() || undefined;
     if (newDescription !== (batch.description ?? null)) body.description = newDescription;
 
     const newSpecies = species.trim() || undefined;
@@ -73,7 +73,7 @@ export function useEditBatchForm({ open, onClose }: EditBatchDialogProps) {
     if (startAt !== toDateTimeLocal(batch.start_at)) body.start_at = dayjs(startAt).toISOString();
 
     if (finishAt !== toDateTimeLocal(batch.finish_at)) {
-      body.finish_at = finishAt ? dayjs(finishAt).toISOString() : null;
+      body.finish_at = finishAt ? dayjs(finishAt).toISOString() : undefined;
     }
 
     if (notes !== (batch.notes ?? '')) body.notes = notes;

@@ -158,7 +158,7 @@ export function useCreateBatchForm({
     const dto: CreateBatchDto = {
       pico_unit_id: Number(picoUnitId),
       start_at: dayjs(startAt).toISOString(),
-      finish_at: finishAt ? dayjs(finishAt).toISOString() : null,
+      finish_at: finishAt ? dayjs(finishAt).toISOString() : undefined,
       description: description.trim() || undefined,
       species: species.trim() || undefined,
       temperature_target: temperatureTarget === '' ? undefined : Number(temperatureTarget),

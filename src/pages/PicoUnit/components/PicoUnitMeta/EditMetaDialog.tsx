@@ -78,7 +78,7 @@ export const EditMetaDialog: React.FC<EditMetaDialogProps> = ({
       name: editName,
       description: editDescription,
       monitored: !!editMonitored,
-      face_color: editFaceColor,
+      face_color: editFaceColor ?? undefined,
     };
 
     await run(() => updateMutation.mutateAsync({ picoUnitId: pico.id, body }), {
