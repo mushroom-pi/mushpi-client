@@ -1,5 +1,6 @@
 import { ImageManager, type ImageManagerImage } from '~components';
 import { useBatchContext } from '~ctx/Batch';
+import { resolveApiUrl } from '~utils/apiUrl';
 
 export function BatchImages() {
   const { batch, uploadImages, removeImage } = useBatchContext();
@@ -9,7 +10,7 @@ export function BatchImages() {
   const urls = batch.images_url ?? [];
   const filenames = batch.images ?? [];
   const images: ImageManagerImage[] = urls.map((url, i) => ({
-    url,
+    url: resolveApiUrl(url) ?? '',
     filename: filenames[i],
   }));
 

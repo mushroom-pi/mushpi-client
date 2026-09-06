@@ -31,7 +31,8 @@ Both files are gitignored. Always regenerate after any `mushpi-server` endpoint 
 ## Images
 
 - `Recipe.image` / `Batch.images` contain **filenames only** (e.g. `"abc123.jpg"`)
-- `Recipe.image_url` / `Batch.images_url` contain **absolute URLs** for display
+- `Recipe.image_url` / `Batch.images_url` contain **root-relative URLs** (e.g. `/images/recipes/1.jpg`) for uploaded files, or an absolute external hotlink URL as-is (Recipe only)
+- Resolve these before rendering with `resolveApiUrl()` from `~utils/apiUrl` — it prefixes relative paths with `VITE_API_BASE_URL` (so dev on Vite :5173 loads from the server origin) and passes absolute URLs (`http(s)://`, `//`, `data:`, `blob:`) through untouched. Apply it in the page components that map DTO → `ImageManagerImage` (e.g. `RecipeImage.tsx`, `BatchImages.tsx`), **never** inside the presentational `ImageManager` molecule.
 - Images are managed via `ImagesApi` (upload, delete) — endpoints live in `src/api/generated/api.ts`
 - Shared UI: `ImageManager` molecule (`src/components/ui/molecules/ImageManager/`) handles both single-image (Recipe, `maxImages=1`, `allowHotlink=true`) and gallery (Batch, `maxImages=5`, `allowHotlink=false`) modes
 - Upload dialog supports drag-and-drop + file picker; optional URL tab for hotlinking (Recipe only)
@@ -241,6 +242,11 @@ Server-side aggregation via `points` parameter (default 200, min 10, max 2000). 
 Color palettes or other domain-specific constant arrays that are tightly coupled to a feature should co-locate with the UI component that consumes them. A stateless atom can export both the component and its default dataset (e.g. `ColorSwatchPicker` + `FACE_COLORS` from the same file). If a palette is consumed by multiple unrelated features, extract it to a shared constants file under `src/utils/` or `src/theme/`.
 
 ## Environment
+
+- `VITE_API_BASE_URL` — API origin for the generated client (read in `src/api/client.ts`, fallback `http://localhost:3000`) and for `resolveApiUrl()`. Dev sets it to `http://localhost:3000` via a **local, gitignored `.env`**; prod bakes it as `/` at Docker build time (same-origin).
+- `VITE_DOCS_PATH` — drives the Server page "API Docs" button link (default `contract` in local `.env`); read in `src/pages/Server/index.tsx`.
+- There is **no `vite-env.d.ts` / `ImportMetaEnv` typing** — env reads are untyped casts (`import.meta.env.VITE_*`).
+- There is **no Vite dev proxy** — all API traffic goes cross-origin to the server via `basePath`. Any server-emitted relative URL (images, or future assets) must be prefixed with the API base for dev rendering via `resolveApiUrl()`.
 
 ```
 VITE_API_BASE_URL=http://localhost:3000

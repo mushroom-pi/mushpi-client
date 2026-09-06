@@ -1,15 +1,15 @@
 import { ImageManager, type ImageManagerImage } from '~components';
 import { useRecipeContext } from '~ctx/Recipe';
+import { resolveApiUrl } from '~utils/apiUrl';
 
 export function RecipeImage() {
   const { recipe, uploadImage, deleteImage } = useRecipeContext();
 
   if (!recipe) return null;
 
-  const hasImage = !!recipe.image_url;
-  const images: ImageManagerImage[] = hasImage
-    ? [{ url: recipe.image_url!, label: recipe.name }]
-    : [];
+  const imageUrl = resolveApiUrl(recipe.image_url);
+  const hasImage = !!imageUrl;
+  const images: ImageManagerImage[] = hasImage ? [{ url: imageUrl!, label: recipe.name }] : [];
 
   return (
     <ImageManager
