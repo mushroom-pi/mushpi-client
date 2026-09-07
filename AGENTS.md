@@ -12,7 +12,7 @@ React 19 · TypeScript ~5.9 · Vite 7 · MUI v7 · TanStack React Query v5 · ax
 
 ## Path Aliases
 
-`vite.config.ts` + `tsconfig.app.json`: `~api`, `~ctx`, `~hook`, `~int`, `~type`, `~comp`, `~components`, `~layout`, `~utils`, `~pages`, `~assets`
+`vite.config.ts` + `tsconfig.app.json`: `~api`, `~ctx`, `~hook`, `~int`, `~type`, `~comp`, `~components`, `~layout`, `~utils`, `~pages`, `~assets`, `src`, `@`. (`src` and `@` both map to `src/`; `~components` maps to the `src/components/index.ts` barrel, while `~comp` maps to the `src/components/` directory.)
 
 ## API Client
 
@@ -51,6 +51,7 @@ Dialog-auto-open: `navigate('/path', { state: { openEditDialog: true } })`, read
 
 ```
 src/
+├── assets/                  # Static SVGs (~assets alias)
 ├── api/                     # Client, generated code, query keys
 ├── components/
 │   ├── BatchForm.tsx        # Shared batch form (consumed by Create + Edit dialogs)
@@ -70,26 +71,40 @@ src/
 │   │   └── index.ts
 │   └── index.ts
 ├── contexts/                # Context + hooks + mutations per entity
-│   ├── PicoUnit/mutations/: changeSetup, controlLoop, delete, outputs, setPoints, update
+│   ├── PicoUnit/mutations/: setup, controlLoop, delete, outputs, reboot, setPoints, update
+│   ├── PicoUnits/           # List-page context (usePicoUnits)
 │   ├── Recipe/mutations/: create, delete, image, update
+│   ├── Recipes/             # List-page context (useRecipes)
 │   ├── Batch/mutations/: create, delete, image, update, createRecipeFromBatch
+│   ├── Batches/             # List-page context (useBatches)
 │   ├── Charts/: provider.tsx, batchProvider.tsx
 │   └── Toast.tsx
-├── hooks/                   # useDashboard, useReadings, useBatchReadings, useServerHealth, useIsServerReachable, useAsyncWithToast, useSettings
+├── hooks/                   # useDashboard, useReadings, useBatchReadings, useServerHealth, useIsServerReachable, useAsyncWithToast, useSettings, useChartContainerWidth, picoUnitsHelpers
+│   ├── BatchForm/           # Batch form state
+│   └── RecipeForm/          # Recipe form state
+├── interfaces/              # Shared TS interfaces (dialogProps.ts, optionalPicoUnit.ts)
 ├── layout/                  # Page wrapper, Sidebar
 ├── pages/                   # Route pages (default exports)
 │   │                       # ⚠️ Page components MUST live in <PageName>/index.tsx,
 │   │                       #   never as a bare <PageName>.tsx at the pages root.
 │   ├── Dashboard/           # Dashboard page at /
 │   │   └── components/      # WarningsBanner, StatsRow, UnitCards, etc.
-│   ├── PicoUnit/            # Unit detail page at /pico-units/:id
-│   │   └── components/      # PicoUnitStatCards, PicoUnitDetailGrid, PicoUnitDevices, etc.
-│   ├── Settings/            # Settings page at /settings
-│   │   └── components/      # SettingsSkeleton (card skeleton)
 │   ├── PicoUnits/           # Units list page at /pico-units
 │   │   └── components/
 │   │       ├── ConnectPicoWizard/      # Multi-step wizard for new Pico provisioning
 │   │       └── ManualRegisterDialog/   # Manual PicoUnit registration (mDNS-based)
+│   ├── PicoUnit/            # Unit detail page at /pico-units/:id
+│   │   └── components/      # PicoUnitStatCards, PicoUnitDetailGrid, PicoUnitDevices, etc.
+│   ├── Readings/            # Charts page at /readings
+│   ├── Recipes/             # Recipes list page at /recipes
+│   ├── Recipe/              # Recipe detail page at /recipes/:id
+│   ├── Batches/             # Batches list page at /batches
+│   ├── Batch/               # Batch detail page at /batches/:id
+│   ├── Server/              # Server health page at /server
+│   └── Settings/            # Settings page at /settings
+│       └── components/      # SettingsSkeleton (card skeleton)
+├── styles/                  # global.css, variables.css
+├── test/                    # setup.ts, fixtures.tsx
 ├── theme/mushroomTheme.ts
 ├── types/charts.ts
 └── utils/
