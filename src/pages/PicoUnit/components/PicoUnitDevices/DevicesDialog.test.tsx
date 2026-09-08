@@ -2,37 +2,61 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
-import { describe, beforeEach, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ToastProvider } from '~ctx/Toast';
 
-import { DevicesDialog } from './DevicesDialog';
 import { makePicoUnit } from '../../../../test/fixtures';
+import { DevicesDialog } from './DevicesDialog';
 
 const mockMutateAsync = vi.fn();
 
-vi.mock('~ctx/PicoUnit', () => ({
-  usePicoUnitContext: () => ({
-    pico: makePicoUnit({
-      id: 1,
-      latest_reading: {
-        temperature: 25,
-        humidity: 80,
-        humidifier_on: false,
-        fan_on: false,
-        heater_on: false,
-        temperature_set: 25,
-        humidity_set: 80,
-        control_loop_enabled: false,
-        ts: '2026-01-01T00:00:00.000Z',
-      },
-    }),
-    changeOutputs: {
-      mutateAsync: mockMutateAsync,
-      isLoading: false,
+// The real PicoUnitProvider memoizes its context value, and `pico` is stable
+// React Query cache data — its identity only changes when server data changes.
+// DevicesDialog relies on that: it memoizes `lr` on [pico] and resets the
+// switch state in an effect keyed on [open, lr]. Returning a fresh object per
+// render wipes every toggle and leaves Save permanently disabled, so build
+// the context once and return the same object from every hook call.
+// The lazy cache lives INSIDE the hook closure (not the factory body) to
+// dodge vi.mock hoisting TDZ issues with the `makePicoUnit` import and the
+// `mockMutateAsync` const: the factory may run before this module finishes
+// evaluating, but the hook only ever runs during render.
+vi.mock('~ctx/PicoUnit', () => {
+  let ctx:
+    | {
+        pico: ReturnType<typeof makePicoUnit>;
+        changeOutputs: { mutateAsync: typeof mockMutateAsync; isLoading: boolean };
+      }
+    | undefined;
+
+  return {
+    usePicoUnitContext: () => {
+      if (!ctx) {
+        ctx = {
+          pico: makePicoUnit({
+            id: 1,
+            latest_reading: {
+              temperature: 25,
+              humidity: 80,
+              humidifier_on: false,
+              fan_on: false,
+              heater_on: false,
+              temperature_set: 25,
+              humidity_set: 80,
+              control_loop_enabled: false,
+              ts: '2026-01-01T00:00:00.000Z',
+            },
+          }),
+          changeOutputs: {
+            mutateAsync: mockMutateAsync,
+            isLoading: false,
+          },
+        };
+      }
+      return ctx;
     },
-  }),
-}));
+  };
+});
 
 // Mock useAsyncWithToast to swallow errors (the component doesn't catch rejections)
 const mockRun = vi.fn();
@@ -86,6 +110,7 @@ describe('DevicesDialog', () => {
 
     // Click Save button
     const saveBtn = screen.getByRole('button', { name: /save/i });
+    expect(saveBtn).toBeEnabled();
     await user.click(saveBtn);
 
     await waitFor(() => {
@@ -112,6 +137,7 @@ describe('DevicesDialog', () => {
 
     // Click Save
     const saveBtn = screen.getByRole('button', { name: /save/i });
+    expect(saveBtn).toBeEnabled();
     await user.click(saveBtn);
 
     // The mock run catches the error; verify it was called with fallbackErrorMessage
@@ -139,6 +165,7 @@ describe('DevicesDialog', () => {
 
     // Click Save
     const saveBtn = screen.getByRole('button', { name: /save/i });
+    expect(saveBtn).toBeEnabled();
     await user.click(saveBtn);
 
     await waitFor(() => {
