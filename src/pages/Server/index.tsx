@@ -5,6 +5,7 @@ import type { FC } from 'react';
 import { Error, PageTitle } from '~components';
 import { useServerHealth } from '~hook/useServerHealth';
 import { Page } from '~layout/Page';
+import { API_BASE } from '~utils/apiUrl';
 
 import { ServerDatabaseCard } from './components/ServerDatabaseCard';
 import { ServerOverviewCard } from './components/ServerOverviewCard';
@@ -15,9 +16,10 @@ export const Server: FC = () => {
   const { data: serverHealth, isLoading, isError, error, refetch } = useServerHealth();
   const isHealthy = !!serverHealth?.server?.healthy && !error;
 
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL as string | undefined;
+  // API_BASE is normalized (trailing slashes stripped), so a same-origin prod
+  // build (`VITE_API_BASE_URL = /` → `''`) yields `/contract`, not `//contract`.
   const docsPath = import.meta.env.VITE_DOCS_PATH as string | undefined;
-  const docsUrl = apiBaseUrl && docsPath ? `${apiBaseUrl}/${docsPath}` : undefined;
+  const docsUrl = docsPath ? `${API_BASE}/${docsPath}` : undefined;
 
   let content: React.ReactNode;
 

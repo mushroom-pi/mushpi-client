@@ -1,3 +1,5 @@
+import { API_BASE } from '~utils/apiUrl';
+
 import {
   BatchesApi,
   Configuration,
@@ -11,11 +13,11 @@ import {
   SettingsApi,
 } from './generated';
 
-// Build a configuration object for runtime values
-const apiBase = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
-
+// Build a configuration object for runtime values. API_BASE is normalized
+// (trailing slashes stripped) — the generated client naive-concatenates
+// basePath + url, so it must never receive a trailing-slash base.
 const configuration = new Configuration({
-  basePath: apiBase,
+  basePath: API_BASE,
   accessToken:
     typeof localStorage !== 'undefined' ? (localStorage.getItem('token') ?? undefined) : undefined,
 });

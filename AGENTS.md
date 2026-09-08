@@ -108,8 +108,13 @@ src/
 ├── theme/mushroomTheme.ts
 ├── types/charts.ts
 └── utils/
+    ├── apiUrl.ts            # Normalized API base (`API_BASE`, trailing slashes stripped) + resolveApiUrl()
+    ├── apiUrl.test.ts       # Vitest: base normalization + image-URL resolution
+    ├── chartLabels.ts       # Chart tick-label helpers (isLongSpan, createTickFormatter)
     ├── methods.ts           # Generic: date formatting, bytes, percentages
+    ├── methods.test.ts      # Vitest: pure formatting helpers
     ├── pico.ts              # Pico: provisioning constants, LED_STATES, chip color helpers
+    ├── timeWindow.ts        # TimeWindow union + resolveTimeBounds() (store intent, resolve per fetch)
     └── charts.ts            # (removed — server handles aggregation)
 ```
 
@@ -156,7 +161,7 @@ Standard React Query patterns apply (see `frontend-react` skill). Project-specif
 
 ## Environment
 
-- `VITE_API_BASE_URL` — API origin for the generated client (read in `src/api/client.ts`, fallback `http://localhost:3000`) and for `resolveApiUrl()`. Dev sets it to `http://localhost:3000` via a **local, gitignored `.env`**; prod bakes it as `/` at Docker build time (same-origin).
+- `VITE_API_BASE_URL` — API origin for the generated client (read in `src/api/client.ts`, fallback `http://localhost:3000`) and for `resolveApiUrl()`. Both consume the shared `API_BASE` constant from `src/utils/apiUrl.ts`, which **normalizes the value by stripping trailing slashes** (same-origin `/` → empty basePath, so the generated client's naive `basePath + url` join yields relative `/ping`, not protocol-relative `//ping`) — do not remove the normalization thinking it's redundant. Dev sets it to `http://localhost:3000` via a **local, gitignored `.env`**; prod bakes it as `/` at Docker build time (same-origin).
 - `VITE_DOCS_PATH` — drives the Server page "API Docs" button link (default `contract` in local `.env`); read in `src/pages/Server/index.tsx`.
 - There is **no `vite-env.d.ts` / `ImportMetaEnv` typing** — env reads are untyped casts (`import.meta.env.VITE_*`).
 - There is **no Vite dev proxy** — all API traffic goes cross-origin to the server via `basePath`. Any server-emitted relative URL (images, or future assets) must be prefixed with the API base for dev rendering via `resolveApiUrl()`.

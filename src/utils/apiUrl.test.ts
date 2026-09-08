@@ -1,18 +1,26 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
- * Helper: stub VITE_API_BASE_URL, reset the module registry so the next
+ * Helper: stub VITE_API_BASE_URL and reset the module registry so the next
  * dynamic import re-evaluates the module (picking up the new env value),
- * and return a fresh `resolveApiUrl` bound to that base.
+ * returning a fresh copy of the `~utils/apiUrl` module.
  */
-async function loadResolver(base: string | undefined) {
+async function loadModule(base: string | undefined) {
   if (base === undefined) {
     vi.unstubAllEnvs();
   } else {
     vi.stubEnv('VITE_API_BASE_URL', base);
   }
   vi.resetModules();
-  const mod = await import('~utils/apiUrl');
+  return import('~utils/apiUrl');
+}
+
+/**
+ * Same stub-and-reimport pattern as `loadModule`, but returns just the fresh
+ * `resolveApiUrl` bound to that base.
+ */
+async function loadResolver(base: string | undefined) {
+  const mod = await loadModule(base);
   return mod.resolveApiUrl;
 }
 
@@ -85,5 +93,32 @@ describe('resolveApiUrl', () => {
   it('falls back to http://localhost:3000 when env var is unset', async () => {
     const resolve = await loadResolver(undefined);
     expect(resolve('/images/recipes/1.jpg')).toBe('http://localhost:3000/images/recipes/1.jpg');
+  });
+});
+
+describe('API_BASE (normalized base consumed by client.ts and the Server page)', () => {
+  it('maps the prod same-origin "/" to an empty base (so /ping stays relative)', async () => {
+    const mod = await loadModule('/');
+    expect(mod.API_BASE).toBe('');
+  });
+
+  it('leaves an absolute dev base without a trailing slash untouched', async () => {
+    const mod = await loadModule('http://localhost:3000');
+    expect(mod.API_BASE).toBe('http://localhost:3000');
+  });
+
+  it('strips a single trailing slash from the base', async () => {
+    const mod = await loadModule('http://localhost:3000/');
+    expect(mod.API_BASE).toBe('http://localhost:3000');
+  });
+
+  it('strips multiple trailing slashes from the base', async () => {
+    const mod = await loadModule('http://localhost:3000///');
+    expect(mod.API_BASE).toBe('http://localhost:3000');
+  });
+
+  it('falls back to http://localhost:3000 when env var is unset', async () => {
+    const mod = await loadModule(undefined);
+    expect(mod.API_BASE).toBe('http://localhost:3000');
   });
 });
