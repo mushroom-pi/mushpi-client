@@ -20,6 +20,20 @@ export function updateItemInAllPages(
   });
 }
 
+/**
+ * Write a poll result to BOTH caches: the detail query ['picoUnit', id]
+ * and every list page ['picoUnits', ...], so navigating back to the list
+ * after a poll shows fresh status/last_seen.
+ */
+export function applyPollResult(
+  qc: ReturnType<typeof useQueryClient>,
+  picoUnitId: number,
+  data: PicoUnit,
+) {
+  qc.setQueryData(picoUnitKeys.detail(picoUnitId), data);
+  updateItemInAllPages(qc, picoUnitId, () => data);
+}
+
 export function removeItemFromAllPages(
   queryClient: ReturnType<typeof useQueryClient>,
   itemId: number,

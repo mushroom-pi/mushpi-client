@@ -6,6 +6,8 @@ import { PicoUnits } from '~api/client';
 import type { PicoUnit } from '~api/generated';
 import { picoUnitKeys, readingsKeys } from '~api/queryKeys';
 
+import { applyPollResult } from './helpers';
+
 export function useGetPicoUnit(picoUnitId: number | null) {
   const queryClient = useQueryClient();
 
@@ -14,7 +16,7 @@ export function useGetPicoUnit(picoUnitId: number | null) {
     if (!picoUnitId) return;
     const interval = setInterval(() => {
       unwrap(PicoUnits.picoUnitIdControllerPollV1({ picoUnitId }))
-        .then((result) => queryClient.setQueryData(picoUnitKeys.detail(picoUnitId), result))
+        .then((result) => applyPollResult(queryClient, picoUnitId, result as unknown as PicoUnit))
         .catch(() => {}); // silent — falls back to last known data
     }, 60_000);
     return () => clearInterval(interval);
@@ -40,7 +42,7 @@ export function usePollPicoUnit() {
       return res as unknown as PicoUnit;
     },
     onSuccess: (data, { picoUnitId }) => {
-      qc.setQueryData(picoUnitKeys.detail(picoUnitId), data);
+      applyPollResult(qc, picoUnitId, data);
       qc.invalidateQueries({ queryKey: readingsKeys.all, exact: false });
     },
   });
