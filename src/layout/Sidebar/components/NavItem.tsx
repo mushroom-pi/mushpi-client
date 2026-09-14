@@ -1,16 +1,19 @@
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import React from 'react';
+import type { ComponentType } from 'react';
 import { NavLink } from 'react-router-dom';
+
+import type { NavIconProps } from '../constants';
 
 type NavItemProps = {
   to: string;
   label: string;
-  icon: React.ReactNode;
+  icon: ComponentType<NavIconProps>;
+  iconProps?: NavIconProps;
   end?: boolean;
   onClick?: () => void;
 };
 
-export function NavItem({ to, label, icon, end, onClick }: NavItemProps) {
+export function NavItem({ to, label, icon: Icon, iconProps, end, onClick }: NavItemProps) {
   return (
     <ListItemButton
       component={NavLink}
@@ -32,7 +35,9 @@ export function NavItem({ to, label, icon, end, onClick }: NavItemProps) {
         },
       }}
     >
-      <ListItemIcon sx={{ minWidth: 36, color: 'text.secondary' }}>{icon}</ListItemIcon>
+      <ListItemIcon sx={{ minWidth: 36, color: 'text.secondary' }}>
+        <Icon {...iconProps} />
+      </ListItemIcon>
       <ListItemText primary={label} primaryTypographyProps={{ fontSize: 14, fontWeight: 600 }} />
     </ListItemButton>
   );
