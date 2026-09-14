@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 
 import { DeleteButton, EditButton, Error, Invalid, ItemPage } from '~components';
 import { RecipeProvider, useRecipeContext } from '~ctx/Recipe';
+import { useDocumentTitle } from '~hook/useDocumentTitle';
 
 import { DeleteRecipeDialog } from './components/DeleteRecipeDialog';
 import { EditRecipeDialog } from './components/EditRecipeDialog';
@@ -13,6 +14,8 @@ import { RecipeMeta } from './components/RecipeMeta';
 
 function RecipeDetailInner() {
   const { recipe, isLoading, isError, error, refetch } = useRecipeContext();
+  const { id } = useParams<{ id: string }>();
+  useDocumentTitle(recipe?.name ?? (id ? `Recipe #${id}` : 'Recipe'));
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
 

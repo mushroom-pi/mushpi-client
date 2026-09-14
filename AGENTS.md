@@ -45,6 +45,10 @@ Both files are gitignored. Always regenerate after any `mushpi-server` endpoint 
 | `/server`         | Server health |
 | `/settings`       | Settings      |
 
+**Tab titles**: every route page calls `useDocumentTitle('<Page>')` from `~hook/useDocumentTitle` (renders `"<Page> — Mushroom Pi"`). Detail pages call it inside the `*Inner` component with ``entity?.name ?? `Entity #${useParams id}` `` — exactly one call-site per route, never in the outer page wrapper. `index.html` holds the bare-brand fallback `Mushroom Pi`.
+
+Page h1 titles mirror `navItems` labels (`<PageTitle>` for lists, `<ItemPage title>` for details).
+
 Dialog-auto-open: `navigate('/path', { state: { openEditDialog: true } })`, read in mount-only `useEffect`, clear with `window.history.replaceState`.
 
 ## Directory Structure
@@ -79,7 +83,7 @@ src/
 │   ├── Batches/             # List-page context (useBatches)
 │   ├── Charts/: provider.tsx, batchProvider.tsx
 │   └── Toast.tsx
-├── hooks/                   # useDashboard, useReadings, useBatchReadings, useServerHealth, useIsServerReachable, useAsyncWithToast, useSettings, useChartContainerWidth, picoUnitsHelpers
+├── hooks/                   # useDashboard, useReadings, useBatchReadings, useServerHealth, useIsServerReachable, useAsyncWithToast, useSettings, useChartContainerWidth, useDocumentTitle, picoUnitsHelpers
 │   ├── BatchForm/           # Batch form state
 │   └── RecipeForm/          # Recipe form state
 ├── interfaces/              # Shared TS interfaces (dialogProps.ts, optionalPicoUnit.ts)

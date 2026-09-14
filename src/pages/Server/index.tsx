@@ -3,6 +3,7 @@ import { Button, Chip, Grid, Stack, Typography } from '@mui/material';
 import type { FC } from 'react';
 
 import { Error, PageTitle } from '~components';
+import { useDocumentTitle } from '~hook/useDocumentTitle';
 import { useServerHealth } from '~hook/useServerHealth';
 import { Page } from '~layout/Page';
 import { API_BASE } from '~utils/apiUrl';
@@ -13,6 +14,7 @@ import { ServerResourcesCard } from './components/ServerResourcesCard';
 import { ServerSkeleton } from './components/ServerSkeleton';
 
 export const Server: FC = () => {
+  useDocumentTitle('Server');
   const { data: serverHealth, isLoading, isError, error, refetch } = useServerHealth();
   const isHealthy = !!serverHealth?.server?.healthy && !error;
 

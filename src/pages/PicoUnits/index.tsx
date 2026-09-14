@@ -4,12 +4,14 @@ import { useState } from 'react';
 import type { PicoUnit } from '~api/generated';
 import { AddNew, CardGridSkeleton, Error, PageTitle, ReconnectPicoDialog } from '~components';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
+import { useDocumentTitle } from '~hook/useDocumentTitle';
 import { Page } from '~layout/Page';
 
 import { ConnectPicoWizard } from './components/ConnectPicoWizard';
 import PicoUnitCard from './components/PicoUnitCard';
 
 export default function PicoUnitsPage() {
+  useDocumentTitle('Pico Units');
   const { units: items, isLoading, isError, error, refetch, queryData } = usePicoUnitsContext();
   const [connectOpen, setConnectOpen] = useState(false);
   const [reconnectUnit, setReconnectUnit] = useState<PicoUnit | null>(null);

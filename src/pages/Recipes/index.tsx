@@ -4,11 +4,13 @@ import { useNavigate } from 'react-router-dom';
 
 import { AddNew, Error, PageTitle, TableSkeleton } from '~components';
 import { useListRecipes } from '~ctx/Recipes';
+import { useDocumentTitle } from '~hook/useDocumentTitle';
 import { Page } from '~layout/Page';
 
 import { CreateRecipeDialog, RecipesTable } from './components';
 
 export default function RecipesPage() {
+  useDocumentTitle('Recipes');
   const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
   const { data, isLoading, isError, error, refetch } = useListRecipes({ page: 1, limit: 20 });

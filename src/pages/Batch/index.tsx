@@ -18,6 +18,7 @@ import { BatchProvider, useBatchContext } from '~ctx/Batch';
 import { BatchChartsProvider } from '~ctx/Charts';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
 import { useExportBatchReadingsCmd } from '~hook/useBatchReadings';
+import { useDocumentTitle } from '~hook/useDocumentTitle';
 
 import { BatchDetailSkeleton } from './components/BatchDetailSkeleton';
 import { BatchMeta } from './components/BatchMeta';
@@ -28,6 +29,8 @@ import { SaveAsRecipeDialog } from './components/SaveAsRecipeDialog';
 function BatchDetailInner() {
   const navigate = useNavigate();
   const { batch, isLoading, isError, error, refetch } = useBatchContext();
+  const { id } = useParams<{ id: string }>();
+  useDocumentTitle(batch?.description ?? (id ? `Batch #${id}` : 'Batch'));
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [saveRecipeOpen, setSaveRecipeOpen] = useState(false);

@@ -6,12 +6,14 @@ import { ChartsTabs, Error, PageTitle } from '~components';
 import { ChartsProvider } from '~ctx/Charts';
 import { usePollPicoUnit } from '~ctx/PicoUnit';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
+import { useDocumentTitle } from '~hook/useDocumentTitle';
 import { Page } from '~layout/Page';
 
 import { BuildQueryForm } from './components/BuildQueryForm';
 import { ReadingsSkeleton } from './components/ReadingsSkeleton';
 
 export const ReadingsPage = () => {
+  useDocumentTitle('Readings');
   const {
     units: picoUnits,
     isLoading: isLoadingPicoUnits,

@@ -1,14 +1,26 @@
-import { Autocomplete, Box, Button, Card, CardContent, Container, Stack, TextField, Typography } from '@mui/material';
-import { useMemo, useState, useEffect } from 'react';
+import {
+  Autocomplete,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Container,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
+import { useEffect, useMemo, useState } from 'react';
 
 import { schemas } from '~api/generated/schemas';
 import { Error, PageTitle } from '~components';
+import { useDocumentTitle } from '~hook/useDocumentTitle';
 import { useSettings, useUpdateSettings } from '~hook/useSettings';
 import { Page } from '~layout/Page';
 
 import { SettingsSkeleton } from './components/SettingsSkeleton';
 
 export const Settings = () => {
+  useDocumentTitle('Settings');
   const { data, isLoading, isError, error, refetch } = useSettings();
   const update = useUpdateSettings();
 
@@ -39,9 +51,7 @@ export const Settings = () => {
   }, [selected]);
 
   const canSave =
-    !!selected &&
-    selected !== (data?.timezone ?? '') &&
-    !Object.values(errors).some(Boolean);
+    !!selected && selected !== (data?.timezone ?? '') && !Object.values(errors).some(Boolean);
 
   const handleSave = () => {
     if (!canSave) return;

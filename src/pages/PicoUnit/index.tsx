@@ -6,6 +6,7 @@ import type { PicoUnit } from '~api/generated';
 import { Error, Invalid, ItemPage, ReconnectPicoDialog, UnitHealthIcon } from '~components';
 import { PicoUnitProvider, usePicoUnitContext } from '~ctx/PicoUnit';
 import { usePicoUnitsContext } from '~ctx/PicoUnits';
+import { useDocumentTitle } from '~hook/useDocumentTitle';
 
 import { PicoUnitDetailGrid as DetailGrid } from './components/PicoUnitDetailGrid';
 import { PicoUnitDetailSkeleton } from './components/PicoUnitDetailSkeleton';
@@ -17,6 +18,8 @@ import { PicoUnitStatCards } from './components/PicoUnitStatCards';
 
 function PicoUnitDetailInner() {
   const { pico, isLoading, isError, error, refetch, pollPico } = usePicoUnitContext();
+  const { id } = useParams<{ id: string }>();
+  useDocumentTitle(pico?.name ?? (id ? `Pico Unit #${id}` : 'Pico Unit'));
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [rebootOpen, setRebootOpen] = useState(false);

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { Error, PageTitle } from '~components';
 import { useDashboard } from '~hook/useDashboard';
+import { useDocumentTitle } from '~hook/useDocumentTitle';
 import { Page } from '~layout/Page';
 
 import { ActiveBatchesWidget } from './components/ActiveBatchesWidget';
@@ -15,6 +16,7 @@ import { UnitCards } from './components/UnitCards';
 import { WarningsBanner } from './components/WarningsBanner';
 
 export default function Dashboard() {
+  useDocumentTitle('Dashboard');
   const { data, isLoading, isError, error, refetch } = useDashboard();
   const navigate = useNavigate();
 
@@ -27,9 +29,7 @@ export default function Dashboard() {
   } else {
     const { units, batches, recipes, stats, warnings } = data!;
 
-    const unitNames = new Map<number, string>(
-      units.items.map((u) => [u.id, u.name ?? u.handle]),
-    );
+    const unitNames = new Map<number, string>(units.items.map((u) => [u.id, u.name ?? u.handle]));
 
     if (units.items.length === 0 && units.total === 0) {
       content = (

@@ -3,8 +3,16 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { BatchesControllerListV1StatusEnum } from '~api/generated';
-import { AddNew, BatchesTable, CreateBatchDialog, Error, PageTitle, TableSkeleton } from '~components';
+import {
+  AddNew,
+  BatchesTable,
+  CreateBatchDialog,
+  Error,
+  PageTitle,
+  TableSkeleton,
+} from '~components';
 import { useListBatches } from '~ctx/Batches';
+import { useDocumentTitle } from '~hook/useDocumentTitle';
 import { Page } from '~layout/Page';
 
 type BatchStatus =
@@ -13,6 +21,7 @@ type BatchStatus =
 type StatusFilter = 'all' | BatchStatus;
 
 export default function BatchesPage() {
+  useDocumentTitle('Batches');
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [createOpen, setCreateOpen] = useState(false);

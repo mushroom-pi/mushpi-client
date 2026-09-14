@@ -113,6 +113,7 @@ Server-side aggregation via `points` parameter (default 200, min 10, max 2000). 
   - Build the mock context object lazily once inside the returned hook closure (a `let` cache), **not** at the `vi.mock` factory top-level — this keeps external references (imports like `makePicoUnit`, module-scope consts like `mockMutateAsync`) evaluated at hook-call time and avoids `vi.mock`-hoisting TDZ "Cannot access before initialization" errors.
   - Add `expect(button).toBeEnabled()` before `user.click(...)` as a fail-loud guard, so a future regression of this kind fails with a clear "button is disabled" message.
   - Reference: `src/pages/PicoUnit/components/PicoUnitDevices/DevicesDialog.test.tsx` mocks `~ctx/PicoUnit` and the fix was memoizing the returned context. The real `PicoUnitProvider` memoizes its context value and `pico` is React Query cache data (referentially stable).
+- **Per-route tab titles (`useDocumentTitle`)**: (1) exactly one owner per route — a call in both a wrapper and its Inner child duels via effect ordering (child effects run first; parent's last and wins), clobbering the data-refined title when cached data renders in the same commit; (2) no `*` catch-all route exists — unknown URLs render an empty main area and keep the `index.html` title on fresh load; (3) `react-helmet-async` evaluated and rejected (v2 peer-declares React ≤18; repo on React 19; 10-line idempotent hook covers it with no provider); (4) pass a primitive string computed before the call so effect deps compare by value.
 
 ## Feature Palettes & Domain Constants
 
