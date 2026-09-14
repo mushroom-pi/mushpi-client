@@ -4,7 +4,6 @@ import Inventory2Icon from '@mui/icons-material/Inventory2';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
-import type { Theme } from '@mui/material';
 import type { ComponentType } from 'react';
 import { FiActivity as ActivityIcon } from 'react-icons/fi';
 
@@ -41,13 +40,5 @@ export const navItems: NavItem[] = [
   { to: '/server', label: 'Server', icon: DnsIcon },
   { to: '/settings', label: 'Settings', icon: SettingsIcon },
 ];
-
-export const activeSx = (theme: Theme) => ({
-  '&[aria-current="page"]': {
-    bgcolor: theme.palette.warning.main,
-    color: 'background.default',
-    '& .MuiListItemIcon-root': { color: 'background.default' },
-  },
-});
 
 export const drawerWidth = 200;

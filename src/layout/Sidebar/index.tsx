@@ -20,6 +20,9 @@ import mushroomPiHorizontalLogo from '~assets/MushroomPiHorizontalLogo.svg';
 import { NavItem } from './components/NavItem';
 import { drawerWidth, navItems } from './constants';
 
+/** Mobile AppBar height — AppBar `height` and the Toolbar `minHeight` below are intentionally coupled. */
+const appBarHeight = 56;
+
 export default function Sidebar() {
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
@@ -34,7 +37,10 @@ export default function Sidebar() {
         p: 2.5,
         gap: 2,
         bgcolor: 'transparent',
-        // subtle right border to match your CSS
+        // Intentionally overlaps the drawer Paper's borderRight below (both the
+        // permanent and temporary branches): the two 1px rgba(255,255,255,0.03)
+        // borders stack to ~1-(1-0.03)^2 ≈ 5.9% effective alpha. Do NOT dedupe —
+        // removing either layer would change the rendered border.
         borderRight: '1px solid rgba(255,255,255,0.03)',
       }}
     >
@@ -101,11 +107,11 @@ export default function Sidebar() {
           sx={{
             bgcolor: `linear-gradient(180deg, ${theme.palette.background.default}, rgba(0,0,0,0.25))`,
             borderBottom: '1px solid rgba(255,255,255,0.02)',
-            height: 56,
+            height: appBarHeight,
             justifyContent: 'center',
           }}
         >
-          <Toolbar sx={{ minHeight: '56px !important', px: 1 }}>
+          <Toolbar sx={{ minHeight: `${appBarHeight}px !important`, px: 1 }}>
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -166,10 +172,8 @@ export default function Sidebar() {
         </Drawer>
       )}
 
-      {/* When permanent drawer is present, consume left space.
-          Note: your App layout should account for the drawerWidth on md+ screens.
-          Example: <Box component="main" sx={{ ml: { md: `${drawerWidth}px` } }}> ... </Box>
-      */}
+      {/* The main-content offset for this permanent drawer is already applied in
+          App.tsx: the main <Box> sets `marginLeft: { xs: 0, md: `${drawerWidth}px` }`. */}
     </>
   );
 }
