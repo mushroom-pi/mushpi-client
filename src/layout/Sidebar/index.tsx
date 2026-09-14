@@ -14,6 +14,9 @@ import {
 } from '@mui/material';
 import React from 'react';
 
+import mushPiSquareLogo from '~assets/MushPiSquareLogo.svg';
+import mushroomPiHorizontalLogo from '~assets/MushroomPiHorizontalLogo.svg';
+
 import { NavItem } from './components/NavItem';
 import { drawerWidth, navItems } from './constants';
 
@@ -37,29 +40,25 @@ export default function Sidebar() {
     >
       {/* Brand */}
       <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
-        <Box
-          sx={{
-            width: 44,
-            height: 44,
-            display: 'grid',
-            placeItems: 'center',
-            fontSize: 22,
-            borderRadius: 1.25,
-            bgcolor: 'rgba(255,255,255,0.04)', // theme.glass
-          }}
-        >
-          <span role="img" aria-label="mushroom">
-            🍄
-          </span>
-        </Box>
-
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{ fontWeight: 700, color: 'primary.main', fontSize: 18 }}
-        >
-          MushPi
-        </Typography>
+        {mdUp ? (
+          /* Desktop: width-driven horizontal lockup. The row is as wide as the
+             drawer's inner content box (drawerWidth minus the p:2.5 padding),
+             so width:100% fills it and height:auto keeps the aspect ratio —
+             it can never overflow or clip the drawer. */
+          <img
+            src={mushroomPiHorizontalLogo}
+            alt="MushPi"
+            style={{ width: '100%', height: 'auto', display: 'block', maxWidth: '100%' }}
+          />
+        ) : (
+          /* Mobile: compact square lockup at a fixed small height so the close
+             button beside it is never crowded out. */
+          <img
+            src={mushPiSquareLogo}
+            alt="MushPi"
+            style={{ height: 44, width: 'auto', maxWidth: '100%', display: 'block' }}
+          />
+        )}
 
         {/* Close button — only shown on mobile */}
         {!mdUp && (
@@ -121,13 +120,11 @@ export default function Sidebar() {
               <MenuIcon />
             </IconButton>
 
-            <Typography
-              variant="h6"
-              component="div"
-              sx={{ ml: 1, fontWeight: 700, color: 'primary.main', fontSize: 16 }}
-            >
-              MushPi
-            </Typography>
+            <img
+              src={mushroomPiHorizontalLogo}
+              alt="Mushroom Pi"
+              style={{ marginLeft: 8, height: 30, width: 'auto', display: 'block' }}
+            />
           </Toolbar>
         </AppBar>
       )}
