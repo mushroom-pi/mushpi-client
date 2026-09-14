@@ -1,7 +1,6 @@
 // Barrel for small, reusable UI atoms.
 export { BigDisplay } from './BigDisplay';
 export { Loading } from './Loading';
-export { Card } from './Card';
 export { InfoField } from './InfoField';
 export { FieldRow } from './FieldRow';
 export { ReadableTime } from './ReadableTime';

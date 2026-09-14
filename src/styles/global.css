@@ -27,21 +27,3 @@ body {
   padding: 0;
 }
 
-/* Utility */
-.container {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-/* Small helper */
-.row {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  flex-wrap: wrap;
-}
-.col {
-  flex: 1 1 300px;
-  min-width: 260px;
-}
