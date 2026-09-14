@@ -2,6 +2,12 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { Box, Tooltip } from '@mui/material';
 import React from 'react';
 
+/* eslint-disable no-restricted-syntax -- FACE_COLORS is a user-selectable data palette (DB face_color values), not styling */
+// These hexes are persisted as `Recipe.face_color` data. They intentionally
+// do NOT import from ~theme/tokens: recoloring the UI brand must never
+// re-interpret stored user data. Two entries coincide with brand tokens by
+// accident (Spore Gold == brand.accent2, Mushroom Cap == brand.accent) —
+// that is a data/theme coincidence, not a coupling.
 export const FACE_COLORS: readonly { hex: string; name: string }[] = [
   { hex: '#2E7D32', name: 'Forest Moss' },
   { hex: '#43A047', name: 'Fern' },
@@ -20,6 +26,7 @@ export const FACE_COLORS: readonly { hex: string; name: string }[] = [
   { hex: '#303F9F', name: 'Twilight Indigo' },
   { hex: '#00838F', name: 'Mist Cyan' },
 ] as const;
+/* eslint-enable no-restricted-syntax */
 
 export interface ColorSwatchPickerProps {
   value: string | null;

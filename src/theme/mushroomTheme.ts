@@ -1,53 +1,68 @@
 import { createTheme } from '@mui/material/styles';
 
-export const mushroom = {
-  bg: '#0f1720',
-  card: '#0f1b12',
-  accent: '#C66F2F',
-  accent2: '#A27B35',
-  leaf: '#3C8D5A',
-  muted: '#9AA6A0',
-  text: '#E6F0EA',
-  glass: 'rgba(255,255,255,0.04)',
-};
+import { brand, cardRadius, scrim, veil } from '~theme/tokens';
+
+// Typed `palette.custom` escape hatch so any consumer (including sx callbacks)
+// can reach the veil/scrim token groups via theme.palette instead of importing
+// tokens directly.
+declare module '@mui/material/styles' {
+  interface Palette {
+    custom: {
+      /** White-alpha overlays for dark glass surfaces */
+      veil: typeof veil;
+      /** Black scrims (AppBar gradient end, image button backdrops) */
+      scrim: typeof scrim;
+    };
+  }
+  interface PaletteOptions {
+    custom?: {
+      veil: typeof veil;
+      scrim: typeof scrim;
+    };
+  }
+}
 
 const theme = createTheme({
   palette: {
     mode: 'dark',
     background: {
-      default: mushroom.bg,
-      paper: mushroom.card,
+      default: brand.bg,
+      paper: brand.card,
     },
     primary: {
-      main: mushroom.accent, // primary accent: mushroom cap
-      contrastText: mushroom.bg,
+      main: brand.accent, // primary accent: mushroom cap
+      contrastText: brand.bg,
     },
     secondary: {
-      main: mushroom.leaf, // green for growth/actions
-      contrastText: mushroom.bg,
+      main: brand.leaf, // green for growth/actions
+      contrastText: brand.bg,
     },
     text: {
-      primary: mushroom.text,
-      secondary: mushroom.muted,
+      primary: brand.text,
+      secondary: brand.muted,
     },
     warning: {
       // use accent2-ish as warning (or you can choose a brighter amber)
-      main: mushroom.accent2,
-      contrastText: mushroom.bg,
+      main: brand.accent2,
+      contrastText: brand.bg,
     },
     info: {
-      main: '#7DD3FC',
+      main: brand.info,
     },
     success: {
-      main: mushroom.leaf,
+      main: brand.leaf,
+    },
+    custom: {
+      veil,
+      scrim,
     },
   },
   components: {
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
-          border: '1px solid rgba(255,255,255,0.03)',
+          borderRadius: cardRadius,
+          border: `1px solid ${veil.hairline}`,
         },
       },
     },

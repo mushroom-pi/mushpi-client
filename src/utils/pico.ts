@@ -1,3 +1,5 @@
+import { led } from '~theme/tokens';
+
 /** Temperature must be within ±2°C of target before a deviation warning fires */
 export const TEMP_DEVIATION_THRESHOLD = 2;
 /** Humidity must be within ±10% of target before a deviation warning fires */
@@ -33,31 +35,31 @@ export const POLL_FINISH_MAX_ATTEMPTS = 5;
 export const LED_STATES = [
   {
     id: 'off',
-    color: '#4a5568',
+    color: led.off,
     label: 'LED OFF',
     meaning: 'No power, or still booting (wait a moment)',
   },
   {
     id: 'config_error',
-    color: '#C53030',
+    color: led.error,
     label: '3 fast blinks + pause',
     meaning: 'config.json is malformed or has invalid values — check serial output',
   },
   {
     id: 'provisioning',
-    color: '#C66F2F',
+    color: led.provisioning,
     label: 'Slow double-blink',
     meaning: 'Provisioning mode — correct! Waiting for credentials',
   },
   {
     id: 'solid',
-    color: '#A27B35',
+    color: led.solid,
     label: 'Solid ON',
     meaning: 'Connected to Wi‑Fi, waiting to reach the hub',
   },
   {
     id: 'heartbeat',
-    color: '#3C8D5A',
+    color: led.heartbeat,
     label: 'Heartbeat blink',
     meaning: 'Fully connected to the hub — operational',
   },

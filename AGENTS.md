@@ -12,7 +12,7 @@ React 19 · TypeScript ~5.9 · Vite 7 · MUI v7 · TanStack React Query v5 · ax
 
 ## Path Aliases
 
-`vite.config.ts` + `tsconfig.app.json`: `~api`, `~ctx`, `~hook`, `~int`, `~type`, `~comp`, `~components`, `~layout`, `~utils`, `~pages`, `~assets`, `src`, `@`. (`src` and `@` both map to `src/`; `~components` maps to the `src/components/index.ts` barrel, while `~comp` maps to the `src/components/` directory.)
+`vite.config.ts` + `tsconfig.app.json`: `~api`, `~ctx`, `~hook`, `~int`, `~type`, `~theme`, `~comp`, `~components`, `~layout`, `~utils`, `~pages`, `~assets`, `src`, `@`. (`src` and `@` both map to `src/`; `~components` maps to the `src/components/index.ts` barrel, while `~comp` maps to the `src/components/` directory.)
 
 ## API Client
 
@@ -107,9 +107,12 @@ src/
 │   ├── Server/              # Server health page at /server
 │   └── Settings/            # Settings page at /settings
 │       └── components/      # SettingsSkeleton (card skeleton)
-├── styles/                  # global.css, variables.css
+├── styles/                  # global.css; variables.css (3-var pre-mount mirror of tokens.ts — --bg/--bg-deep/--text — guarded 1:1 by theme/tokens.test.ts)
 ├── test/                    # setup.ts, fixtures.tsx
-├── theme/mushroomTheme.ts
+├── theme/
+│   ├── mushroomTheme.ts     # sole createTheme; built from tokens.ts, augments typed palette.custom.{veil,scrim}
+│   ├── tokens.ts            # SINGLE SOURCE OF TRUTH for colors — raw hex/rgb literals allowed ONLY here
+│   └── tokens.test.ts       # guards: variables.css mirror + src-wide stray-color scan
 ├── types/charts.ts
 └── utils/
     ├── apiUrl.ts            # Normalized API base (`API_BASE`, trailing slashes stripped) + resolveApiUrl()
@@ -153,7 +156,7 @@ Standard React Query patterns apply (see `frontend-react` skill). Project-specif
 - `yarn format` / `yarn format:check` — Prettier
 - `yarn test` / `yarn test:watch` / `yarn test:coverage` — Vitest
 - Husky pre-commit (v9): `.husky/pre-commit` runs `npx --no-install lint-staged`; wiring via `"prepare": "husky"` and `git config core.hooksPath=.husky/_`. lint-staged runs `eslint --fix` + `prettier --write` on staged files.
-  - **Severity policy**: most rules are `warn`; only `import/no-unresolved` is `error`. Pre-commit runs `eslint --fix` (no `--max-warnings=0`), so **errors block commits, warnings do not**. Enforce zero-warnings as a CI gate (`eslint --max-warnings=0`) rather than at pre-commit.
+  - **Severity policy**: most rules are `warn`; `import/no-unresolved` and the raw-color `no-restricted-syntax` rules (hex/rgb/hsl literals outside `src/theme/tokens.ts`) are `error`. Pre-commit runs `eslint --fix` (no `--max-warnings=0`), so **errors block commits, warnings do not**. Enforce zero-warnings as a CI gate (`eslint --max-warnings=0`) rather than at pre-commit.
 
 ## Testing
 
@@ -161,7 +164,7 @@ Standard React Query patterns apply (see `frontend-react` skill). Project-specif
 - **Global setup**: `src/test/setup.ts` auto-applies `@testing-library/jest-dom` matchers and runs `cleanup()` after each test via `afterEach`.
 - **Shared fixtures**: `src/test/fixtures.tsx` exports `makePicoUnit()` (factory), `renderWithProviders()` (QueryClientProvider wrapper), and other shared test helpers.
 - **What to test**: Pure utilities (`methods.ts`), custom hooks with logic (`useAsyncWithToast`), mutation factories (`createOptimisticMutation`), ErrorBoundary, and dialogs that send hardware commands (`DevicesDialog`). Skip pass-through React Query wrappers, generated API code, and presentational-only components.
-- **Globals**: `describe`, `it`, `expect`, `vi`, `beforeEach`, `afterEach` are available without imports (in `.test.*` files). Import `render`, `screen`, `waitFor` from `@testing-library/react` and `userEvent` from `@testing-library/user-event`.
+- **Globals**: `vitest.config.ts` sets `globals: true`, so `describe`, `it`, `expect`, `vi`, `beforeEach`, `afterEach` work at _runtime_ without imports. **But you must still import them from `vitest`** — `tsc -b` type-checks test files and `vitest/globals` is not in tsconfig `types`, so relying on globals breaks `yarn build`. Import `render`, `screen`, `waitFor` from `@testing-library/react` and `userEvent` from `@testing-library/user-event`.
 - **Never test generated code** in `src/api/generated/`.
 
 ## Environment
@@ -180,6 +183,7 @@ VITE_API_BASE_URL=http://localhost:3000
 Standard conventions from `frontend-react` skill apply. Project-specific additions:
 
 - Import order: `@trivago/prettier-plugin-sort-imports` handles sort order via Prettier. Third-party imports first, then `~` aliases, then relative imports.
+- **Never hardcode colors** — raw hex/rgb literals live only in `src/theme/tokens.ts`; use `~theme/tokens` imports or `theme.palette.*`/MUI color strings. Enforced by `no-restricted-syntax` (error) + `tokens.test.ts`. Exemptions: `tokens.ts` (source), `ColorSwatchPicker` FACE_COLORS (data palette), SVG assets (static art).
 - Loading states: Prefer shape-matched MUI `<Skeleton>` components over the generic `<Loading />` spinner for data pages. See the `frontend-react` skill for the full pattern (hierarchy, gating on `isLoading`, page shell structure). Reusable skeletons live in atoms/molecules; page-scoped skeleton compositions live in `pages/<Page>/components/`.
 - **No dead props**: The ESLint config treats unused props/imports as errors (`@typescript-eslint/no-unused-vars`). Don't add props to an interface that the component body never uses — the build will fail. If a prop seems theoretically useful but has no consumer, drop it.
 - **Page-scoped presentational components**: A presentational (stateless) component used by only one page stays co-located in `pages/<Page>/components/`, not under `components/ui/atoms/`. The shared `atoms/` directory is for components reused across 2+ pages. If a page-scoped component later gains a second consumer, promote it to `components/ui/atoms/` at that time.

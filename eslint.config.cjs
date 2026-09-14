@@ -59,6 +59,7 @@ module.exports = [
             { pattern: '~hook/**', group: 'internal' },
             { pattern: '~int/**', group: 'internal' },
             { pattern: '~type/**', group: 'internal' },
+            { pattern: '~theme/**', group: 'internal' },
             { pattern: '~comp/**', group: 'internal' },
             { pattern: '~components', group: 'internal' },
             { pattern: '~layout/**', group: 'internal' },
@@ -77,6 +78,28 @@ module.exports = [
 
       // react-hooks: enable exhaustive-deps so eslint-disable comments are meaningful
       'react-hooks/exhaustive-deps': 'warn',
+
+      // Single-source-of-truth colors: raw literals live only in src/theme/tokens.ts
+      // (exempted below) and ColorSwatchPicker's FACE_COLORS data palette
+      // (file-level disable). Error severity is deliberate — blocks pre-commit.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'Literal[value=/^#[0-9a-fA-F]{3,8}$/]',
+          message: 'Raw hex color — use ~theme/tokens or theme.palette.*',
+        },
+        {
+          selector: 'Literal[value=/rgba?\\(|hsla?\\(/]',
+          message: 'Raw rgb/hsl color — use ~theme/tokens or theme.palette + alpha()',
+        },
+      ],
+    },
+  },
+  {
+    // tokens.ts is the single source of truth — raw literals allowed here
+    files: ['src/theme/tokens.ts'],
+    rules: {
+      'no-restricted-syntax': 'off',
     },
   },
 ];

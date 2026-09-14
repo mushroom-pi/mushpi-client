@@ -3,6 +3,8 @@ import ClearIcon from '@mui/icons-material/Clear';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, Button, CardMedia, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 
+import { scrim } from '~theme/tokens';
+
 export interface ImageTileProps {
   src: string;
   alt?: string;
@@ -28,8 +30,8 @@ export function ImageTile({ src, alt, onDelete }: ImageTileProps) {
               position: 'absolute',
               top: 4,
               right: 4,
-              bgcolor: 'rgba(0, 0, 0, 0.6)',
-              '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.8)' },
+              bgcolor: scrim.image,
+              '&:hover': { bgcolor: scrim.imageHover },
             }}
           >
             <ClearIcon fontSize="small" />

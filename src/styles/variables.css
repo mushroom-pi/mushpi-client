@@ -1,13 +1,11 @@
+/**
+ * Pre-mount body paint ONLY — mirrors src/theme/tokens.ts (brand.bg /
+ * brand.bgDeep / brand.text) — guarded 1:1 by src/theme/tokens.test.ts;
+ * only pre-mount styles live here. Once React mounts, MUI's theme (built
+ * from the same tokens) owns all colors. Do not add UI vars here.
+ */
 :root {
-  /* Mushroom + organic palette */
-  --bg: #0f1720; /* deep background */
-  --card: #0f1b12; /* subtle card bg */
-  --accent: #c66f2f; /* warm mushroom cap (accent) */
-  --accent-2: #a27b35; /* secondary warm */
-  --leaf: #3c8d5a; /* green for growth */
-  --muted: #9aa6a0; /* muted text */
-  --text: #e6f0ea; /* main text */
-  --glass: rgba(255, 255, 255, 0.04);
-  --radius: 12px;
-  --shadow: 0 8px 24px rgba(2, 6, 2, 0.45);
+  --bg: #0f1720; /* = brand.bg */
+  --bg-deep: #071013; /* = brand.bgDeep */
+  --text: #e6f0ea; /* = brand.text */
 }

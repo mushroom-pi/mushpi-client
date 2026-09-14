@@ -16,6 +16,7 @@ import React from 'react';
 
 import mushPiSquareLogo from '~assets/MushPiSquareLogo.svg';
 import mushroomPiHorizontalLogo from '~assets/MushroomPiHorizontalLogo.svg';
+import { cardShadow, scrim, veil } from '~theme/tokens';
 
 import { NavItem } from './components/NavItem';
 import { drawerWidth, navItems } from './constants';
@@ -28,6 +29,8 @@ export default function Sidebar() {
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
+  const appBarGradient = `linear-gradient(180deg, ${theme.palette.background.default}, ${scrim.appBar})`;
+
   const drawerContent = (
     <Box
       sx={{
@@ -38,10 +41,10 @@ export default function Sidebar() {
         gap: 2,
         bgcolor: 'transparent',
         // Intentionally overlaps the drawer Paper's borderRight below (both the
-        // permanent and temporary branches): the two 1px rgba(255,255,255,0.03)
-        // borders stack to ~1-(1-0.03)^2 ≈ 5.9% effective alpha. Do NOT dedupe —
+        // permanent and temporary branches): the two 1px veil.hairline borders
+        // stack to ~1-(1-0.03)^2 ≈ 5.9% effective alpha. Do NOT dedupe —
         // removing either layer would change the rendered border.
-        borderRight: '1px solid rgba(255,255,255,0.03)',
+        borderRight: `1px solid ${veil.hairline}`,
       }}
     >
       {/* Brand */}
@@ -88,7 +91,7 @@ export default function Sidebar() {
         </List>
       </Box>
 
-      <Divider sx={{ borderColor: 'rgba(255,255,255,0.02)' }} />
+      <Divider sx={{ borderColor: veil.subtle }} />
 
       {/* footer pushed to bottom */}
       <Box sx={{ mt: 'auto', color: 'text.secondary', fontSize: 12 }}>
@@ -105,8 +108,8 @@ export default function Sidebar() {
           position="sticky"
           elevation={0}
           sx={{
-            bgcolor: `linear-gradient(180deg, ${theme.palette.background.default}, rgba(0,0,0,0.25))`,
-            borderBottom: '1px solid rgba(255,255,255,0.02)',
+            bgcolor: appBarGradient,
+            borderBottom: `1px solid ${veil.subtle}`,
             height: appBarHeight,
             justifyContent: 'center',
           }}
@@ -144,10 +147,9 @@ export default function Sidebar() {
             sx: {
               width: drawerWidth,
               boxSizing: 'border-box',
-              background:
-                'linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01))',
-              borderRight: '1px solid rgba(255,255,255,0.03)',
-              boxShadow: 'var(--shadow)',
+              background: `linear-gradient(180deg, ${veil.subtle}, ${veil.faint})`,
+              borderRight: `1px solid ${veil.hairline}`,
+              boxShadow: cardShadow,
             },
           }}
         >
@@ -164,7 +166,7 @@ export default function Sidebar() {
             sx: {
               width: drawerWidth,
               bgcolor: 'background.paper',
-              borderRight: '1px solid rgba(255,255,255,0.03)',
+              borderRight: `1px solid ${veil.hairline}`,
             },
           }}
         >

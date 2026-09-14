@@ -37,8 +37,6 @@ import { useReconnectPoll } from './useReconnectPoll';
 
 const STEPS = ['Diagnose', 'Connect', 'Setup', 'Finish'];
 
-const ACCENT_COLOR = '#C66F2F';
-
 /** Diagnostic card for step 0 */
 function DiagnosticCard({
   color,
@@ -205,7 +203,7 @@ export function ReconnectPicoDialog({ pico, onClose }: ReconnectPicoDialogProps)
         {exact ? (
           <>
             Join the Wi-Fi network:{' '}
-            <Typography component="span" fontWeight="bold" sx={{ color: ACCENT_COLOR }}>
+            <Typography component="span" fontWeight="bold" sx={{ color: 'primary.main' }}>
               {ssid}
             </Typography>
           </>

@@ -2,6 +2,8 @@ import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import type { ComponentType } from 'react';
 import { NavLink } from 'react-router-dom';
 
+import { veil } from '~theme/tokens';
+
 import type { NavIconProps } from '../constants';
 
 type NavItemProps = {
@@ -27,7 +29,7 @@ export function NavItem({ to, label, icon: Icon, iconProps, end, onClick }: NavI
         mb: 0.5,
         color: 'text.secondary',
         fontWeight: 600,
-        '&:hover': { bgcolor: 'rgba(255,255,255,0.02)', color: 'text.primary' },
+        '&:hover': { bgcolor: veil.subtle, color: 'text.primary' },
         '&[aria-current="page"]': {
           bgcolor: (theme) => theme.palette.warning.main,
           color: 'background.default',

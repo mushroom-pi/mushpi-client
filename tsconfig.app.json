@@ -34,6 +34,7 @@
       "~hook/*": ["src/hooks/*"],
       "~int/*": ["src/interfaces/*"],
       "~type/*": ["src/types/*"],
+      "~theme/*": ["src/theme/*"],
       "~comp/*": ["src/components/*"],
       "~components": ["src/components/index.ts"],
       "~layout/*": ["src/layout/*"],

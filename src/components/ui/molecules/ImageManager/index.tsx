@@ -3,6 +3,8 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import { Box, CardMedia, Grid, IconButton, Stack, Tooltip } from '@mui/material';
 import { useState } from 'react';
 
+import { scrim } from '~theme/tokens';
+
 import { AddImageTile, EmptyImagePlaceholder, ImageTile } from './ImageTile';
 import { RemoveImageDialog } from './RemoveImageDialog';
 import { UploadImageDialog } from './UploadImageDialog';
@@ -72,7 +74,7 @@ function FeatureMode({
               position: 'absolute',
               top: 8,
               right: 8,
-              bgcolor: 'rgba(0, 0, 0, 0.6)',
+              bgcolor: scrim.image,
               borderRadius: 1,
               p: 0.5,
             }}
