@@ -5,10 +5,7 @@ import { unwrap } from '~api/adapter';
 import { PicoUnits } from '~api/client';
 import type { PicoUnitListResponseDto } from '~api/generated';
 import { picoUnitsKeys } from '~api/queryKeys';
-import {
-  POLL_FINISH_INTERVAL_MS,
-  POLL_FINISH_MAX_ATTEMPTS,
-} from '~utils/pico';
+import { POLL_FINISH_INTERVAL_MS, POLL_FINISH_MAX_ATTEMPTS } from '~utils/pico';
 
 export function useReconnectPoll(picoUnitId: number | undefined) {
   const qc = useQueryClient();
@@ -23,9 +20,7 @@ export function useReconnectPoll(picoUnitId: number | undefined) {
   const query = useQuery<PicoUnitListResponseDto>({
     queryKey: picoUnitsKeys.list({ page: 1, limit: 100 }),
     queryFn: async () => {
-      const resp = await unwrap(
-        PicoUnits.picoUnitsControllerListV1({ page: 1, limit: 100 }),
-      );
+      const resp = await unwrap(PicoUnits.picoUnitsControllerListV1({ page: 1, limit: 100 }));
       return resp as unknown as PicoUnitListResponseDto;
     },
     refetchInterval: enabled ? POLL_FINISH_INTERVAL_MS : false,
@@ -70,5 +65,11 @@ export function useReconnectPoll(picoUnitId: number | undefined) {
     setTimedOut(false);
   }, []);
 
-  return { waiting: !recovered && picoUnitId != null && !timedOut, recovered, attempt, timedOut, reset };
+  return {
+    waiting: !recovered && picoUnitId != null && !timedOut,
+    recovered,
+    attempt,
+    timedOut,
+    reset,
+  };
 }

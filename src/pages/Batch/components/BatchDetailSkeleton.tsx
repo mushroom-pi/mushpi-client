@@ -1,12 +1,4 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  Divider,
-  Grid,
-  Skeleton,
-  Stack,
-} from '@mui/material';
+import { Box, Card, CardContent, Divider, Grid, Skeleton, Stack } from '@mui/material';
 
 import { ChartsTabsSkeleton, ItemPage } from '~components';
 

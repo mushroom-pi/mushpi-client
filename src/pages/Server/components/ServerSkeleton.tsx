@@ -1,11 +1,4 @@
-import {
-  Card,
-  CardContent,
-  Divider,
-  Grid,
-  Skeleton,
-  Stack,
-} from '@mui/material';
+import { Card, CardContent, Divider, Grid, Skeleton, Stack } from '@mui/material';
 
 import { CardSkeleton } from '~components';
 

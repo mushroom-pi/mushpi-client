@@ -18,12 +18,7 @@ export const RefreshButton: React.FC<RefreshButtonProps> = ({
 }) => (
   <Tooltip title={tooltip}>
     <span>
-      <IconButton
-        onClick={onClick}
-        disabled={isLoading}
-        aria-label={ariaLabel}
-        size={size}
-      >
+      <IconButton onClick={onClick} disabled={isLoading} aria-label={ariaLabel} size={size}>
         <RefreshIcon />
       </IconButton>
     </span>

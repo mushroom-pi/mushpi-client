@@ -54,10 +54,7 @@ export const BatchChartsProvider: React.FC<React.PropsWithChildren<BatchChartsPr
     return ticks;
   }, [labels]);
 
-  const queryData = useMemo(
-    () => (query.data ? omit(query.data, 'data') : null),
-    [query.data],
-  );
+  const queryData = useMemo(() => (query.data ? omit(query.data, 'data') : null), [query.data]);
 
   const value = useMemo<ChartsContextValue>(
     () => ({

@@ -74,13 +74,7 @@ export const batchKeys = {
   },
   currentForUnit: (picoUnitId: number) => ['batches', 'unit', picoUnitId, 'current'] as const,
   readings: (batchId: number, start?: string | null, end?: string | null, points?: number) =>
-    [
-      'batchReadings',
-      batchId,
-      start || 'none',
-      end || 'none',
-      points ?? 200,
-    ] as const,
+    ['batchReadings', batchId, start || 'none', end || 'none', points ?? 200] as const,
 };
 
 export const dashboardKeys = {

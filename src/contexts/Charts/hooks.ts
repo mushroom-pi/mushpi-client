@@ -22,7 +22,9 @@ export const fmtTsShort = (iso?: string) => {
 export const toAggregatedChartPoints = (items: AggregatedReadingDto[]): AggregatedChartPoint[] =>
   items.map((it) => {
     const tempRange =
-      it.tempMin != null && it.tempMax != null ? ([it.tempMin, it.tempMax] as [number, number]) : undefined;
+      it.tempMin != null && it.tempMax != null
+        ? ([it.tempMin, it.tempMax] as [number, number])
+        : undefined;
     const humidityRange =
       it.humidityMin != null && it.humidityMax != null
         ? ([it.humidityMin, it.humidityMax] as [number, number])
@@ -61,16 +63,10 @@ export const toAggregatedChartPoints = (items: AggregatedReadingDto[]): Aggregat
 
 const SAMPLE_TICK_COUNT = 5;
 
-export function useCharts(
-  params: ChartsReadingsParams,
-  enabled: boolean = true,
-) {
+export function useCharts(params: ChartsReadingsParams, enabled: boolean = true) {
   const { picoUnitId, timeWindow, points } = params;
 
-  const query = useListPicoUnitReadings(
-    { picoUnitId, timeWindow, points },
-    enabled,
-  );
+  const query = useListPicoUnitReadings({ picoUnitId, timeWindow, points }, enabled);
 
   const chartsData = useMemo<AggregatedChartPoint[]>(() => {
     if (!query.data) return [];

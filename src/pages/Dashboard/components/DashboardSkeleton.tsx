@@ -37,12 +37,7 @@ export function DashboardSkeleton() {
               <Skeleton variant="text" width="40%" height={28} sx={{ mb: 1 }} />
               <Stack spacing={1.5}>
                 {Array.from({ length: 3 }, (_, i) => (
-                  <Skeleton
-                    key={i}
-                    variant="rectangular"
-                    height={56}
-                    sx={{ borderRadius: 1 }}
-                  />
+                  <Skeleton key={i} variant="rectangular" height={56} sx={{ borderRadius: 1 }} />
                 ))}
               </Stack>
             </CardContent>

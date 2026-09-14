@@ -5,16 +5,9 @@ import { unwrap } from '~api/adapter';
 import { PicoUnits } from '~api/client';
 import type { PicoUnit, PicoUnitListResponseDto } from '~api/generated';
 import { picoUnitsKeys } from '~api/queryKeys';
-import {
-  diffNewUnitIds,
-  POLL_FINISH_INTERVAL_MS,
-  POLL_FINISH_MAX_ATTEMPTS,
-} from '~utils/pico';
+import { POLL_FINISH_INTERVAL_MS, POLL_FINISH_MAX_ATTEMPTS, diffNewUnitIds } from '~utils/pico';
 
-export function useNewPicoPoll(
-  baselineIds: number[] | null,
-  options: { enabled: boolean },
-) {
+export function useNewPicoPoll(baselineIds: number[] | null, options: { enabled: boolean }) {
   const qc = useQueryClient();
   const [newUnit, setNewUnit] = useState<PicoUnit | null>(null);
   const [detected, setDetected] = useState(false);
@@ -28,9 +21,7 @@ export function useNewPicoPoll(
   const query = useQuery<PicoUnitListResponseDto>({
     queryKey: picoUnitsKeys.list({ page: 1, limit: 100 }),
     queryFn: async () => {
-      const resp = await unwrap(
-        PicoUnits.picoUnitsControllerListV1({ page: 1, limit: 100 }),
-      );
+      const resp = await unwrap(PicoUnits.picoUnitsControllerListV1({ page: 1, limit: 100 }));
       return resp as unknown as PicoUnitListResponseDto;
     },
     refetchInterval: enabled ? POLL_FINISH_INTERVAL_MS : false,

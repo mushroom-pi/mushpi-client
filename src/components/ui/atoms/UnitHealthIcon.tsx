@@ -7,10 +7,7 @@ import type { ReactElement } from 'react';
 
 type UnitStatus = 'unmonitored' | 'healthy' | 'degraded' | 'offline';
 
-const STATUS_CONFIG: Record<
-  UnitStatus,
-  { icon: ReactElement; tooltip: string }
-> = {
+const STATUS_CONFIG: Record<UnitStatus, { icon: ReactElement; tooltip: string }> = {
   healthy: {
     icon: <CheckCircleIcon color="success" fontSize="small" />,
     tooltip: 'Unit is healthy and responding',
@@ -32,9 +29,5 @@ const STATUS_CONFIG: Record<
 export function UnitHealthIcon({ status }: { status: UnitStatus }) {
   const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.unmonitored;
 
-  return (
-    <Tooltip title={config.tooltip}>
-      {config.icon}
-    </Tooltip>
-  );
+  return <Tooltip title={config.tooltip}>{config.icon}</Tooltip>;
 }

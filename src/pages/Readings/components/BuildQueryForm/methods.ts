@@ -2,7 +2,7 @@ import dayjs, { type Dayjs } from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
 import type { ChartsReadingsParams } from '~ctx/Charts';
-import { dayjsFromTimeWindow, type RangePreset, type TimeWindow } from '~utils/timeWindow';
+import { type RangePreset, type TimeWindow, dayjsFromTimeWindow } from '~utils/timeWindow';
 
 import type { LocalParams } from './interfaces';
 

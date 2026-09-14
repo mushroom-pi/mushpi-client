@@ -1,11 +1,4 @@
-import {
-  Card,
-  CardContent,
-  Divider,
-  Grid,
-  Skeleton,
-  Stack,
-} from '@mui/material';
+import { Card, CardContent, Divider, Grid, Skeleton, Stack } from '@mui/material';
 
 import { ItemPage, TableSkeleton } from '~components';
 
@@ -35,12 +28,7 @@ export function RecipeDetailSkeleton() {
                 </Stack>
               </Grid>
               <Grid size={{ xs: 12, md: 5 }}>
-                <Skeleton
-                  variant="rounded"
-                  width="100%"
-                  height={200}
-                  sx={{ borderRadius: 1 }}
-                />
+                <Skeleton variant="rounded" width="100%" height={200} sx={{ borderRadius: 1 }} />
               </Grid>
             </Grid>
           </CardContent>

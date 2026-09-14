@@ -48,11 +48,7 @@ export interface OnOffChartProps {
   height?: number;
 }
 
-export const OnOffChart: React.FC<OnOffChartProps> = ({
-  dataKey,
-  showXAxis = false,
-  height,
-}) => {
+export const OnOffChart: React.FC<OnOffChartProps> = ({ dataKey, showXAxis = false, height }) => {
   const { chartsData: data } = useChartsContext();
   const { palette } = useTheme();
 

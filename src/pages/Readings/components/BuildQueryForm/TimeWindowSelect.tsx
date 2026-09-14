@@ -6,7 +6,11 @@ import { useState } from 'react';
 import { DateTimeField } from '~components';
 import type { RangePreset } from '~utils/timeWindow';
 
-import { PeriodSelect, type PresetRange, type RangePreset as PeriodRangePreset } from './PeriodSelect';
+import {
+  type RangePreset as PeriodRangePreset,
+  PeriodSelect,
+  type PresetRange,
+} from './PeriodSelect';
 
 type PresetState = RangePreset | 'recent' | 'custom';
 

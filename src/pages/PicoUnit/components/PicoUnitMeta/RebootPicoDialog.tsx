@@ -1,4 +1,11 @@
-import { Alert, DialogContentText, FormControl, FormControlLabel, Radio, RadioGroup } from '@mui/material';
+import {
+  Alert,
+  DialogContentText,
+  FormControl,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+} from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { ConfirmDialog } from '~components';
@@ -30,14 +37,11 @@ export const RebootPicoDialog: React.FC<RebootPicoDialogProps> = ({
   }, [open]);
 
   async function doReboot() {
-    await run(
-      () => rebootPico.mutateAsync({ picoUnitId, body: { type } }),
-      {
-        successMessage: 'Reboot initiated',
-        fallbackErrorMessage: 'Failed to reboot pico unit',
-        onSuccess: () => onClose(),
-      },
-    );
+    await run(() => rebootPico.mutateAsync({ picoUnitId, body: { type } }), {
+      successMessage: 'Reboot initiated',
+      fallbackErrorMessage: 'Failed to reboot pico unit',
+      onSuccess: () => onClose(),
+    });
   }
 
   return (

@@ -5,10 +5,10 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  Tooltip,
   type SelectChangeEvent,
   type SxProps,
   type Theme,
+  Tooltip,
 } from '@mui/material';
 
 const AGGREGATION_POINT_OPTIONS = [50, 100, 200, 500, 1000, 2000];

@@ -25,12 +25,7 @@ const PreviewRow: React.FC<RowProps> = ({ label, currentVal, proposedVal }) => {
       <Typography variant="body2" sx={{ minWidth: 90, fontWeight: 500 }}>
         {label}
       </Typography>
-      <Chip
-        label={formatGp(currentVal)}
-        size="small"
-        color="default"
-        variant="outlined"
-      />
+      <Chip label={formatGp(currentVal)} size="small" color="default" variant="outlined" />
       <ArrowForward fontSize="small" color="action" />
       <Chip
         label={formatGp(proposedVal)}

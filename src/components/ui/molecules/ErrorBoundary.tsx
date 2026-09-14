@@ -43,11 +43,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
               textAlign: 'center',
             }}
           >
-            <img
-              src={sadMushroomSvg}
-              alt="Sad mushroom"
-              style={{ width: 140, height: 'auto' }}
-            />
+            <img src={sadMushroomSvg} alt="Sad mushroom" style={{ width: 140, height: 'auto' }} />
             <Typography variant="h5" color="text.primary" sx={{ mt: 3, mb: 1 }}>
               Something went wrong
             </Typography>

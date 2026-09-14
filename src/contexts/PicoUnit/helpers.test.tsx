@@ -5,8 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { picoUnitKeys } from '~api/queryKeys';
 
-import { createOptimisticMutation } from './helpers';
 import { makePicoUnit } from '../../test/fixtures';
+import { createOptimisticMutation } from './helpers';
 
 // vi.hoisted() ensures the mock ref is available inside the hoisted vi.mock factory
 const { mockPollV1 } = vi.hoisted(() => ({ mockPollV1: vi.fn() }));
@@ -117,9 +117,7 @@ describe('createOptimisticMutation', () => {
 
     await waitFor(() => {
       const cached = qc.getQueryData<any>(picoUnitKeys.detail(1));
-      expect(cached.latest_reading.humidifier_on).toBe(
-        originalItem.latest_reading.humidifier_on,
-      );
+      expect(cached.latest_reading.humidifier_on).toBe(originalItem.latest_reading.humidifier_on);
     });
   });
 

@@ -32,10 +32,7 @@ export function TableSkeleton({ columns, rows = 6 }: TableSkeletonProps) {
             <TableRow key={rowIdx}>
               {Array.from({ length: columns }, (_, colIdx) => (
                 <TableCell key={colIdx}>
-                  <Skeleton
-                    variant="text"
-                    width={`${60 + ((rowIdx + colIdx) % 5) * 10}%`}
-                  />
+                  <Skeleton variant="text" width={`${60 + ((rowIdx + colIdx) % 5) * 10}%`} />
                 </TableCell>
               ))}
             </TableRow>

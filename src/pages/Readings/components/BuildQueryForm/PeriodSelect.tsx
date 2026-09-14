@@ -109,7 +109,12 @@ export const PeriodSelect = ({
 
   return (
     <FormControl
-      sx={{ position: 'relative', minWidth: { xs: 200, xl: 430 }, width: { xs: '100%', xl: 'auto' }, ...sx }}
+      sx={{
+        position: 'relative',
+        minWidth: { xs: 200, xl: 430 },
+        width: { xs: '100%', xl: 'auto' },
+        ...sx,
+      }}
       size="medium"
     >
       {isSmallScreen ? (

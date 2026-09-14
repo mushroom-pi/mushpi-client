@@ -1,5 +1,5 @@
 import { Alert, Stack } from '@mui/material';
-import { useMemo, type KeyboardEvent } from 'react';
+import { type KeyboardEvent, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import type { DashboardWarningDto } from '~api/generated';
@@ -9,10 +9,7 @@ interface WarningsBannerProps {
   unitNames?: Map<number, string>;
 }
 
-function handleAlertKeyDown(
-  e: KeyboardEvent<HTMLDivElement>,
-  navigate: () => void,
-) {
+function handleAlertKeyDown(e: KeyboardEvent<HTMLDivElement>, navigate: () => void) {
   if (e.key === 'Enter' || e.key === ' ') {
     e.preventDefault();
     navigate();

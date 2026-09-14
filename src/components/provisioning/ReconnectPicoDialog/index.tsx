@@ -18,8 +18,19 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import { HeaderAndIcon, LedStateReference, JoinWifiIllustration, OpenBrowserIllustration, SuccessIllustration } from '~components';
-import { apSsidOrFallback, LED_STATES, POLL_FINISH_MAX_ATTEMPTS, PROVISION_AP_URL } from '~utils/pico';
+import {
+  HeaderAndIcon,
+  JoinWifiIllustration,
+  LedStateReference,
+  OpenBrowserIllustration,
+  SuccessIllustration,
+} from '~components';
+import {
+  LED_STATES,
+  POLL_FINISH_MAX_ATTEMPTS,
+  PROVISION_AP_URL,
+  apSsidOrFallback,
+} from '~utils/pico';
 
 import type { ReconnectPicoDialogProps } from './interfaces';
 import { useReconnectPoll } from './useReconnectPoll';
@@ -114,9 +125,13 @@ function LedTransitionDiagram() {
 
 export function ReconnectPicoDialog({ pico, onClose }: ReconnectPicoDialogProps) {
   const [activeStep, setActiveStep] = useState(0);
-  const { waiting, recovered, attempt, timedOut, reset: resetPoll } = useReconnectPoll(
-    activeStep === STEPS.length - 1 ? pico?.id : undefined,
-  );
+  const {
+    waiting,
+    recovered,
+    attempt,
+    timedOut,
+    reset: resetPoll,
+  } = useReconnectPoll(activeStep === STEPS.length - 1 ? pico?.id : undefined);
   const { ssid, exact } = apSsidOrFallback(pico?.mac);
 
   // Reset step when dialog opens/closes
@@ -154,7 +169,8 @@ export function ReconnectPicoDialog({ pico, onClose }: ReconnectPicoDialogProps)
         let meaning: string = state.meaning;
 
         if (state.id === 'provisioning') {
-          meaning = 'Provisioning mode. The Pico is waiting for Wi‑Fi credentials. Continue to reconnect.';
+          meaning =
+            'Provisioning mode. The Pico is waiting for Wi‑Fi credentials. Continue to reconnect.';
           action = (
             <Button size="small" variant="contained" onClick={() => setActiveStep(1)}>
               Next →
@@ -162,7 +178,7 @@ export function ReconnectPicoDialog({ pico, onClose }: ReconnectPicoDialogProps)
           );
         } else if (state.id === 'solid') {
           meaning =
-            'This unit is already registered. If the LED is solid but the unit appears offline, the hub URL on the Pico may be wrong. Check the Pico\'s config.json.';
+            "This unit is already registered. If the LED is solid but the unit appears offline, the hub URL on the Pico may be wrong. Check the Pico's config.json.";
         } else if (state.id === 'off') {
           meaning = 'No power or still booting. Wait 30 seconds and check again.';
         } else if (state.id === 'heartbeat') {
@@ -195,8 +211,8 @@ export function ReconnectPicoDialog({ pico, onClose }: ReconnectPicoDialogProps)
           </>
         ) : (
           <>
-            On your phone or laptop, look for a Wi-Fi network starting with &apos;mushpi-provision&apos;{' '}
-            and join it.
+            On your phone or laptop, look for a Wi-Fi network starting with
+            &apos;mushpi-provision&apos; and join it.
           </>
         )}
       </Typography>

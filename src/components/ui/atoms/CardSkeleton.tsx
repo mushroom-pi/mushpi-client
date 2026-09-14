@@ -1,11 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  Skeleton,
-  type SxProps,
-  type Theme,
-} from '@mui/material';
+import { Card, CardContent, CardHeader, Skeleton, type SxProps, type Theme } from '@mui/material';
 
 export interface CardSkeletonProps {
   variant?: 'card' | 'widget';
@@ -14,12 +7,7 @@ export interface CardSkeletonProps {
   sx?: SxProps<Theme>;
 }
 
-export function CardSkeleton({
-  variant = 'card',
-  lines = 2,
-  height,
-  sx,
-}: CardSkeletonProps) {
+export function CardSkeleton({ variant = 'card', lines = 2, height, sx }: CardSkeletonProps) {
   return (
     <Card sx={sx}>
       <CardHeader

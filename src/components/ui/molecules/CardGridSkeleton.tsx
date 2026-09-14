@@ -10,13 +10,7 @@ export interface CardGridSkeletonProps {
   lg?: number;
 }
 
-export function CardGridSkeleton({
-  count,
-  xs = 12,
-  sm = 6,
-  md = 4,
-  lg,
-}: CardGridSkeletonProps) {
+export function CardGridSkeleton({ count, xs = 12, sm = 6, md = 4, lg }: CardGridSkeletonProps) {
   return (
     <Grid container spacing={2}>
       {Array.from({ length: count }, (_, i) => (

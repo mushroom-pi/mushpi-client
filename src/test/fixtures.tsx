@@ -47,10 +47,7 @@ export function renderWithProviders(
   void _qc;
 
   return {
-    ...render(
-      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>,
-      restOptions,
-    ),
+    ...render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>, restOptions),
     queryClient,
   };
 }

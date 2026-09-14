@@ -122,9 +122,7 @@ export const ReadingsTargetChart: React.FC<ReadingsTargetChartProps> = ({
             minTickGap={30}
           />
           <YAxis unit={unit} tickCount={5} domain={yDomain} />
-          <Tooltip
-            labelFormatter={(ts) => dayjs(ts).format('MMM DD HH:mm')}
-          />
+          <Tooltip labelFormatter={(ts) => dayjs(ts).format('MMM DD HH:mm')} />
           <Area
             name="Range"
             dataKey={rangeKey}

@@ -36,7 +36,8 @@ export function UnitCards({ items, healthy, degraded, offline, total }: UnitCard
         Monitored Pico Units
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        {healthy} healthy · {degraded} degraded · {offline} offline ({total} total) — paused units not shown
+        {healthy} healthy · {degraded} degraded · {offline} offline ({total} total) — paused units
+        not shown
       </Typography>
 
       <Grid container spacing={2}>

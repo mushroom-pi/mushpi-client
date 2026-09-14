@@ -10,12 +10,13 @@ export type TimeWindow =
   | { kind: 'preset'; preset: RangePreset }
   | { kind: 'custom'; start?: string; end?: string };
 
-export const PRESET_DURATIONS: Record<RangePreset, { unit: dayjs.ManipulateType; amount: number }> = {
-  '1h': { unit: 'hour', amount: 1 },
-  '6h': { unit: 'hour', amount: 6 },
-  '24h': { unit: 'hour', amount: 24 },
-  '7d': { unit: 'day', amount: 7 },
-};
+export const PRESET_DURATIONS: Record<RangePreset, { unit: dayjs.ManipulateType; amount: number }> =
+  {
+    '1h': { unit: 'hour', amount: 1 },
+    '6h': { unit: 'hour', amount: 6 },
+    '24h': { unit: 'hour', amount: 24 },
+    '7d': { unit: 'day', amount: 7 },
+  };
 
 /** Resolve a TimeWindow to API query bounds AT CALL TIME (presets stay dynamic on refetch) */
 export const resolveTimeBounds = (tw: TimeWindow): { start?: string; end?: string } => {
@@ -37,7 +38,11 @@ export const resolveTimeBounds = (tw: TimeWindow): { start?: string; end?: strin
 /** Reverse map: TimeWindow → local UI draft values */
 export const dayjsFromTimeWindow = (
   tw: TimeWindow,
-): { start: dayjs.Dayjs | null; end: dayjs.Dayjs | null; preset: RangePreset | 'recent' | 'custom' } => {
+): {
+  start: dayjs.Dayjs | null;
+  end: dayjs.Dayjs | null;
+  preset: RangePreset | 'recent' | 'custom';
+} => {
   if (tw.kind === 'none') return { start: null, end: null, preset: 'recent' };
   if (tw.kind === 'preset') return { start: null, end: null, preset: tw.preset };
   return {

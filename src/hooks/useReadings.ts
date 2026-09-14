@@ -9,10 +9,14 @@ import type {
   ReadingsApiPicoUnitIdReadingsControllerListForUnitV1Request as ListPicoUnitReadingsParams,
 } from '~api/generated';
 import { readingsKeys } from '~api/queryKeys';
-import { resolveTimeBounds, type TimeWindow } from '~utils/timeWindow';
+import { type TimeWindow, resolveTimeBounds } from '~utils/timeWindow';
 
 export const useListPicoUnitReadings = (
-  { picoUnitId, timeWindow, points = 200 }: {
+  {
+    picoUnitId,
+    timeWindow,
+    points = 200,
+  }: {
     picoUnitId?: number;
     timeWindow: TimeWindow;
     points?: number;

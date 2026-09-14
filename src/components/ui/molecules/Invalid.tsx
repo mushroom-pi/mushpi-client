@@ -21,9 +21,5 @@ export const Invalid: React.FC<InvalidProps> = ({ compact, item }) => {
 
   if (compact) return inner;
 
-  return (
-    <Container sx={{ py: 6 }}>
-      {inner}
-    </Container>
-  );
+  return <Container sx={{ py: 6 }}>{inner}</Container>;
 };
