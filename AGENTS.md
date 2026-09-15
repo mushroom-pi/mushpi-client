@@ -120,7 +120,8 @@ src/
     ├── chartLabels.ts       # Chart tick-label helpers (isLongSpan, createTickFormatter)
     ├── methods.ts           # Generic: date formatting, bytes, percentages
     ├── methods.test.ts      # Vitest: pure formatting helpers
-    ├── pico.ts              # Pico: provisioning constants, LED_STATES, chip color helpers
+    ├── pico.ts              # Pico: provisioning constants, LED_STATES, chip color helpers, firmwareStatus()/firmwareCaption() display helpers
+    ├── pico.test.ts         # Vitest: firmware-status null/unknown branching + caption composition
     ├── timeWindow.ts        # TimeWindow union + resolveTimeBounds() (store intent, resolve per fetch)
     └── charts.ts            # (removed — server handles aggregation)
 ```

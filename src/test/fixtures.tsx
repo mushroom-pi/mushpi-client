@@ -22,6 +22,10 @@ export function makePicoUnit(overrides?: Record<string, unknown>): any {
       control_loop_enabled: true,
       ts: '2026-01-01T00:00:00.000Z',
     },
+    // Post-#21 firmware reports both; pass { firmware_version: null, api_version: null }
+    // in overrides to simulate a legacy unit that hasn't announced since the migration.
+    firmware_version: '0.8.4',
+    api_version: 1,
     ...overrides,
   };
 }

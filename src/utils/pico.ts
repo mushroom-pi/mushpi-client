@@ -80,3 +80,43 @@ export const chipColorForFailedReadings = (failedReadings: number | null | undef
   if (n < FAILS_READINGS_UNHEALTHY) return 'warning' as const;
   return 'error' as const;
 };
+
+/** Placeholder shown when a unit has not reported its firmware/API contract version */
+export const FIRMWARE_UNKNOWN = 'unknown';
+
+/** Minimal structural shape of the version fields (nullable until a unit announces with post-#21 firmware) */
+export interface FirmwareReportFields {
+  firmware_version?: string | null;
+  api_version?: number | null;
+}
+
+export interface FirmwareStatus {
+  /** Reported firmware version string, or `FIRMWARE_UNKNOWN` */
+  firmware: string;
+  /** Reported Pico↔Server API-contract generation (bare integer as string), or `FIRMWARE_UNKNOWN` */
+  apiGeneration: string;
+  /** True only when BOTH values were reported */
+  known: boolean;
+}
+
+/**
+ * Normalize a unit's self-reported firmware version and Pico↔Server API-contract
+ * generation for display. `null`/`undefined`/blank → `'unknown'` — the expected
+ * state for legacy units that have not announced since the server migration,
+ * not an error. Deliberately no "stale/incompatible" judgment (server-side
+ * range-check feature territory).
+ */
+export function firmwareStatus(pico: FirmwareReportFields | null | undefined): FirmwareStatus {
+  const firmware = pico?.firmware_version?.trim() || FIRMWARE_UNKNOWN;
+  const apiGeneration = pico?.api_version != null ? String(pico.api_version) : FIRMWARE_UNKNOWN;
+  return {
+    firmware,
+    apiGeneration,
+    known: firmware !== FIRMWARE_UNKNOWN && apiGeneration !== FIRMWARE_UNKNOWN,
+  };
+}
+
+/** One compact fleet-scan caption line, e.g. "Firmware 0.8.4 · API gen 1" */
+export function firmwareCaption(status: FirmwareStatus): string {
+  return `Firmware ${status.firmware} · API gen ${status.apiGeneration}`;
+}

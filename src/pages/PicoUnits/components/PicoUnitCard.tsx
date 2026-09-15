@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 
 import type { PicoUnit } from '~api/generated';
 import { UnitHealthIcon } from '~components';
+import { firmwareCaption, firmwareStatus } from '~utils/pico';
 
 export default function PicoUnitCard({
   pico,
@@ -30,6 +31,7 @@ export default function PicoUnitCard({
 }) {
   const navigate = useNavigate();
   const offline = pico.status === 'offline';
+  const firmware = firmwareStatus(pico);
 
   function friendlyDate(ts?: string) {
     if (!ts) return '—';
@@ -92,9 +94,19 @@ export default function PicoUnitCard({
             {pico.description ?? 'No description'}
           </Typography>
 
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
             Host: {pico.host ?? '—'}
             {pico.port ? `:${pico.port}` : ''}
+          </Typography>
+
+          {/* Firmware/API-generation caption: neutral styling; disabled tone when unreported.
+              Unknown here is the expected state for legacy units, not a warning. */}
+          <Typography
+            variant="caption"
+            color={firmware.known ? 'text.secondary' : 'text.disabled'}
+            sx={{ display: 'block' }}
+          >
+            {firmwareCaption(firmware)}
           </Typography>
         </CardContent>
       </CardActionArea>
