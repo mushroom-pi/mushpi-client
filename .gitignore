@@ -31,3 +31,6 @@ src/api/generated/*
 
 # OpenAPI spec copy (used for local regeneration, canonical source is mushpi-server/spec/)
 openapi.json
+
+# Accidental `husky --version` artifact (husky treats args as the install dir)
+--version/

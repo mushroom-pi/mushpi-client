@@ -158,6 +158,12 @@ Standard React Query patterns apply (see `frontend-react` skill). Project-specif
 - Husky pre-commit (v9): `.husky/pre-commit` runs `npx --no-install lint-staged`; wiring via `"prepare": "husky"` and `git config core.hooksPath=.husky/_`. lint-staged runs `eslint --fix` + `prettier --write` on staged files.
   - **Severity policy**: most rules are `warn`; `import/no-unresolved` and the raw-color `no-restricted-syntax` rules (hex/rgb/hsl literals outside `src/theme/tokens.ts`) are `error`. Pre-commit runs `eslint --fix` (no `--max-warnings=0`), so **errors block commits, warnings do not**. Enforce zero-warnings as a CI gate (`eslint --max-warnings=0`) rather than at pre-commit.
 
+## Versioning
+
+- Commit messages follow Conventional Commits, enforced by commitlint (`commitlint.config.cjs` + `.husky/commit-msg` hook).
+- The `package.json` version is bumped only when releasing (on the `main` branch) — never during day-to-day `dev` work.
+- Never edit the root `release.json` or git tags.
+
 ## Testing
 
 - **Test runner**: Vitest 3.x with jsdom environment. Config lives in `vitest.config.ts` (separate file — merging into `vite.config.ts` causes type conflicts between Vitest's bundled vite and the project's `@vitejs/plugin-react`).
