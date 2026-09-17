@@ -28,6 +28,13 @@ yarn gen:all:remote      # regenerate both
 
 Both files are gitignored. Always regenerate after any `mushpi-server` endpoint change.
 
+**Offline regeneration (preferred when no server is running).** The bare `gen:client`/`gen:schemas` default to the client's own `./openapi.json`, which can be **stale** relative to the server's committed spec. Point `OPENAPI_SPEC` at the server's canonical spec instead — no server boot, no risk of touching a live database:
+
+```bash
+OPENAPI_SPEC=../mushpi-server/spec/openapi.json yarn gen:client && \
+OPENAPI_SPEC=../mushpi-server/spec/openapi.json yarn gen:schemas
+```
+
 **New API classes must be manually wired.** After introducing a new server controller (e.g. `DashboardModule`), the generated `*Api` class (e.g. `DashboardApi`) is created in `src/api/generated/api.ts` but is **not auto-exported**. You must manually import and instantiate it in `src/api/client.ts` alongside the other API exports. Same pattern as existing `Control`, `Images`, `Monitoring`, etc.
 
 ## Routing
@@ -120,8 +127,8 @@ src/
     ├── chartLabels.ts       # Chart tick-label helpers (isLongSpan, createTickFormatter)
     ├── methods.ts           # Generic: date formatting, bytes, percentages
     ├── methods.test.ts      # Vitest: pure formatting helpers
-    ├── pico.ts              # Pico: provisioning constants, LED_STATES, chip color helpers, firmwareStatus()/firmwareCaption() display helpers
-    ├── pico.test.ts         # Vitest: firmware-status null/unknown branching + caption composition
+    ├── pico.ts              # Pico: provisioning constants, LED_STATES, chip color helpers, firmwareStatus()/firmwareCaption() display helpers, compatibilityStatus() (maps server-owned api_compatibility verdict)
+    ├── pico.test.ts         # Vitest: firmware-status null/unknown branching + caption composition + compatibilityStatus verdict/defensive-unknown branching
     ├── timeWindow.ts        # TimeWindow union + resolveTimeBounds() (store intent, resolve per fetch)
     └── charts.ts            # (removed — server handles aggregation)
 ```

@@ -6,6 +6,8 @@ import { Box, Card, CardContent, Chip, Grid, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import type { DashboardUnitItemDto } from '~api/generated';
+import { FirmwareCompatBadge } from '~components';
+import { compatibilityStatus } from '~utils/pico';
 
 import { formatLastSeen } from '../methods';
 
@@ -83,6 +85,9 @@ export function UnitCards({ items, healthy, degraded, offline, total }: UnitCard
 
                 {/* Status chips row */}
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1 }}>
+                  {/* warning-only; the server exposes api_compatibility on dashboard items
+                      (no api_version here, so the badge tooltip uses its generic copy) */}
+                  <FirmwareCompatBadge status={compatibilityStatus(unit)} />
                   {unit.lastReading && (
                     <Chip
                       label={unit.controlLoopEnabled ? 'Control loop ON' : 'Control loop OFF'}

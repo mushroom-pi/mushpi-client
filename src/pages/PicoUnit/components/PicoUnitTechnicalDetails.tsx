@@ -1,12 +1,12 @@
 import MemoryIcon from '@mui/icons-material/Memory';
-import { Grid, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Grid, Typography, useMediaQuery, useTheme } from '@mui/material';
 import React, { useMemo } from 'react';
 
-import { BigDisplay, InfoCard, InfoField, Loading } from '~components';
+import { BigDisplay, FirmwareCompatBadge, InfoCard, InfoField, Loading } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import type { OptionalPicoUnitProps } from '~int/optionalPicoUnit';
 import { bytesToMB } from '~utils/methods';
-import { FIRMWARE_UNKNOWN, firmwareStatus } from '~utils/pico';
+import { FIRMWARE_UNKNOWN, compatibilityStatus, firmwareStatus } from '~utils/pico';
 
 const API_VERSION_TOOLTIP =
   'The Pico↔Server REST API-contract generation this unit speaks. ' +
@@ -34,6 +34,8 @@ export const PicoUnitTechnicalDetails: React.FC<OptionalPicoUnitProps> = ({ pico
   );
 
   const { firmware, apiGeneration } = technical.firmware;
+  // Server-owned verdict — plain read (not a hook) so it stays below the existing early return.
+  const compatibility = compatibilityStatus(pico);
 
   return (
     <InfoCard title="Technical details" subtitle="Static board data" icon={<MemoryIcon />}>
@@ -60,7 +62,11 @@ export const PicoUnitTechnicalDetails: React.FC<OptionalPicoUnitProps> = ({ pico
           <InfoField label="API version" tooltip={API_VERSION_TOOLTIP}>
             {apiGeneration !== FIRMWARE_UNKNOWN ? (
               /* bare integer on purpose — no `v` prefix, so it can't be misread as SemVer */
-              <BigDisplay content={apiGeneration} />
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                <BigDisplay content={apiGeneration} />
+                {/* warning-only; renders nothing unless the server flags the unit incompatible */}
+                <FirmwareCompatBadge status={compatibility} apiVersion={pico.api_version} />
+              </Box>
             ) : (
               <Typography variant="body2" color="text.disabled">
                 This unit hasn&apos;t reported its API version yet — it likely runs pre-versioning

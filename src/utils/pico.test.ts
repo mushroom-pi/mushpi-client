@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
+import type { DashboardUnitItemDto, PicoUnit, PollPicoUnitResponseDto } from '~api/generated';
 import {
+  type CompatibilityStatus,
   FIRMWARE_UNKNOWN,
   type FirmwareStatus,
+  compatibilityStatus,
   firmwareCaption,
   firmwareStatus,
 } from '~utils/pico';
@@ -80,5 +83,96 @@ describe('firmwareCaption', () => {
 
   it('substitutes unknown in both slots for a legacy unit', () => {
     expect(caption({})).toBe('Firmware unknown · API gen unknown');
+  });
+});
+
+describe('compatibilityStatus', () => {
+  it('passes through a server "compatible" verdict', () => {
+    expect(compatibilityStatus({ api_compatibility: 'compatible' })).toBe('compatible');
+  });
+
+  it('passes through a server "incompatible" verdict', () => {
+    expect(compatibilityStatus({ api_compatibility: 'incompatible' })).toBe('incompatible');
+  });
+
+  it('passes through an explicit server "unknown" verdict', () => {
+    expect(compatibilityStatus({ api_compatibility: 'unknown' })).toBe('unknown');
+  });
+
+  it('treats an absent field (older server that omits it) as unknown, never re-deriving a verdict', () => {
+    expect(compatibilityStatus({})).toBe('unknown');
+  });
+
+  it('treats a null api_compatibility value as unknown', () => {
+    expect(compatibilityStatus({ api_compatibility: null })).toBe('unknown');
+  });
+
+  it('never invents a range check from a null api_version — trusts the server verdict', () => {
+    // A unit with NO api_version but a server "incompatible" verdict still reads incompatible:
+    // the client does not compare api_version against any minimum/maximum.
+    expect(compatibilityStatus({ api_compatibility: 'incompatible', api_version: null })).toBe(
+      'incompatible',
+    );
+  });
+
+  it('ignores api_version entirely — the verdict is server-owned', () => {
+    // An absurd api_version does not flip a "compatible" verdict: no client-side range logic.
+    expect(compatibilityStatus({ api_compatibility: 'compatible', api_version: 999_999 })).toBe(
+      'compatible',
+    );
+    expect(compatibilityStatus({ api_compatibility: 'unknown', api_version: 1 })).toBe('unknown');
+  });
+
+  it('collapses an unrecognised verdict string to unknown (warning-only safety)', () => {
+    expect(compatibilityStatus({ api_compatibility: 'definitely-broken' })).toBe('unknown');
+  });
+
+  it('handles a null or undefined unit without throwing', () => {
+    expect(compatibilityStatus(null)).toBe('unknown');
+    expect(compatibilityStatus(undefined)).toBe('unknown');
+  });
+});
+
+// ── Compile-time contract guard ─────────────────────────────────────────────────────────
+// `CompatibilityStatus` is *derived* from the server's generated `api_compatibility` enum
+// (see src/utils/pico.ts) rather than hand-copied. The helpers below are erased at runtime
+// but are checked by `tsc -b`, so they run on every `yarn build`: if the contract ever gains
+// a state, the client alias follows automatically (it's a type alias, not a re-declaration),
+// and these assertions lock the alias to the exact generated field type and prove it is a
+// closed union. They are NOT a runtime behaviour test — they exist so a future hand-widening
+// (e.g. someone re-typing the alias to `string`) is caught by the compiler, not a green suite.
+
+/** Exact type identity (non-distributive — the classic conditional-wrapping trick). */
+type Equals<X, Y> =
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? true : false;
+
+/**
+ * Compile-time assertion: the generic is constrained to `true`, so any call whose argument
+ * resolves to anything else (e.g. `false` when a value drifts out of the union) fails `tsc`.
+ * The optional `_proof` param and empty body keep it free at runtime; `_`-prefix exempts it
+ * from `noUnusedParameters`.
+ */
+function assertContractHolds<T extends true>(_proof?: T): void {
+  // intentionally empty — type-level guard only
+}
+
+describe('CompatibilityStatus ↔ server api_compatibility contract (compile-time guard)', () => {
+  it('locks the derived alias to the generated DTO field types', () => {
+    // The alias IS PicoUnit.api_compatibility, so this pair is identical by construction —
+    // a trivially-true anchor check. The other two DTOs each declare their own
+    // structurally-identical enum, so these are the load-bearing cross-checks: every site the
+    // badge reads the verdict from must agree with the client alias, or the build breaks.
+    assertContractHolds<Equals<CompatibilityStatus, PicoUnit['api_compatibility']>>();
+    assertContractHolds<Equals<CompatibilityStatus, DashboardUnitItemDto['api_compatibility']>>();
+    assertContractHolds<
+      Equals<CompatibilityStatus, PollPicoUnitResponseDto['api_compatibility']>
+    >();
+    expect(true).toBe(true); // satisfies the runtime `it` body; the real check is at compile time
+  });
+
+  it('rejects an out-of-contract literal (union is closed, never widened to string)', () => {
+    // @ts-expect-error a value the server never emits must NOT be assignable to CompatibilityStatus
+    const notAStatus: CompatibilityStatus = 'a_value_the_server_never_emits';
+    expect(notAStatus).toBeDefined(); // runtime reference only — keeps `noUnusedLocals` satisfied
   });
 });

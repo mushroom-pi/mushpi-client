@@ -1,3 +1,4 @@
+import type { PicoUnitApiCompatibilityEnum } from '~api/generated';
 import { led } from '~theme/tokens';
 
 /** Temperature must be within ±2°C of target before a deviation warning fires */
@@ -119,4 +120,47 @@ export function firmwareStatus(pico: FirmwareReportFields | null | undefined): F
 /** One compact fleet-scan caption line, e.g. "Firmware 0.8.4 · API gen 1" */
 export function firmwareCaption(status: FirmwareStatus): string {
   return `Firmware ${status.firmware} · API gen ${status.apiGeneration}`;
+}
+
+/**
+ * Server-owned verdict on whether a unit's Pico↔Server `api_version` falls inside
+ * the range this server supports.
+ *
+ * DERIVED from the generated contract (`PicoUnit.api_compatibility`) rather than
+ * hand-copied, so the value set is written exactly once (in `src/api/generated`) and can
+ * never silently drift from the server. Regenerating the API client is the only way this
+ * type changes. The `pico.test.ts` compile-time guard proves it tracks the contract.
+ */
+export type CompatibilityStatus = PicoUnitApiCompatibilityEnum;
+
+/**
+ * Minimal structural shape the compatibility helper reads off a unit. `api_version`
+ * is deliberately declared here but NEVER consulted — the server computes the verdict;
+ * the client must not re-derive it. Both `PicoUnit` and `DashboardUnitItemDto` satisfy
+ * this shape. `api_compatibility` is optional only for defensiveness: an older server
+ * that predates it omits the field entirely (see REFERENCE.md).
+ */
+export interface CompatibilityFields {
+  api_compatibility?: string | null;
+  /** Present-but-unused: proves the client never range-checks it. */
+  api_version?: number | null;
+}
+
+/**
+ * Map the server's computed `api_compatibility` verdict onto {@link CompatibilityStatus}.
+ *
+ * The server OWNS the "is this unit's API generation in range?" judgement (see
+ * `mushpi-server/spec` `PicoUnit.api_compatibility`). This helper only reads that verdict —
+ * it never compares `api_version` against any minimum/maximum and hardcodes no range. When
+ * `api_compatibility` is absent/`undefined`/`null` (talking to an older server) it returns
+ * `'unknown'`, which the badge renders as nothing — an unjudged unit is not an error.
+ */
+export function compatibilityStatus(
+  pico: CompatibilityFields | null | undefined,
+): CompatibilityStatus {
+  const verdict = pico?.api_compatibility;
+  if (verdict === 'compatible' || verdict === 'incompatible') return verdict;
+  // Explicit 'unknown', an absent/legacy field, null, or any unrecognised value all
+  // collapse to 'unknown' so the UI stays warning-only.
+  return 'unknown';
 }
