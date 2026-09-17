@@ -80,6 +80,8 @@ Server-side aggregation via `points` parameter (default 200, min 10, max 2000). 
 
 **Time-relative query bounds store intent, not resolved timestamps.** When a user selects "Last 1h", store the preset descriptor (`{ kind:'preset', preset:'1h' }`) in the query key and resolve it to absolute timestamps (`start=now()-1h, end=now()`) inside `queryFn` at execution time. If absolute timestamps are frozen into provider state at apply time, every `refetchInterval` tick refetches the same stale window with no new data. Custom absolute ranges store their frozen bounds — that behavior is correct. See `~utils/timeWindow.ts` for the `TimeWindow` discriminated union and `resolveTimeBounds()`.
 
+**Unit selection on the Readings page has three layered state sources** — `PicoUnits.selectedUnitId` (app context) → `ChartsProvider.initialParams`/`params` (Charts context) → `BuildQueryForm.localParams` (form draft). `src/contexts/Charts/provider.tsx` runs a one-directional sync effect that reverts `params.picoUnitId` back to `initialParams.picoUnitId`, and `initialParams` derives from `selectedUnitId` in `src/pages/Readings/index.tsx` (`selectedId`, passed to `<ChartsProvider initialParams={{ picoUnitId: selectedId, points: 200 }}>`). **Rule: any code that changes the selected unit must go through `setSelectedUnitId` from `usePicoUnitsContext()`** — writing only to the Charts `params` is silently reverted on the next commit, so the dropdown would display the new unit while charts/CSV/Refresh still read the old unit's data (the readings query is keyed on `params.picoUnitId`). This also gates the page-level poll effect in `src/pages/Readings/index.tsx` (effect with `[selectedId]` deps), which only fires when `selectedUnitId` actually changes. Reference impl: `onPicoUnitChange` in `src/pages/Readings/components/BuildQueryForm/useBuildQueryForm.ts`.
+
 ### Chart Layout Conventions
 
 - **Two chart components** serve all three tabs: `ReadingsTargetChart` (temp/humidity with target lines) and `OnOffChart` (binary step lines). Both wrap in `<ResponsiveContainer>` with `syncId="anyId"` for cross-chart tooltip linking.
@@ -142,6 +144,8 @@ src/
 │   ├── PicoUnit/            # Unit detail page at /pico-units/:id
 │   │   └── components/      # PicoUnitStatCards, PicoUnitDetailGrid, PicoUnitDevices, etc.
 │   ├── Readings/            # Charts page at /readings
+│   │   └── components/
+│   │       └── BuildQueryForm/         # useBuildQueryForm.test.tsx — Charts-context unit-switch test (see §Charts (Recharts))
 │   ├── Recipes/             # Recipes list page at /recipes
 │   ├── Recipe/              # Recipe detail page at /recipes/:id
 │   ├── Batches/             # Batches list page at /batches
@@ -182,6 +186,8 @@ OPENAPI_SPEC=../mushpi-server/spec/openapi.json yarn gen:schemas
 ## Testing (Vitest) Detail
 
 - **Globals**: `vitest.config.ts` sets `globals: true`, so `describe`, `it`, `expect`, `vi`, `beforeEach`, `afterEach` work at _runtime_ without imports. **But you must still import them from `vitest`** — `tsc -b` type-checks test files and `vitest/globals` is not in tsconfig `types`, so relying on globals breaks `yarn build`. Import `render`, `screen`, `waitFor` from `@testing-library/react` and `userEvent` from `@testing-library/user-event`.
+- **Charts-context unit switching**: first test covering the Readings page / Charts-context unit switching is `src/pages/Readings/components/BuildQueryForm/useBuildQueryForm.test.tsx`. To faithfully reproduce the `ChartsProvider` sync effect in a test harness, `initialParams` must be **derived from the same upstream source the real page uses** (`selectedUnitId`), typically via a small bridge component — a hardcoded/static `initialParams` makes the revert unavoidable and yields an unfaithful test (see §Charts (Recharts) for the contract).
+- **Observed lint convention**: test files in this repo are allowed to carry an `import/order` warning (warning-only; `yarn lint` still exits 0) — see the sibling test files `src/contexts/PicoUnit/helpers.test.tsx` and `src/pages/PicoUnit/components/PicoUnitDevices/DevicesDialog.test.tsx`.
 
 ## Component & Mutation Gotchas
 

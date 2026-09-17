@@ -15,7 +15,7 @@ import { buildInitialLocalParams, buildTimeWindowFromLocal } from './methods';
 type PresetState = RangePreset | 'recent' | 'custom';
 
 export function useBuildQueryForm() {
-  const { units: picoUnits = [] } = usePicoUnitsContext();
+  const { units: picoUnits = [], setSelectedUnitId } = usePicoUnitsContext();
   const { params, setParams, points, setPoints } = useChartsContext();
 
   const [localParams, setLocalParams] = useState<LocalParams>(() =>
@@ -81,7 +81,8 @@ export function useBuildQueryForm() {
   const onPicoUnitChange = (val: number) => {
     const next = { ...localParams, picoUnitId: val };
     setLocalParams(next);
-    update(next);
+    update(next); // Charts context setParams → query key changes → fetch for new unit
+    setSelectedUnitId(val); // PicoUnits source of truth → initialParams agrees, no revert
   };
 
   const onStartChange = (v: Dayjs | null) => {
