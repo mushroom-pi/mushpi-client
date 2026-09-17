@@ -7,3 +7,9 @@ coverage
 *.css
 src/api/generated
 *.hbs
+
+# Agent-instruction markdown — byte-budgeted (AGENTS.md core has a ≤12 KB ceiling)
+# and read by LLMs rather than rendered; prettier's table padding / list rewrapping
+# adds bytes and makes the budget unenforceable. Matched at any depth (gitignore-style).
+AGENTS.md
+REFERENCE.md

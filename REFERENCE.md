@@ -1,8 +1,8 @@
 # mushpi-client — Reference (On-Demand)
 
-Long-tail details and gotchas. **Load only when the task touches these areas** — do not read on every spawn. The always-loaded [`AGENTS.md`](./AGENTS.md) holds the stack, path aliases, API client, routing, directory structure, build/dev/testing commands, state-management overview, coding rules, and env vars.
+Long-tail details and gotchas. **Load only when the task touches these areas** — do not read on every spawn. The always-loaded [`AGENTS.md`](./AGENTS.md) holds the stack, path aliases, API client, routing, directory index, build/dev/testing commands, state-management inventory, coding rules, and env vars.
 
-Topics covered here: image handling · `useAsyncWithToast` · polling gotchas · Recharts chart conventions · known quirks · feature palettes · Husky fragility.
+Topics covered here: image handling · `useAsyncWithToast` · polling gotchas · Recharts chart conventions · directory & file detail · client regeneration · testing (Vitest) detail · component & mutation gotchas · known quirks · feature palettes · Husky fragility.
 
 ---
 
@@ -52,6 +52,15 @@ await run(
 - **`unwrap<T>` mis-infers the generated API return type**: `unwrap()` (from `~api/adapter`) types its result as the full `AxiosResponse<T>` rather than the actual `data` payload for generated API calls, even though it returns the unwrapped data object at runtime. Any new **strongly-typed** consumer of an `unwrap()` result therefore needs an `as unknown as <Type>` cast (the codebase's existing convention) — it only "works" silently when passed to permissive APIs like `setQueryData`, whose generic defaults to `unknown`. See `src/contexts/PicoUnit/hooks.ts` (`mutationFn`/`queryFn` and the `applyPollResult` call sites) for the established cast pattern.
 - **dayjs relative time**: The `relativeTime` plugin is NOT registered globally. Use `dayjs().diff()` + manual formatting for "X ago" strings. See `src/pages/Dashboard/methods.ts` for the pattern (`formatRelativeFromNow`, `formatLastSeen`).
 
+### Pico Poll & Mutation Patterns
+
+- Mutations live in the entity's `mutations/` folder (one file per concern)
+- Optimistic updates via `createOptimisticMutation` factory in `src/contexts/PicoUnit/helpers.ts`
+- **One-shot server actions** (e.g. `/reboot`, `/poll` returning 202) use plain `useMutation` with `onSuccess` invalidation — NOT `createOptimisticMutation`. There is no optimistic client state to project (the Pico goes offline briefly, an immediate follow-up poll would fail), unlike control mutations (`/setpoints`, `/outputs`, `/control/loop`, `/setup`) which do use `createOptimisticMutation` + poll-on-settle
+- **On-demand hardware polling**: `usePollPicoUnit` mutation calls `POST /v1/pico-units/:id/poll` to trigger an immediate Pico poll (stores a new reading, returns updated `PicoUnit` with `latest_reading`). Exposed via `pollPico` on `PicoUnitCtx`. Used on page mount, after control mutations, and for periodic 60 s background refresh on the unit detail, readings, and batch pages.
+- **Poll results must propagate to BOTH caches**: the list query (`picoUnitsKeys.*`) and the detail query (`picoUnitKeys.detail(id)`) are disjoint — writing to one does not touch the other. Any code path consuming a Pico poll result must write it to both, or the list page will show stale `status`/`last_seen` when navigating back from a detail page. Use `applyPollResult(qc, id, data)` from `~ctx/PicoUnit/helpers` (writes the detail cache + patches every list page via `updateItemInAllPages`). `usePollPicoUnit.onSuccess` and `useGetPicoUnit`'s 60 s background poll both already do this — a new poll path that forgets it re-introduces the staleness bug.
+- **60 s background refresh**: long-lived readings views (unit detail, readings board, batch detail) auto-refresh every 60 s via hardware poll on the unit detail page and `refetchInterval` on the readings/batch readings queries. Dashboard uses `useDashboard` hook with `refetchInterval: 60_000` — single `GET /v1/dashboard/summary` call returns all aggregated data.
+
 ## Charts (Recharts)
 
 Chart components live in `src/components/ui/molecules/ChartsTabs/`. Providers and the `useChartsContext()` hook live in `src/contexts/Charts/`.
@@ -82,6 +91,103 @@ Server-side aggregation via `points` parameter (default 200, min 10, max 2000). 
 - **Legend**: positioned at `verticalAlign="top"` on `ReadingsTargetChart` to avoid competing with XAxis labels. `OnOffChart` has no legend (single-line charts).
 - **Skeleton**: `ChartsTabsSkeleton` renders a single 360px rectangle — does not mirror the stacked layout. This is a known gap.
 
+## Directory & File Detail
+
+Per-file commentary for the directory-level index in [`AGENTS.md`](./AGENTS.md) §Directory Structure.
+
+```
+src/
+├── assets/                  # Static SVGs (~assets alias)
+├── api/                     # Client, generated code, query keys
+├── components/
+│   ├── BatchForm.tsx        # Shared batch form (consumed by Create + Edit dialogs)
+│   ├── PicoUnitForm.tsx     # Shared PicoUnit form
+│   ├── RecipeForm.tsx       # Shared recipe form
+│   ├── provisioning/        # Reconnect wizard, LED reference, provisioning illustrations
+│   │   ├── LedStateReference.tsx
+│   │   ├── ProvisioningIllustrations.tsx
+│   │   └── ReconnectPicoDialog/
+│   ├── ui/
+│   │   ├── atoms/           # Stateless presentational
+│   │   ├── molecules/       # Composed (may use context/hooks)
+│   │   │   ├── BatchesTable.tsx       # Shared batch table (consumed by Batches, PicoUnit, Recipe pages)
+│   │   │   ├── ChartsTabs/            # Shared chart tab suite (consumed by Readings + Batch pages)
+│   │   │   ├── CreateBatchDialog/     # Folder molecule (consumed by Batches, PicoUnit, Recipe pages)
+│   │   │   └── ImageManager/          # Shared image gallery/upload/remove (used by Recipe + Batch)
+│   │   └── index.ts
+│   └── index.ts
+├── contexts/                # Context + hooks + mutations per entity
+│   ├── PicoUnit/mutations/: setup, controlLoop, delete, outputs, reboot, setPoints, update
+│   ├── PicoUnits/           # List-page context (usePicoUnits)
+│   ├── Recipe/mutations/: create, delete, image, update
+│   ├── Recipes/             # List-page context (useRecipes)
+│   ├── Batch/mutations/: create, delete, image, update, createRecipeFromBatch
+│   ├── Batches/             # List-page context (useBatches)
+│   ├── Charts/: provider.tsx, batchProvider.tsx
+│   └── Toast.tsx
+├── hooks/                   # useDashboard, useReadings, useBatchReadings, useServerHealth, useIsServerReachable, useAsyncWithToast, useSettings, useChartContainerWidth, useDocumentTitle, picoUnitsHelpers
+│   ├── BatchForm/           # Batch form state
+│   └── RecipeForm/          # Recipe form state
+├── interfaces/              # Shared TS interfaces (dialogProps.ts, optionalPicoUnit.ts)
+├── layout/                  # Page wrapper, Sidebar
+├── pages/                   # Route pages (default exports)
+│   │                       # ⚠️ Page components MUST live in <PageName>/index.tsx,
+│   │                       #   never as a bare <PageName>.tsx at the pages root.
+│   ├── Dashboard/           # Dashboard page at /
+│   │   └── components/      # WarningsBanner, StatsRow, UnitCards, etc.
+│   ├── PicoUnits/           # Units list page at /pico-units
+│   │   └── components/
+│   │       ├── ConnectPicoWizard/      # Multi-step wizard for new Pico provisioning
+│   │       └── ManualRegisterDialog/   # Manual PicoUnit registration (mDNS-based)
+│   ├── PicoUnit/            # Unit detail page at /pico-units/:id
+│   │   └── components/      # PicoUnitStatCards, PicoUnitDetailGrid, PicoUnitDevices, etc.
+│   ├── Readings/            # Charts page at /readings
+│   ├── Recipes/             # Recipes list page at /recipes
+│   ├── Recipe/              # Recipe detail page at /recipes/:id
+│   ├── Batches/             # Batches list page at /batches
+│   ├── Batch/               # Batch detail page at /batches/:id
+│   ├── Server/              # Server health page at /server
+│   └── Settings/            # Settings page at /settings
+│       └── components/      # SettingsSkeleton (card skeleton)
+├── styles/                  # global.css; variables.css (3-var pre-mount mirror of tokens.ts — --bg/--bg-deep/--text — guarded 1:1 by theme/tokens.test.ts)
+├── test/                    # setup.ts, fixtures.tsx
+├── theme/
+│   ├── mushroomTheme.ts     # sole createTheme; built from tokens.ts, augments typed palette.custom.{veil,scrim}
+│   ├── tokens.ts            # SINGLE SOURCE OF TRUTH for colors — raw hex/rgb literals allowed ONLY here
+│   └── tokens.test.ts       # guards: variables.css mirror + src-wide stray-color scan
+├── types/                   # charts.ts; buildInfo.d.ts (ambient Vite `define` version globals)
+└── utils/
+    ├── apiUrl.ts            # Normalized API base (`API_BASE`, trailing slashes stripped) + resolveApiUrl()
+    ├── apiUrl.test.ts       # Vitest: base normalization + image-URL resolution
+    ├── buildInfo.ts         # Build-time version globals (define-injected) — CLIENT_BUILD_VERSION, RELEASE_VERSION/LABEL
+    ├── chartLabels.ts       # Chart tick-label helpers (isLongSpan, createTickFormatter)
+    ├── methods.ts           # Generic: date formatting, bytes, percentages
+    ├── methods.test.ts      # Vitest: pure formatting helpers
+    ├── pico.ts              # Pico: provisioning constants, LED_STATES, chip color helpers, firmwareStatus()/firmwareCaption() display helpers, compatibilityStatus() (maps server-owned api_compatibility verdict)
+    ├── pico.test.ts         # Vitest: firmware-status null/unknown branching + caption composition + compatibilityStatus verdict/defensive-unknown branching + compile-time contract guards (CompatibilityStatus ↔ PicoUnitApiCompatibilityEnum, UnitStatus ↔ PicoUnitStatusEnum)
+    └── timeWindow.ts        # TimeWindow union + resolveTimeBounds() (store intent, resolve per fetch)
+```
+
+> **Removed path note**: `src/utils/charts.ts` was deleted — the server handles all chart aggregation (see §Charts (Recharts)). It is not structure and does not appear in the tree above.
+
+## Regenerating the Client
+
+**Offline regeneration (preferred when no server is running).** The bare `gen:client`/`gen:schemas` default to the client's own `./openapi.json`, which can be **stale** relative to the server's committed spec. Point `OPENAPI_SPEC` at the server's canonical spec instead — no server boot, no risk of touching a live database:
+
+```bash
+OPENAPI_SPEC=../mushpi-server/spec/openapi.json yarn gen:client && \
+OPENAPI_SPEC=../mushpi-server/spec/openapi.json yarn gen:schemas
+```
+
+## Testing (Vitest) Detail
+
+- **Globals**: `vitest.config.ts` sets `globals: true`, so `describe`, `it`, `expect`, `vi`, `beforeEach`, `afterEach` work at _runtime_ without imports. **But you must still import them from `vitest`** — `tsc -b` type-checks test files and `vitest/globals` is not in tsconfig `types`, so relying on globals breaks `yarn build`. Import `render`, `screen`, `waitFor` from `@testing-library/react` and `userEvent` from `@testing-library/user-event`.
+
+## Component & Mutation Gotchas
+
+- **Mutation identity in context `useMemo` deps**: React Query v5's `useMutation` returns a wrapper object that changes identity every render, but `mutate`/`mutateAsync` are referentially stable. In context-provider `useMemo` dependency arrays, **destructure** `mutate`, `mutateAsync`, and `isPending` from the mutation result and depend on those stable primitives — never the whole mutation wrapper object. Rebuilding the wrapper from stable parts keeps the memo honest and prevents cascading consumer re-renders.
+- **CSV download failures must surface via toast**: `useAsyncWithToast().run()` with `fallbackErrorMessage: 'Failed to download CSV'` and `rethrow: true`. Wrap the export+download logic inside `run()`. Server HTTP errors auto-surface; `fallbackErrorMessage` covers network/non-HTTP failures. Remove `console.error` calls from download catch blocks.
+
 ## Known Quirks
 
 - `picoUnitIdBatchesControllerGetCurrentV1` requires `batchId: 0` (generator bug — param not in URL, ignored)
@@ -102,19 +208,20 @@ Server-side aggregation via `points` parameter (default 200, min 10, max 2000). 
 - Server-down detection: `ServerDownBanner` (import from `~components`) renders a warning `Alert` at the top of the app when `GET /ping` fails. Uses `useIsServerReachable` hook (30s polling, `retry: false`). Fast-path: any successful server response from another query immediately clears the banner via `QueryCache.subscribe()` — no waiting for the next ping tick.
 - `/ping` vs `/health`: `/ping` returns bare `"pong"` — use for liveness polling (`retry: false`, low overhead). `/health` returns full `HealthCheckResponseDto` with server/database/service status — use for the Server page. The `monitoringControllerPing()` method exists on both `MonitoringApi` and `NoValidationApi` in the generated client; use `MonitoringApi` (consistent with `useServerHealth`).
 - **Sidebar icon for Server page**: `DnsIcon` (`@mui/icons-material/Dns`), not `SettingsIcon`. The gear icon belongs to Settings. Server originally used `SettingsIcon` — reassigned when the gear was reserved for the Settings page.
-- **Settings page**: Uses `SettingsApi` (manually wired in `src/api/client.ts`). `useSettings()` query + `useUpdateSettings()` mutation co-located in `src/hooks/useSettings.ts` (singleton resource pattern, not in entity mutations folder). Zod validation uses the generated `UpdateSettingsDto` schema.
+- **Settings page (singleton resource pattern)**: Uses `SettingsApi` (manually wired in `src/api/client.ts`). `useSettings()` fetches the current timezone from `GET /v1/settings`; `useUpdateSettings()` mutation calls `PATCH /v1/settings` with `onSuccess` cache update + snackbar. Query and mutation are co-located in `src/hooks/useSettings.ts` — not in an entity mutations folder. Zod validation uses the generated `UpdateSettingsDto` schema.
 - **`PicoUnit.devices` field**: `POST /v1/pico-units/:id/poll` now returns `PollPicoUnitResponseDto` which extends `PicoUnit` with an optional `devices?: DevicesDto` field containing live pin mapping from the Pico (`active_high`, `pins.dht/humidifier/fan/heater`). This field is only available on poll responses — it is not persisted server-side. The client accesses it via `pico.devices` from `pollPico()` results.
 - **`MappingInfo` card — content without `latest_reading`**: The pin mapping info card (`PicoUnitMapping/MappingInfo.tsx`) gates on `pico` only (not `latest_reading`), since pin mapping is independent of sensor readings. This is a separate pattern from Controls/Devices cards which require sensor data. Document as a distinct card category.
 - **Generated DTO naming collision**: Both the TypeScript interface and the Zod schema for DTOs like `ChangeSetupDto` share the same exported name. When importing both from `src/api/generated/`, rename one to avoid conflicts — e.g. `import { ChangeSetupDto, ChangeSetupDtoSchema } from '~api/generated/schemas'`. The schema rename convention appends `Schema` to the DTO name.
 - **`active_high` excluded from UI**: The `active_high` field (relay polarity) is deliberately excluded from the pin mapping dialog — it is relay configuration, not Pico pin mapping. It passes through in `devices` but the UI only exposes the 4 GPIO pin numbers.
 - **Dialog props beyond `DialogProps`**: The shared `DialogProps` interface (`open`/`onClose`/`closeOnSave?`) is a minimal convenience for `ModalForm`/`EditMetaDialog`-style dialogs. Dialogs needing extra typed props (e.g. target IDs, entity data, boolean flags) define a local interface alongside `open`/`onClose` — do not contort the shared interface to fit.
 - **Do NOT use MUI `<Popper>` for persistent panels with mutable content.** `<Popper>` uses floating-ui under the hood, which recalculates position via JS on every content re-render. When the panel stays open while the user interacts with form fields inside it (e.g. date pickers, text inputs), each value change triggers a reposition — causing the panel to drift or teleport to wrong corners of the screen. Instead, use a conditional render with CSS `position: absolute` on the child and `position: relative` on the immediate parent. This pins the panel in place with zero JS recalculation. See `PeriodSelect.tsx` for the pattern.
-- **Protocol-relative URL corruption from trailing-slash base paths.** The generated client's `createRequestFunction` (`src/api/generated/common.ts`) naive-concatenates `basePath + url`, and `url` is always path-absolute (`/ping`, `/v1/...`). A `basePath` ending in `/` therefore yields protocol-relative URLs (`'/' + '/ping'` = `//ping` → browser requests `http://ping`). Never pass a trailing-slash basePath — always normalize with `.replace(/\/+$/, '')` via the shared `API_BASE` constant (see `src/api/client.ts` / `src/utils/apiUrl.ts`). Same join applies to any hand-built URL off the API base (e.g. the Server page docs button). Relevant when touching API base config, `VITE_API_BASE_URL`/`VITE_DOCS_PATH` env vars, or the Docker client build (which bakes `VITE_API_BASE_URL=/`).
+- **Protocol-relative URL corruption from trailing-slash base paths.** The generated client's `createRequestFunction` (`src/api/generated/common.ts`) naive-concatenates `basePath + url`, and `url` is always path-absolute (`/ping`, `/v1/...`). A `basePath` ending in `/` therefore yields protocol-relative URLs (`'/' + '/ping'` = `//ping` → browser requests `http://ping`). Never pass a trailing-slash basePath — always normalize with `.replace(/\/+$/, '')` via the shared `API_BASE` constant in `src/utils/apiUrl.ts`. Both the generated client's base (read in `src/api/client.ts`, fallback `http://localhost:3000`) and `resolveApiUrl()` consume `API_BASE`; same-origin `/` normalizes to an empty basePath, so the naive `basePath + url` join yields relative `/ping`, not protocol-relative `//ping` — **do not remove the normalization thinking it's redundant**. Dev sets `VITE_API_BASE_URL` to `http://localhost:3000` via a **local, gitignored `.env`**; prod bakes it as `/` at Docker build time (same-origin). Same join applies to any hand-built URL off the API base (e.g. the Server page docs button). Relevant when touching API base config, `VITE_API_BASE_URL`/`VITE_DOCS_PATH` env vars, or the Docker client build.
 - **Context mocks in component tests must return referentially stable objects.** If the component-under-test memoizes derived state off a context value (e.g. `useMemo(() => pico?.latest_reading, [pico])`) or has effects keyed on it (e.g. a reset-on-`[open, lr]` effect), a `vi.mock` factory that constructs a fresh context object per hook call re-triggers those effects on every render and silently wipes user interaction — surfacing as disabled buttons and user-event's cryptic `pointer-events: none` error rather than an obvious assertion failure. Pattern:
   - Build the mock context object lazily once inside the returned hook closure (a `let` cache), **not** at the `vi.mock` factory top-level — this keeps external references (imports like `makePicoUnit`, module-scope consts like `mockMutateAsync`) evaluated at hook-call time and avoids `vi.mock`-hoisting TDZ "Cannot access before initialization" errors.
   - Add `expect(button).toBeEnabled()` before `user.click(...)` as a fail-loud guard, so a future regression of this kind fails with a clear "button is disabled" message.
   - Reference: `src/pages/PicoUnit/components/PicoUnitDevices/DevicesDialog.test.tsx` mocks `~ctx/PicoUnit` and the fix was memoizing the returned context. The real `PicoUnitProvider` memoizes its context value and `pico` is React Query cache data (referentially stable).
-- **Per-route tab titles (`useDocumentTitle`)**: (1) exactly one owner per route — a call in both a wrapper and its Inner child duels via effect ordering (child effects run first; parent's last and wins), clobbering the data-refined title when cached data renders in the same commit; (2) no `*` catch-all route exists — unknown URLs render an empty main area and keep the `index.html` title on fresh load; (3) `react-helmet-async` evaluated and rejected (v2 peer-declares React ≤18; repo on React 19; 10-line idempotent hook covers it with no provider); (4) pass a primitive string computed before the call so effect deps compare by value.
+- **Per-route tab titles (`useDocumentTitle`)**: every route page calls `useDocumentTitle('<Page>')` from `~hook/useDocumentTitle` (renders `"<Page> — Mushroom Pi"`); detail pages call it inside the `*Inner` component with ``entity?.name ?? `Entity #${useParams id}` `` — exactly one call-site per route, never in the outer page wrapper. `index.html` holds the bare-brand fallback `Mushroom Pi`. Gotchas: (1) exactly one owner per route — a call in both a wrapper and its Inner child duels via effect ordering (child effects run first; parent's last and wins), clobbering the data-refined title when cached data renders in the same commit; (2) no `*` catch-all route exists — unknown URLs render an empty main area and keep the `index.html` title on fresh load; (3) `react-helmet-async` evaluated and rejected (v2 peer-declares React ≤18; repo on React 19; 10-line idempotent hook covers it with no provider); (4) pass a primitive string computed before the call so effect deps compare by value.
+- **Dialog auto-open via navigation state**: `navigate('/path', { state: { openEditDialog: true } })`, read in mount-only `useEffect`, clear with `window.history.replaceState`.
 - **SVG assets + `public/favicon.svg` intentionally duplicate brand token values** (`accent`, `accent2`, `leaf`, `muted`, `info` — ×54 in the logos). Static art cannot consume CSS vars; if a brand token changes, sync the SVGs manually. The body gradient keeps a static `variables.css` mirror of `brand.bg`/`bgDeep`/`text` to avoid a flash-of-lighter-background on the Pi 3 B+ (pre-React paint; guarded 1:1 by `src/theme/tokens.test.ts`).
 - **`firmware_version` / `api_version` are nullable (Pico↔Server version handshake)**: these `PicoUnit` fields (which replaced the removed `software_version` — old references break the build until the client is regenerated) stay `NULL` until a unit first announces with firmware that reports the version handshake, so "Unknown" is the **expected** state for legacy units (firmware predating the handshake) after the server migration, not an error — render an honest disabled-styled unknown line, never a fake default. `api_version` is the Pico↔Server REST contract generation (see `mushpi-docs/versioning.md` §4), distinct from the server's `/v1/` URI prefix — do not conflate the two in UI copy. Display helpers: `firmwareStatus()` / `firmwareCaption()` (raw version display) and `compatibilityStatus()` (maps the server verdict) in `~utils/pico`.
 - **Version display / `release.json` resolution**: the sidebar footer (release bundle, axis ②) and the `/server` Overview card (client component, axis ①) read only from `~utils/buildInfo`. `release.json` lives at the monorepo root, NOT in the client repo — `vite.config.ts` tries `../release.json` (monorepo) then `./release.json` (Docker image build: requires `COPY release.json /app/release.json` in the `client-build` stage and `.dockerignore` not excluding the file; if missing the build still succeeds and the footer degrades to `dev` — a missing COPY is a silent display bug, not a build break). Never invent a version string; strict SemVer, no suffixes (`versioning.md` §3.4).
@@ -127,3 +234,5 @@ Color palettes or other domain-specific constant arrays that are tightly coupled
 ## Husky Exec-Bit Fragility
 
 `.husky/_/` is gitignored + generated, so its executable bits live only on the local filesystem. If a copy/archive/mount/umask strips them, git silently skips the hook (no lint, no error). Repair with `rm -rf .husky/_ && npx husky` (a bare `npx husky` re-run does not restore them). Verify `ls -la .husky/_/` shows `-rwxr-xr-x`.
+
+**ESLint severity policy** (pre-commit, v9): most rules are `warn`; `import/no-unresolved` and the raw-color `no-restricted-syntax` rules (hex/rgb/hsl literals outside `src/theme/tokens.ts`) are `error`. Pre-commit runs `eslint --fix` (no `--max-warnings=0`), so **errors block commits, warnings do not**. Enforce zero-warnings as a CI gate (`eslint --max-warnings=0`) rather than at pre-commit.
