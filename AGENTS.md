@@ -120,10 +120,11 @@ src/
 │   ├── mushroomTheme.ts     # sole createTheme; built from tokens.ts, augments typed palette.custom.{veil,scrim}
 │   ├── tokens.ts            # SINGLE SOURCE OF TRUTH for colors — raw hex/rgb literals allowed ONLY here
 │   └── tokens.test.ts       # guards: variables.css mirror + src-wide stray-color scan
-├── types/charts.ts
+├── types/                   # charts.ts; buildInfo.d.ts (ambient Vite `define` version globals)
 └── utils/
     ├── apiUrl.ts            # Normalized API base (`API_BASE`, trailing slashes stripped) + resolveApiUrl()
     ├── apiUrl.test.ts       # Vitest: base normalization + image-URL resolution
+    ├── buildInfo.ts         # Build-time version globals (define-injected) — CLIENT_BUILD_VERSION, RELEASE_VERSION/LABEL
     ├── chartLabels.ts       # Chart tick-label helpers (isLongSpan, createTickFormatter)
     ├── methods.ts           # Generic: date formatting, bytes, percentages
     ├── methods.test.ts      # Vitest: pure formatting helpers
@@ -185,6 +186,7 @@ Standard React Query patterns apply (see `frontend-react` skill). Project-specif
 
 - `VITE_API_BASE_URL` — API origin for the generated client (read in `src/api/client.ts`, fallback `http://localhost:3000`) and for `resolveApiUrl()`. Both consume the shared `API_BASE` constant from `src/utils/apiUrl.ts`, which **normalizes the value by stripping trailing slashes** (same-origin `/` → empty basePath, so the generated client's naive `basePath + url` join yields relative `/ping`, not protocol-relative `//ping`) — do not remove the normalization thinking it's redundant. Dev sets it to `http://localhost:3000` via a **local, gitignored `.env`**; prod bakes it as `/` at Docker build time (same-origin).
 - `VITE_DOCS_PATH` — drives the Server page "API Docs" button link (default `contract` in local `.env`); read in `src/pages/Server/index.tsx`.
+- `__APP_BUILD_VERSION__` / `__APP_RELEASE_VERSION__` — **not env vars**; Vite `define` globals injected in `vite.config.ts` (client `package.json` version; root `release.json` `release`, resolved as `../release.json` in the monorepo and `./release.json` in the Docker image; `null` fallback → footer shows `dev`). Consume only via `~utils/buildInfo`; typed in `src/types/buildInfo.d.ts` (no `vite-env.d.ts` by convention).
 - There is **no `vite-env.d.ts` / `ImportMetaEnv` typing** — env reads are untyped casts (`import.meta.env.VITE_*`).
 - There is **no Vite dev proxy** — all API traffic goes cross-origin to the server via `basePath`. Any server-emitted relative URL (images, or future assets) must be prefixed with the API base for dev rendering via `resolveApiUrl()`.
 

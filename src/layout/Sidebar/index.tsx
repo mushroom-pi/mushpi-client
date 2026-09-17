@@ -17,6 +17,7 @@ import React from 'react';
 import mushPiSquareLogo from '~assets/MushPiSquareLogo.svg';
 import mushroomPiHorizontalLogo from '~assets/MushroomPiHorizontalLogo.svg';
 import { cardShadow, scrim, veil } from '~theme/tokens';
+import { RELEASE_LABEL } from '~utils/buildInfo';
 
 import { NavItem } from './components/NavItem';
 import { drawerWidth, navItems } from './constants';
@@ -95,7 +96,7 @@ export default function Sidebar() {
 
       {/* footer pushed to bottom */}
       <Box sx={{ mt: 'auto', color: 'text.secondary', fontSize: 12 }}>
-        <Typography variant="caption">v0.1 • offline</Typography>
+        <Typography variant="caption">{RELEASE_LABEL}</Typography>
       </Box>
     </Box>
   );

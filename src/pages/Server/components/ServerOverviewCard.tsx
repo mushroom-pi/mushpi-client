@@ -4,6 +4,7 @@ import type { FC } from 'react';
 
 import type { HealthCheckResponseDto as ServerHealth } from '~api/generated';
 import { BigDisplay, InfoCard, InfoField } from '~components';
+import { CLIENT_BUILD_VERSION } from '~utils/buildInfo';
 
 interface ServerOverviewCardProps {
   serverHealth: ServerHealth;
@@ -18,6 +19,9 @@ export const ServerOverviewCard: FC<ServerOverviewCardProps> = ({ serverHealth }
     <InfoCard title="Overview" subtitle="General status" icon={<StorageIcon />}>
       <InfoField label="App version">
         <BigDisplay content={serverHealth.server?.appVersion} />
+      </InfoField>
+      <InfoField label="Client build version">
+        <BigDisplay content={CLIENT_BUILD_VERSION} />
       </InfoField>
       <InfoField label="Node.js version">
         <BigDisplay content={serverHealth.server?.nodeVersion} />
