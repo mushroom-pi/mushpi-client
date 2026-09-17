@@ -66,9 +66,20 @@ export const LED_STATES = [
   },
 ] as const;
 
+/**
+ * Consecutive failed poll attempts at which the server flips a monitored unit to
+ * `offline`. Mirrors server `OFFLINE_FAILED_CALLS_THRESHOLD = failsToUnhealthy = 3`
+ * (`mushpi-server/src/modules/pico-units/pico-units.constant.ts`); the server does not
+ * expose the number at runtime, so it is kept local. For health *gating*, prefer the
+ * server-computed `pico.status` over re-deriving a verdict from `failed_calls` —
+ * this constant only backs the cosmetic failed-calls chip colouring below.
+ */
+export const OFFLINE_FAILED_CALLS_THRESHOLD = 3;
+
+/** Color for the failed_calls chip: 0=success(green), 1-2=warning(yellow), 3+=error(red) */
 export const chipColorForFailedCalls = (failedCalls: number | null) => {
   if (!failedCalls) return 'success';
-  if (failedCalls < 3) return 'warning';
+  if (failedCalls < OFFLINE_FAILED_CALLS_THRESHOLD) return 'warning';
   return 'error';
 };
 
@@ -85,7 +96,7 @@ export const chipColorForFailedReadings = (failedReadings: number | null | undef
 /** Placeholder shown when a unit has not reported its firmware/API contract version */
 export const FIRMWARE_UNKNOWN = 'unknown';
 
-/** Minimal structural shape of the version fields (nullable until a unit announces with post-#21 firmware) */
+/** Minimal structural shape of the version fields (nullable until a unit first reports them via the announce/version handshake) */
 export interface FirmwareReportFields {
   firmware_version?: string | null;
   api_version?: number | null;

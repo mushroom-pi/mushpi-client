@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { DashboardUnitItemDto, PicoUnit, PollPicoUnitResponseDto } from '~api/generated';
+import type { UnitStatus } from '~components';
 import {
   type CompatibilityStatus,
   FIRMWARE_UNKNOWN,
@@ -173,6 +174,30 @@ describe('CompatibilityStatus ↔ server api_compatibility contract (compile-tim
   it('rejects an out-of-contract literal (union is closed, never widened to string)', () => {
     // @ts-expect-error a value the server never emits must NOT be assignable to CompatibilityStatus
     const notAStatus: CompatibilityStatus = 'a_value_the_server_never_emits';
+    expect(notAStatus).toBeDefined(); // runtime reference only — keeps `noUnusedLocals` satisfied
+  });
+});
+
+// ── Compile-time contract guard: UnitStatus ↔ server status enums ──────────────────────
+// `UnitStatus` (src/components/ui/atoms/UnitHealthIcon.tsx) is *derived* from the generated
+// `PicoUnitStatusEnum` rather than hand-copied — same identity-based pattern as
+// CompatibilityStatus above, living here because this file is the established home of the
+// contract guards (the atom has no co-located test).
+
+describe('UnitStatus ↔ server status contract (compile-time guard)', () => {
+  it('locks the derived alias to the generated DTO field types', () => {
+    // The alias IS PicoUnit['status'] — a trivially-true anchor check. DashboardUnitItemDto
+    // declares its OWN structurally-identical status enum, so the second assertion is the
+    // load-bearing cross-check: dashboard `UnitCards` feeds that field into the alias-typed
+    // `UnitHealthIcon` prop, and the two enums must stay identical or the build breaks.
+    assertContractHolds<Equals<UnitStatus, PicoUnit['status']>>();
+    assertContractHolds<Equals<UnitStatus, DashboardUnitItemDto['status']>>();
+    expect(true).toBe(true); // satisfies the runtime `it` body; the real check is at compile time
+  });
+
+  it('rejects an out-of-contract literal (union is closed, never widened to string)', () => {
+    // @ts-expect-error a value the server never emits must NOT be assignable to UnitStatus
+    const notAStatus: UnitStatus = 'a_value_the_server_never_emits';
     expect(notAStatus).toBeDefined(); // runtime reference only — keeps `noUnusedLocals` satisfied
   });
 });

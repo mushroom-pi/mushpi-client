@@ -21,7 +21,11 @@ export const PicoUnitPerformance: React.FC<OptionalPicoUnitProps> = ({ pico: dat
   if (!pico || !pico.latest_reading) return <Loading />;
 
   const { latest_reading: lr, failed_calls, failed_readings } = pico;
-  const isHealthy = failed_calls < 3;
+  // Trust the server-computed health verdict instead of re-deriving it from
+  // `failed_calls` — the server flips a monitored unit to 'offline' once failed
+  // polls reach its threshold (see OFFLINE_FAILED_CALLS_THRESHOLD in ~utils/pico).
+  // When unreachable, the latest reading is stale, so mask the perf metrics.
+  const isReachable = pico.status !== 'offline';
 
   return (
     <InfoCard title="Perfomance" subtitle="Latest metrics" icon={<SpeedIcon />}>
@@ -53,15 +57,15 @@ export const PicoUnitPerformance: React.FC<OptionalPicoUnitProps> = ({ pico: dat
         tooltip="This shouldn't be higher than 85 °C"
       >
         <Chip
-          label={typeof lr.board_temp === 'number' && isHealthy ? `${lr.board_temp} °C` : '—'}
-          color={!isHealthy || Math.abs(lr.board_temp ?? 0) > 85 ? 'error' : 'success'}
+          label={typeof lr.board_temp === 'number' && isReachable ? `${lr.board_temp} °C` : '—'}
+          color={!isReachable || Math.abs(lr.board_temp ?? 0) > 85 ? 'error' : 'success'}
           size="medium"
         />
       </InfoField>
       <InfoField label="Response time" display="beside" tooltip="This shouldn't be over 1 second">
         <Chip
           label={
-            isHealthy && typeof lr.time_to_response_ms === 'number'
+            isReachable && typeof lr.time_to_response_ms === 'number'
               ? `${lr.time_to_response_ms} ms`
               : '—'
           }

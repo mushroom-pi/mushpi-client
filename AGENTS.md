@@ -128,7 +128,7 @@ src/
     ├── methods.ts           # Generic: date formatting, bytes, percentages
     ├── methods.test.ts      # Vitest: pure formatting helpers
     ├── pico.ts              # Pico: provisioning constants, LED_STATES, chip color helpers, firmwareStatus()/firmwareCaption() display helpers, compatibilityStatus() (maps server-owned api_compatibility verdict)
-    ├── pico.test.ts         # Vitest: firmware-status null/unknown branching + caption composition + compatibilityStatus verdict/defensive-unknown branching
+    ├── pico.test.ts         # Vitest: firmware-status null/unknown branching + caption composition + compatibilityStatus verdict/defensive-unknown branching + compile-time contract guards (CompatibilityStatus ↔ PicoUnitApiCompatibilityEnum, UnitStatus ↔ PicoUnitStatusEnum)
     ├── timeWindow.ts        # TimeWindow union + resolveTimeBounds() (store intent, resolve per fetch)
     └── charts.ts            # (removed — server handles aggregation)
 ```

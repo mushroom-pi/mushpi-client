@@ -2,12 +2,29 @@ import { Alert, Stack } from '@mui/material';
 import { type KeyboardEvent, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import type { DashboardWarningDto } from '~api/generated';
+import { type DashboardWarningDto, DashboardWarningDtoTypeEnum } from '~api/generated';
 
 interface WarningsBannerProps {
   warnings: DashboardWarningDto[];
   unitNames?: Map<number, string>;
 }
+
+/** How the banner presents a warning: consolidated offline line, deviation counter, or one alert each. */
+type WarningGroup = 'offline' | 'deviation' | 'individual';
+
+/**
+ * Every warning type the server can emit must declare its banner treatment here.
+ * `Record<DashboardWarningDtoTypeEnum, WarningGroup>` is exhaustiveness-checked: if the
+ * server adds a warning type and the client regenerates, the missing key is a `tsc`
+ * error — a new type can never be silently dropped by the banner.
+ */
+const WARNING_GROUPS: Record<DashboardWarningDtoTypeEnum, WarningGroup> = {
+  [DashboardWarningDtoTypeEnum.UnitOffline]: 'offline',
+  [DashboardWarningDtoTypeEnum.TempDeviation]: 'deviation',
+  [DashboardWarningDtoTypeEnum.HumidityDeviation]: 'deviation',
+  [DashboardWarningDtoTypeEnum.UnitDegraded]: 'individual',
+  [DashboardWarningDtoTypeEnum.EmptyReadings]: 'individual',
+};
 
 function handleAlertKeyDown(e: KeyboardEvent<HTMLDivElement>, navigate: () => void) {
   if (e.key === 'Enter' || e.key === ' ') {
@@ -20,7 +37,7 @@ export function WarningsBanner({ warnings, unitNames }: WarningsBannerProps) {
   const navigate = useNavigate();
 
   const consolidated = useMemo(() => {
-    const offlineWarnings = warnings.filter((w) => w.type === 'unit_offline');
+    const offlineWarnings = warnings.filter((w) => WARNING_GROUPS[w.type] === 'offline');
     const offlineUnitIds = new Set(offlineWarnings.map((w) => w.unitId));
 
     // Deduplicate offline unit names (keep first occurrence per unitId)
@@ -35,16 +52,16 @@ export function WarningsBanner({ warnings, unitNames }: WarningsBannerProps) {
 
     // Deviation warnings: exclude units that are offline
     const deviatingWarnings = warnings.filter(
-      (w) =>
-        (w.type === 'temp_deviation' || w.type === 'humidity_deviation') &&
-        !offlineUnitIds.has(w.unitId),
+      (w) => WARNING_GROUPS[w.type] === 'deviation' && !offlineUnitIds.has(w.unitId),
     );
     const deviatingUnitIds = new Set(deviatingWarnings.map((w) => w.unitId));
     const deviationCount = deviatingUnitIds.size;
 
-    // Other warnings: unit_degraded, empty_readings — keep individual
+    // Catch-all bucket: the 'individual' types above, PLUS anything this client's
+    // generated contract predates (unknown type → group lookup misses → rendered as
+    // its own generic alert instead of vanishing from the banner).
     const otherWarnings = warnings.filter(
-      (w) => w.type === 'unit_degraded' || w.type === 'empty_readings',
+      (w) => WARNING_GROUPS[w.type] !== 'offline' && WARNING_GROUPS[w.type] !== 'deviation',
     );
 
     return { offlineNames, deviationCount, otherWarnings };

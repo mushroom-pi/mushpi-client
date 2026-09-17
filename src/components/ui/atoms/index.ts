@@ -14,6 +14,7 @@ export { AddNew } from './AddNew';
 export { ColorSwatchPicker } from './ColorSwatchPicker';
 export { FACE_COLORS } from './ColorSwatchPicker';
 export { UnitHealthIcon } from './UnitHealthIcon';
+export type { UnitStatus } from './UnitHealthIcon';
 export { FirmwareCompatBadge } from './FirmwareCompatBadge';
 export { CardSkeleton } from './CardSkeleton';
 export type { CardSkeletonProps } from './CardSkeleton';

@@ -1,12 +1,8 @@
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import ErrorIcon from '@mui/icons-material/Error';
-import PauseCircleIcon from '@mui/icons-material/PauseCircle';
-import WarningIcon from '@mui/icons-material/Warning';
 import { Box, Card, CardContent, Chip, Grid, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import type { DashboardUnitItemDto } from '~api/generated';
-import { FirmwareCompatBadge } from '~components';
+import { FirmwareCompatBadge, UnitHealthIcon } from '~components';
 import { compatibilityStatus } from '~utils/pico';
 
 import { formatLastSeen } from '../methods';
@@ -17,16 +13,6 @@ interface UnitCardsProps {
   degraded: number;
   offline: number;
   total: number;
-}
-
-function StatusIcon({ status }: { status: string }) {
-  if (status === 'offline')
-    return <ErrorIcon color="error" fontSize="small" aria-label="Offline" />;
-  if (status === 'degraded')
-    return <WarningIcon color="warning" fontSize="small" aria-label="Degraded" />;
-  if (status === 'unmonitored')
-    return <PauseCircleIcon color="disabled" fontSize="small" aria-label="Unmonitored" />;
-  return <CheckCircleIcon color="success" fontSize="small" aria-label="Healthy" />;
 }
 
 export function UnitCards({ items, healthy, degraded, offline, total }: UnitCardsProps) {
@@ -52,7 +38,7 @@ export function UnitCards({ items, healthy, degraded, offline, total }: UnitCard
               <CardContent>
                 {/* Header: health icon + name */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-                  <StatusIcon status={unit.status} />
+                  <UnitHealthIcon status={unit.status} />
                   <Box>
                     <Typography variant="subtitle1" fontWeight={600} lineHeight={1.2}>
                       {unit.name ?? unit.handle}

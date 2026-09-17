@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 
+import { type RebootDtoTypeEnum } from '~api/generated';
 import { ConfirmDialog } from '~components';
 import { usePicoUnitContext } from '~ctx/PicoUnit';
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
@@ -25,7 +26,7 @@ export const RebootPicoDialog: React.FC<RebootPicoDialogProps> = ({
   picoUnitId,
   isOffline,
 }) => {
-  const [type, setType] = useState<'soft' | 'hard'>('soft');
+  const [type, setType] = useState<RebootDtoTypeEnum>('soft');
   const { rebootPico } = usePicoUnitContext();
   const { run } = useAsyncWithToast();
   const isLoading = rebootPico.isLoading;
@@ -59,7 +60,7 @@ export const RebootPicoDialog: React.FC<RebootPicoDialogProps> = ({
         uptime; a hard reboot performs a full power-cycle.
       </DialogContentText>
       <FormControl component="fieldset">
-        <RadioGroup value={type} onChange={(e) => setType(e.target.value as 'soft' | 'hard')}>
+        <RadioGroup value={type} onChange={(e) => setType(e.target.value as RebootDtoTypeEnum)}>
           <FormControlLabel
             value="soft"
             control={<Radio />}
