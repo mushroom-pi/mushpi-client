@@ -4,7 +4,7 @@ React 19 + Vite web dashboard served from Raspberry Pi 3 B+. Talks only to `mush
 
 > **Skill**: For general React frontend patterns (atomic design, React Query conventions, Zod form validation, ModalForm/DataTable usage), load the `frontend-react` skill. This file documents **only** what is specific to this project or deviates from standard frontend conventions.
 >
-> **Reference**: long-tail details (image handling, polling/mutation/chart gotchas, directory & file detail, regeneration, Vitest, known quirks, palettes, Husky) live in [`REFERENCE.md`](./REFERENCE.md) — load **only when the task touches those areas**; the full topic list is at its top.
+> **Reference**: long-tail details (path aliases, image handling, polling/mutation/chart gotchas, directory & file detail, regeneration, Vitest, known quirks, palettes, Husky, knip) live in [`REFERENCE.md`](./REFERENCE.md) — load **only when the task touches those areas**; the full topic list is at its top.
 
 ## Stack
 
@@ -12,22 +12,7 @@ React 19 · TypeScript ~5.9 · Vite 7 · MUI v7 + `@mui/x-date-pickers` v8 · Ta
 
 ## Path Aliases
 
-Defined in `vite.config.ts` + `tsconfig.app.json` (keep in sync) — 14 aliases, one per row:
-
-- `~api/*` → `src/api/*`
-- `~assets/*` → `src/assets/*`
-- `~comp/*` → `src/components/` (directory)
-- `~components` → `src/components/index.ts` (barrel)
-- `~ctx/*` → `src/contexts/*`
-- `~hook/*` → `src/hooks/*`
-- `~int/*` → `src/interfaces/*`
-- `~layout/*` → `src/layout/*`
-- `~pages/*` → `src/pages/*`
-- `~theme/*` → `src/theme/*`
-- `~type/*` → `src/types/*`
-- `~utils/*` → `src/utils/*`
-- `src/*` → `src/*`
-- `@/*` → `src/*`
+14 aliases in `vite.config.ts` + `tsconfig.app.json` (keep in sync) — full table: REFERENCE.md §Path Aliases.
 
 ## API Client
 
@@ -113,9 +98,14 @@ Poll/mutation patterns (`createOptimisticMutation`, one-shot vs. control mutatio
 - `yarn build` — `tsc -b && vite build` (may fail if generated schemas.ts has TS errors; regenerate)
 - `yarn preview` — `vite preview` (serve the built bundle locally)
 - `npx vite build` — builds without typecheck
-- `yarn lint` / `yarn lint:fix` — ESLint
+- `yarn lint` / `yarn lint:fix` — ESLint (fixing, local)
+- `yarn lint:ci` — ESLint gate: `--max-warnings=0`, non-mutating (CI form — never point CI at `lint`)
 - `yarn format` / `yarn format:check` — Prettier
 - `yarn test` / `yarn test:watch` / `yarn test:coverage` — Vitest
+- `yarn audit:prod` — informational production audit: `yarn npm audit --environment production --recursive --no-deprecations` (Yarn's own exit code)
+- `yarn audit:ci` — audit gate: `audit:prod` + `--severity high`; non-mutating
+- `yarn knip` — dead-code/unused-dep report (config: `knip.json`); `yarn knip:ci` — gate (unused files + runtime deps, no devDeps; needs `--no-gitignore` — REFERENCE.md §Knip)
+- Script convention: bare = local (may mutate); `:ci` = non-mutating fail-on-findings gate. Scripts run under `sh` — use the tool's native exit code, never `$?`/`[[` bashisms
 - Husky pre-commit (v9): `.husky/pre-commit` runs `npx --no-install lint-staged`; wiring via `"prepare": "husky"` and `git config core.hooksPath=.husky/_`. lint-staged runs `eslint --fix` + `prettier --write` on staged files. ESLint severity policy + exec-bit repair: REFERENCE.md §Husky.
 
 ## Versioning

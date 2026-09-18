@@ -1,10 +1,29 @@
 # mushpi-client — Reference (On-Demand)
 
-Long-tail details and gotchas. **Load only when the task touches these areas** — do not read on every spawn. The always-loaded [`AGENTS.md`](./AGENTS.md) holds the stack, path aliases, API client, routing, directory index, build/dev/testing commands, state-management inventory, coding rules, and env vars.
+Long-tail details and gotchas. **Load only when the task touches these areas** — do not read on every spawn. The always-loaded [`AGENTS.md`](./AGENTS.md) holds the stack, API client, routing, directory index, build/dev/testing commands, state-management inventory, coding rules, and env vars.
 
-Topics covered here: image handling · `useAsyncWithToast` · polling gotchas · Recharts chart conventions · directory & file detail · client regeneration · testing (Vitest) detail · component & mutation gotchas · known quirks · feature palettes · Husky fragility.
+Topics covered here: path aliases · image handling · `useAsyncWithToast` · polling gotchas · Recharts chart conventions · directory & file detail · client regeneration · testing (Vitest) detail · component & mutation gotchas · known quirks · feature palettes · Knip · Husky fragility.
 
 ---
+
+## Path Aliases
+
+Defined in `vite.config.ts` + `tsconfig.app.json` (keep in sync) — 14 aliases, one per row:
+
+- `~api/*` → `src/api/*`
+- `~assets/*` → `src/assets/*`
+- `~comp/*` → `src/components/` (directory)
+- `~components` → `src/components/index.ts` (barrel)
+- `~ctx/*` → `src/contexts/*`
+- `~hook/*` → `src/hooks/*`
+- `~int/*` → `src/interfaces/*`
+- `~layout/*` → `src/layout/*`
+- `~pages/*` → `src/pages/*`
+- `~theme/*` → `src/theme/*`
+- `~type/*` → `src/types/*`
+- `~utils/*` → `src/utils/*`
+- `src/*` → `src/*`
+- `@/*` → `src/*`
 
 ## Images
 
@@ -204,6 +223,7 @@ OPENAPI_SPEC=../mushpi-server/spec/openapi.json yarn gen:schemas
 - **`RefreshButton` atom** (`src/components/ui/atoms/RefreshButton.tsx`): reusable Tooltip+IconButton+RefreshIcon component. Props: `onClick`, `isLoading?`, `tooltip?`, `ariaLabel?`, `size?`. The `<span>` wrapper is required for Tooltip to work when IconButton is disabled (MUI quirk). Use this instead of inline `RefreshIcon`+`Tooltip`+`IconButton` patterns.
 - `PicoUnitCard.tsx` `friendlyDate` uses `new Date().toLocaleString()` instead of `dayjs` — pre-existing deviation from the "Use dayjs for dates" rule
 - Grep tool skips `src/api/generated/` (gitignored) — always use `read` or bash `grep`/`rg` directly to discover generated method signatures
+- **Yarn artifacts in git**: `.yarn/install-state.gz` is a regenerable build artifact and is untracked — never re-add it. The `.gitignore` allowlist (`.yarn/*` + negations for `patches`, `plugins`, `releases`, `sdks`, `versions`) is deliberate tracked-config policy — do not "clean up" the negations. Note: `.gitignore` has no effect on already-tracked files, so removal required `git rm --cached`.
 - **PicoUnit.status is the canonical health signal** — server provides `'unmonitored'|'healthy'|'degraded'|'offline'`. Client-side health helpers (`isUnitOffline`, `isUnitHealthy`, `shouldShowRebootHint`) removed. Use `pico.status` directly.
 - **Generated `PicoUnit` is complete** — every entity field (`id`, `name`, `handle`, `monitored`, `last_seen`, etc.) is declared on the generated interface (the server's `@ApiProperty` sweep made it so). Access via `pico.<field>` is strictly typed; no local hand-written `PicoUnit` interface or `as any` casts are needed.
 - **`useListPicoUnits` conflation fix**: The first argument is the API filter params (e.g. `{ monitored: true }`); the second argument is React Query options (e.g. `{ enabled: open }`). The RQ run-flag (`enabled`) must come from `queryOptions`, not entity filter params. The hook no longer defaults to filtering by `monitored: true` — callers must pass it explicitly if they want only monitored units.
@@ -236,6 +256,14 @@ OPENAPI_SPEC=../mushpi-server/spec/openapi.json yarn gen:schemas
 ## Feature Palettes & Domain Constants
 
 Color palettes or other domain-specific constant arrays that are tightly coupled to a feature should co-locate with the UI component that consumes them. A stateless atom can export both the component and its default dataset (e.g. `ColorSwatchPicker` + `FACE_COLORS` from the same file). **Data** palettes (user-selectable values persisted to the DB, like `FACE_COLORS`) stay co-located with their component and carry a file-scoped `no-restricted-syntax` exemption — recoloring the brand must never re-interpret stored data. But if the palette holds shared **UI colors**, it belongs in `src/theme/tokens.ts` — the single source of truth for every rendered color (`brand`/`veil`/`scrim`/`led` + `cardRadius`/`cardShadow`), mapped into MUI via typed `palette.custom` in `mushroomTheme.ts`. Raw literals there are enforced away by ESLint (error) + `theme/tokens.test.ts`.
+
+## Knip (Dead Code & Unused Dependencies)
+
+- **Config** (`knip.json`): `entry` = non-imported roots (`src/main.tsx`, `index.html`, `src/types/buildInfo.d.ts`, `vite.config.ts`, `vitest.config.ts`, `src/test/setup.ts`, `scripts/*.mjs`); `project` = `src/**/*.{ts,tsx}` + `scripts/**/*.mjs`; `ignore` = `dist/**` + `coverage/**` — currently a no-op (the `project` globs already exclude those trees; knip's "Remove from ignore" configuration hints confirm), kept as a defensive guard so widening `project` later cannot silently pull build artifacts into the scan.
+- **Gate scoping — deliberately differs from the server**: `knip:ci` = `knip --include files,dependencies,unlisted --exclude devDependencies --no-gitignore`. The server's `--dependencies` form is **blind to unused files** — the issue class that actually fires in this repo (dead files) — so the frontend gate adds `files`. In knip 5, `--include dependencies` also surfaces devDependencies findings (observed: bare `--include files,dependencies` printed 10 devDep findings), so devDeps are explicitly excluded until they are cleared. `unlisted` (imported-but-undeclared) is in scope: zero findings today, so it catches future regressions without pre-existing red. exports/types/duplicates are deliberately out of scope (~180 findings, mostly permanent generated-client noise).
+- **`src/types/buildInfo.d.ts` ambient-typing gotcha**: the Vite `define`-globals typing (`__APP_BUILD_VERSION__`/`__APP_RELEASE_VERSION__`) is consumed by `tsc` via tsconfig and imported by nobody, so knip reports it as an unused file. It is a compiler entry point, not dead code — it lives in `knip.json` `entry`. Never delete the file; never "fix" it via `ignore`.
+- **Generated-directory gotcha**: `src/api/generated/*` is gitignored but contains real imported code (`~api/generated/...`). Without `--no-gitignore` knip never sees those files and falsely reports `axios` and `zod` as unused dependencies; with `--no-gitignore` the false positives disappear. This is the *opposite* reason from `mushpi-server`, where `--no-gitignore` is needed because a broad ancestor `.gitignore` hides the whole project. There is no config equivalent of the flag, so it lives in the script.
+- **Knip 5 vs 6 flag pin**: `--exclude devDependencies` (in `knip:ci`) is knip 5 syntax; knip 6 changed/removed that form. The `knip: "^5.51.0"` devDependency pin preserves the flag semantics — do not float to 6 without reworking `knip:ci`.
 
 ## Husky Exec-Bit Fragility
 
