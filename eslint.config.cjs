@@ -5,9 +5,13 @@ const importPlugin = require('eslint-plugin-import');
 const reactHooks = require('eslint-plugin-react-hooks');
 
 module.exports = [
-  // Global ignores — never lint build output
+  // Global ignores — never lint build output, and never lint the generated API
+  // client: src/api/generated/** is gitignored, tool-emitted (openapi-generator-cli
+  // / openapi-zod-client headers include file-wide `/* eslint-disable */` banners)
+  // and reproducible by the gen:* scripts. Findings there are neither actionable
+  // nor committable, and hand-edits would be destroyed by the next regeneration.
   {
-    ignores: ['dist/**'],
+    ignores: ['dist/**', 'src/api/generated/**'],
   },
   // Apply to TS/JS files in the project
   {
@@ -68,7 +72,18 @@ module.exports = [
           ],
           pathGroupsExcludedImportTypes: ['builtin'],
           'newlines-between': 'always',
-          alphabetize: { order: 'asc', caseInsensitive: true },
+          // NOTE: `alphabetize` is deliberately NOT set. Import sorting is owned
+          // by @trivago/prettier-plugin-sort-imports (`.prettierrc` importOrder),
+          // which every `prettier --write` / lint-staged pass applies. Its
+          // comparator is javascript-natural-sort (code-unit: `../x` sorts before
+          // `./y`); import/order's alphabetize uses localeCompare('en') (`./y`
+          // first). The two disagree on any file mixing `../` and `./` imports
+          // (e.g. `../../test/fixtures` vs `./helpers` in test files), and
+          // Prettier always wins because lint-staged runs `eslint --fix` first
+          // and `prettier --write` after — enabling alphabetize here produces an
+          // unfixable ping-pong, not fixable by reordering. ESLint remains the
+          // group + blank-line validator; Prettier stays the single authority
+          // for ordering within groups.
         },
       ],
 
