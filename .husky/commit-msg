@@ -1,2 +1,1 @@
-if [ "$2" = "merge" ] || [ "$2" = "squash" ]; then exit 0; fi
-npx --no-install commitlint --edit "$1"
+yarn commitlint --edit "$1"

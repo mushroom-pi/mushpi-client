@@ -106,7 +106,7 @@ Poll/mutation patterns (`createOptimisticMutation`, one-shot vs. control mutatio
 - `yarn audit:ci` — audit gate: `audit:prod` + `--severity high`; non-mutating
 - `yarn knip` — dead-code/unused-dep report (config: `knip.json`); `yarn knip:ci` — gate (unused files + runtime deps, no devDeps; needs `--no-gitignore` — REFERENCE.md §Knip)
 - Script convention: bare = local (may mutate); `:ci` = non-mutating fail-on-findings gate. Scripts run under `sh` — use the tool's native exit code, never `$?`/`[[` bashisms
-- Husky pre-commit (v9): `.husky/pre-commit` runs `npx --no-install lint-staged`; wiring via `"prepare": "husky"` and `git config core.hooksPath=.husky/_`. lint-staged runs `eslint --fix` + `prettier --write` on staged files. ESLint severity policy + exec-bit repair: REFERENCE.md §Husky.
+- Husky (v9): pre-commit = `yarn lint-staged` (eslint --fix + prettier --write, staged); commit-msg = `yarn commitlint` (`ignores`: merge/revert/fixup/squash); pre-push = `yarn audit:ci && yarn build && yarn knip:ci && yarn test`. Wiring: `"prepare": "husky"` + `core.hooksPath=.husky/_`. Severity + exec-bit: REFERENCE.md §Husky.
 
 ## Versioning
 

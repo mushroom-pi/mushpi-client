@@ -2,7 +2,7 @@
 
 Long-tail details and gotchas. **Load only when the task touches these areas** — do not read on every spawn. The always-loaded [`AGENTS.md`](./AGENTS.md) holds the stack, API client, routing, directory index, build/dev/testing commands, state-management inventory, coding rules, and env vars.
 
-Topics covered here: path aliases · image handling · `useAsyncWithToast` · polling gotchas · Recharts chart conventions · directory & file detail · client regeneration · testing (Vitest) detail · component & mutation gotchas · known quirks · feature palettes · Knip · Husky fragility.
+Topics covered here: path aliases · image handling · `useAsyncWithToast` · polling gotchas · Recharts chart conventions · directory & file detail · client regeneration · testing (Vitest) detail · component & mutation gotchas · known quirks · feature palettes · Knip · Husky hooks & exec-bit fragility.
 
 ---
 
@@ -272,6 +272,14 @@ Color palettes or other domain-specific constant arrays that are tightly coupled
 - **Knip 5 vs 6 flag pin**: `--exclude devDependencies` (in `knip:ci`) is knip 5 syntax; knip 6 changed/removed that form. The `knip: "^5.51.0"` devDependency pin preserves the flag semantics — do not float to 6 without reworking `knip:ci`.
 
 ## Husky Exec-Bit Fragility
+
+**Hook lineup (v9)**: three hooks, one command each, dispatched by the generated `.husky/_/h` wrapper. `pre-commit` = `yarn lint-staged` — staged-scoped `eslint --fix` + `prettier --write` (deliberately not the skill's whole-repo `format` + `lint` pattern; staged-scoping is this repo's established behaviour). `commit-msg` = `yarn commitlint --edit "$1"` — `$1` is the commit-message file. `pre-push` = `yarn audit:ci && yarn build && yarn knip:ci && yarn test` (order mirrors the server's `audit → build → prune → test`; there is no `test:e2e` here). Rationale:
+
+- **`yarn`, not `npx --no-install`** — Yarn Berry resolves the local devDependency bin directly; no npx indirection.
+- **Dead `$2` guard removed**: the old commit-msg hook began with `if [ "$2" = "merge" ] || [ "$2" = "squash" ]; then exit 0; fi`, which can never fire — git does not pass a second argument to `commit-msg` (`$1` is the message file). Skipping merge/revert/fixup/squash messages is now done by **source-based `ignores` functions in `commitlint.config.cjs`** (three patterns mirroring `mushpi-server/commitlint.config.mjs`: `Merge (branch|pull request|remote-tracking branch)`, `Revert "`, `(fixup|squash)!`), which is the correct fix because commitlint sees the actual message text.
+- **`&&`-chained pre-push on one line**: git/husky must not be relied on to abort a multi-statement hook at the first failure, so every gate is an explicit `&&` operand (current husky 9.1.7's `h` does spawn hooks via `sh -e "$s"`, but the chain is version-independent and self-documenting). A bare `;`-separated or multi-line ladder would let earlier failures pass silently.
+- **No `pre-merge-commit`** — the server uses one to gate its e2e suite; this repo has no equivalent heavy stage; pre-commit (staged) + pre-push (full gates) cover it.
+- **Tracked hook files need no exec bit** (mode 100644, same as the server's): `h` invokes them through `sh`. Only the generated `.husky/_/` wrappers must be executable — see repair note below.
 
 `.husky/_/` is gitignored + generated, so its executable bits live only on the local filesystem. If a copy/archive/mount/umask strips them, git silently skips the hook (no lint, no error). Repair with `rm -rf .husky/_ && npx husky` (a bare `npx husky` re-run does not restore them). Verify `ls -la .husky/_/` shows `-rwxr-xr-x`.
 
