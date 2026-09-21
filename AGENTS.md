@@ -4,7 +4,7 @@ React 19 + Vite web dashboard served from Raspberry Pi 3 B+. Talks only to `mush
 
 > **Skill**: For general React frontend patterns (atomic design, React Query conventions, Zod form validation, ModalForm/DataTable usage), load the `frontend-react` skill. This file documents **only** what is specific to this project or deviates from standard frontend conventions.
 >
-> **Reference**: long-tail details (path aliases, image handling, polling/mutation/chart gotchas, directory & file detail, regeneration, Vitest, known quirks, palettes, Husky, knip) live in [`REFERENCE.md`](./REFERENCE.md) — load **only when the task touches those areas**; the full topic list is at its top.
+> **Reference**: long-tail details (path aliases, image handling, polling/mutation/chart gotchas, directory & file detail, regeneration, Vitest, known quirks, palettes, Husky, knip, dependency hygiene) live in [`REFERENCE.md`](./REFERENCE.md) — load **only when the task touches those areas**; the full topic list is at its top.
 
 ## Stack
 
@@ -106,7 +106,7 @@ Poll/mutation patterns (`createOptimisticMutation`, one-shot vs. control mutatio
 - `yarn audit:ci` — audit gate: `audit:prod` + `--severity high`; non-mutating
 - `yarn knip` — dead-code/unused-dep report (config: `knip.json`); `yarn knip:ci` — gate (unused files + runtime deps, no devDeps; needs `--no-gitignore` — REFERENCE.md §Knip)
 - Script convention: bare = local (may mutate); `:ci` = non-mutating fail-on-findings gate. Scripts run under `sh` — use the tool's native exit code, never `$?`/`[[` bashisms
-- Husky (v9): pre-commit = `yarn lint-staged` (eslint --fix + prettier --write, staged); commit-msg = `yarn commitlint` (`ignores`: merge/revert/fixup/squash); pre-push = `yarn audit:ci && yarn build && yarn knip:ci && yarn test`. Wiring: `"prepare": "husky"` + `core.hooksPath=.husky/_`. Severity + exec-bit: REFERENCE.md §Husky.
+- Husky (v9): pre-commit / commit-msg / pre-push gates; lineup + wiring + severity: REFERENCE.md §Husky.
 
 ## Versioning
 
@@ -116,12 +116,11 @@ Poll/mutation patterns (`createOptimisticMutation`, one-shot vs. control mutatio
 
 ## Testing
 
-- **Test runner**: Vitest 3.x with jsdom environment. Config lives in `vitest.config.ts` (separate file — merging into `vite.config.ts` causes type conflicts between Vitest's bundled vite and the project's `@vitejs/plugin-react`).
+- **Test runner**: Vitest 4.x with jsdom environment. Config lives in `vitest.config.ts` (separate file — merging into `vite.config.ts` causes type conflicts between Vitest's bundled vite and the project's `@vitejs/plugin-react`).
 - **Global setup**: `src/test/setup.ts` auto-applies `@testing-library/jest-dom` matchers and runs `cleanup()` after each test via `afterEach`.
 - **Shared fixtures**: `src/test/fixtures.tsx` exports `makePicoUnit()` (factory), `renderWithProviders()` (QueryClientProvider wrapper), and other shared test helpers.
-- **What to test**: Pure utilities (`methods.ts`), custom hooks with logic (`useAsyncWithToast`), mutation factories (`createOptimisticMutation`), ErrorBoundary, and dialogs that send hardware commands (`DevicesDialog`). Skip pass-through React Query wrappers, generated API code, and presentational-only components.
 - **Never test generated code** in `src/api/generated/`.
-- Despite `globals: true`, test files must still import from `vitest` — REFERENCE.md §Testing (Vitest) Detail.
+- What-to-test / skip list + the `globals: true` import caveat: REFERENCE.md §Testing (Vitest) Detail.
 
 ## Environment
 
@@ -138,7 +137,7 @@ Standard conventions from `frontend-react` skill apply. Project-specific additio
 - Import order: `@trivago/prettier-plugin-sort-imports` handles sort order via Prettier. Third-party imports first, then `~` aliases, then relative imports.
 - **Never hardcode colors** — raw hex/rgb literals live only in `src/theme/tokens.ts`; use `~theme/tokens` imports or `theme.palette.*`/MUI color strings. Enforced by `no-restricted-syntax` (error) + `tokens.test.ts`. Exemptions: `tokens.ts` (source), `ColorSwatchPicker` FACE_COLORS (data palette), SVG assets (static art).
 - Loading states: Prefer shape-matched MUI `<Skeleton>` components over the generic `<Loading />` spinner for data pages. See the `frontend-react` skill for the full pattern (hierarchy, gating on `isLoading`, page shell structure). Reusable skeletons live in atoms/molecules; page-scoped skeleton compositions live in `pages/<Page>/components/`.
-- **No dead props**: The ESLint config treats unused props/imports as errors (`@typescript-eslint/no-unused-vars`). Don't add props to an interface that the component body never uses — the build will fail. If a prop seems theoretically useful but has no consumer, drop it.
+- **No dead props**: Unused props/imports fail the build via `tsc` `noUnusedLocals`/`noUnusedParameters` (the ESLint `@typescript-eslint/no-unused-vars` rule is only `warn`). Don't add props to an interface that the component body never uses. If a prop seems theoretically useful but has no consumer, drop it.
 - **Page-scoped presentational components**: A presentational (stateless) component used by only one page stays co-located in `pages/<Page>/components/`, not under `components/ui/atoms/`. The shared `atoms/` directory is for components reused across 2+ pages. If a page-scoped component later gains a second consumer, promote it to `components/ui/atoms/` at that time.
 - **No cross-page imports**: Never import from another page's folder via `~pages/<OtherPage>/...`. If a component, dialog, or utility is needed by 2+ pages, promote it to `~components`. Conversely, if you find an existing `~pages/<X>/...` import in a different page's file, report it — it's a code smell that needs a promotion PR.
 - **Error boundaries are the sole exception to functional components**: React's error boundary lifecycle methods (`getDerivedStateFromError`, `componentDidCatch`) only exist on class components — there is no functional hook equivalent. The `ErrorBoundary` component in `molecules/` is intentionally a class component. Wrap it around `<Routes>` only (not the app shell) so the sidebar and `ServerDownBanner` survive page crashes.
