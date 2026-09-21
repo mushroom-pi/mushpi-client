@@ -57,7 +57,7 @@ src/
 ├── assets/      static SVGs (~assets)
 ├── components/  shared components — see "Shared Components" below
 ├── contexts/    8: PicoUnit, PicoUnits, Recipe, Recipes, Batch, Batches, Charts, Toast
-├── hooks/       9 hooks + picoUnitsHelpers + BatchForm/ + RecipeForm/
+├── hooks/       9 hooks + BatchForm/ + RecipeForm/
 ├── interfaces/  shared TS interfaces
 ├── layout/      app shell — Page wrapper, Sidebar
 ├── pages/       10 pages, one <Page>/index.tsx per route (never bare <Page>.tsx)

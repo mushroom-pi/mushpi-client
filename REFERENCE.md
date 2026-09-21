@@ -146,7 +146,7 @@ src/
 │   ├── Batches/             # List-page context (useBatches)
 │   ├── Charts/: provider.tsx, batchProvider.tsx
 │   └── Toast.tsx
-├── hooks/                   # useDashboard, useReadings, useBatchReadings, useServerHealth, useIsServerReachable, useAsyncWithToast, useSettings, useChartContainerWidth, useDocumentTitle, picoUnitsHelpers
+├── hooks/                   # useDashboard, useReadings, useBatchReadings, useServerHealth, useIsServerReachable, useAsyncWithToast, useSettings, useChartContainerWidth, useDocumentTitle
 │   ├── BatchForm/           # Batch form state
 │   └── RecipeForm/          # Recipe form state
 ├── interfaces/              # Shared TS interfaces (dialogProps.ts, optionalPicoUnit.ts)
