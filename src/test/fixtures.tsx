@@ -13,7 +13,7 @@ import type { PicoUnit, Readings } from '~api/generated';
 export function makePicoUnit(
   overrides?: Record<string, unknown>,
 ): PicoUnit & { latest_reading: Readings } {
-  const unit: PicoUnit & { latest_reading: Readings } = {
+  const unit: PicoUnit = {
     id: 1,
     created_at: '2026-01-01T00:00:00.000Z',
     handle: 'test-unit',
@@ -33,23 +33,34 @@ export function makePicoUnit(
     // legacy unit that hasn't announced since the migration.
     firmware_version: '0.8.4',
     api_version: 1,
-    latest_reading: {
-      temperature: 25,
-      humidity: 80,
-      humidifier_on: false,
-      fan_on: false,
-      heater_on: false,
-      temperature_set: 25,
-      humidity_set: 80,
-      control_loop_enabled: true,
-      board_uptime_s: 0,
-      board_temp: 42,
-      board_used_mem: 100_000,
-      board_used_fs: 200_000,
-      time_to_response_ms: 120,
-    },
   };
-  return { ...unit, ...overrides };
+  // The generated Readings contract carries the full entity row: primary key,
+  // timestamp, and a back-reference to the unit it belongs to. The ts matches
+  // the unit's created_at and the DevicesDialog fixture's reading ts.
+  const latestReading: Readings = {
+    id: 1,
+    ts: '2026-01-01T00:00:00.000Z',
+    temperature: 25,
+    humidity: 80,
+    humidifier_on: false,
+    fan_on: false,
+    heater_on: false,
+    temperature_set: 25,
+    humidity_set: 80,
+    control_loop_enabled: true,
+    board_uptime_s: 0,
+    board_temp: 42,
+    board_used_mem: 100_000,
+    board_used_fs: 200_000,
+    time_to_response_ms: 120,
+    pico_unit: unit,
+    pico_unit_id: unit.id,
+  };
+  const withReading: PicoUnit & { latest_reading: Readings } = {
+    ...unit,
+    latest_reading: latestReading,
+  };
+  return { ...withReading, ...overrides };
 }
 
 /**
