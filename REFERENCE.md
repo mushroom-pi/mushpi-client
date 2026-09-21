@@ -195,12 +195,18 @@ src/
 
 ## Regenerating the Client
 
-**Offline regeneration (preferred when no server is running).** The bare `gen:client`/`gen:schemas` default to the client's own `./openapi.json`, which can be **stale** relative to the server's committed spec. Point `OPENAPI_SPEC` at the server's canonical spec instead — no server boot, no risk of touching a live database:
+**Offline regeneration from the server's committed spec is the canonical path.** The server's `spec:export` generates `../mushpi-server/spec/openapi.json` from **compiled** output (`dist/`), so the committed spec carries the same `@nestjs/swagger` CLI-plugin metadata as the live-served contract (proven with server commit `cc7dd6b`) — offline regeneration is equivalent to the `:remote` path, with no server boot and no risk of touching a live database:
 
 ```bash
 OPENAPI_SPEC=../mushpi-server/spec/openapi.json yarn gen:client && \
 OPENAPI_SPEC=../mushpi-server/spec/openapi.json yarn gen:schemas
 ```
+
+(`gen:client` chains the `gen:dedup` fix-up; `gen:schemas` chains `gen:fix-array-types`.)
+
+The bare commands **without** `OPENAPI_SPEC` read the client's own gitignored `./openapi.json` convenience copy, which nothing keeps in sync and can lag the server's committed spec — prefer the explicit `OPENAPI_SPEC` form above over refreshing that copy by hand.
+
+**`info.title` is the only sanctioned offline-vs-remote difference.** It lands in the line-4 doc header of the five root TS files (`api.ts`, `base.ts`, `common.ts`, `configuration.ts`, `index.ts`): `mushpi-server` offline vs `mushpi-server LOCAL` from a running server. The title only records which input the generation run read — it is **no longer** a signal that the generated types came from a diverged contract.
 
 ## Testing (Vitest) Detail
 
