@@ -1,1 +1,1 @@
-yarn audit:ci && yarn build && yarn knip:ci && yarn test
+yarn audit:ci && yarn lint:ci && yarn build && yarn knip:ci && yarn test
