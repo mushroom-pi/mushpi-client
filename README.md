@@ -71,3 +71,11 @@ export default defineConfig([
   },
 ]);
 ```
+
+## License
+
+Licensed under the MIT License.
+
+Copyright (c) 2026 [Adriana Martín de Aguilera](https://www.amda.dev)
+
+See [LICENSE](LICENSE) for the full license text.

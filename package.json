@@ -2,6 +2,7 @@
   "name": "mushpi-client",
   "private": true,
   "version": "0.8.0",
+  "license": "MIT",
   "type": "module",
   "packageManager": "yarn@4.14.1",
   "scripts": {
