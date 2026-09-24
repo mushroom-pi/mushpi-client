@@ -1,6 +1,6 @@
 # mushpi-client — Project Context
 
-React 19 + Vite web dashboard served from Raspberry Pi 3 B+. Talks only to `mushpi-server`; never directly to Pico units.
+React 19 + Vite web dashboard served from Raspberry Pi 3 (1GB). Talks only to `mushpi-server`; never directly to Pico units.
 
 > **Skill**: For general React frontend patterns (atomic design, React Query conventions, Zod form validation, ModalForm/DataTable usage), load the `frontend-react` skill. This file documents **only** what is specific to this project or deviates from standard frontend conventions.
 >
