@@ -183,6 +183,7 @@ src/
     ├── apiUrl.ts            # Normalized API base (`API_BASE`, trailing slashes stripped) + resolveApiUrl()
     ├── apiUrl.test.ts       # Vitest: base normalization + image-URL resolution
     ├── buildInfo.ts         # Build-time version globals (define-injected) — CLIENT_BUILD_VERSION, RELEASE_VERSION/LABEL
+    ├── externalLinks.ts     # DOCUMENTATION_SITE_URL — public Mintlify docs site (sidebar Help)
     ├── chartLabels.ts       # Chart tick-label helpers (isLongSpan, createTickFormatter)
     ├── methods.ts           # Generic: date formatting, bytes, percentages
     ├── methods.test.ts      # Vitest: pure formatting helpers
