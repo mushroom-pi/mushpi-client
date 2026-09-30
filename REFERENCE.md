@@ -226,7 +226,6 @@ The bare commands **without** `OPENAPI_SPEC` read the client's own gitignored `.
 
 ## Known Quirks
 
-- `picoUnitIdBatchesControllerGetCurrentV1` requires `batchId: 0` (generator bug — param not in URL, ignored)
 - Vite chunk size warning (~1.35 MB) is informational
 - **V1 naming**: all generated API methods carry a `V1` suffix (e.g. `batchesControllerListV1`, `picoUnitIdControllerGetOneV1`). This comes from the server's URI versioning (`/v1/` prefix) and is not a bug. Method names will change again when `/v2/` endpoints are introduced — plan client code accordingly.
 - `schemas.ts` sometimes uses bare `Array` without type param — regenerate from fixed server spec

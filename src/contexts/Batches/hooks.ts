@@ -62,14 +62,12 @@ export function usePicoUnitBatches(
   });
 }
 
-// batchId is required by the generated client but unused in the URL template
-// (generator quirk for /pico-units/{picoUnitId}/batches/current)
 export function usePicoUnitCurrentBatch(picoUnitId: number | null) {
   return useQuery<Batch, unknown, Batch>({
     queryKey: batchKeys.currentForUnit(picoUnitId ?? 0),
     queryFn: async () => {
       const resp = await unwrap(
-        Batches.picoUnitIdBatchesControllerGetCurrentV1({ picoUnitId: picoUnitId!, batchId: 0 }),
+        Batches.picoUnitIdBatchesControllerGetCurrentV1({ picoUnitId: picoUnitId! }),
       );
       return resp as unknown as Batch;
     },
