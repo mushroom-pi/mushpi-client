@@ -189,7 +189,9 @@ src/
     ├── methods.test.ts      # Vitest: pure formatting helpers
     ├── pico.ts              # Pico: provisioning constants, LED_STATES, chip color helpers, firmwareStatus()/firmwareCaption() display helpers, compatibilityStatus() (maps server-owned api_compatibility verdict)
     ├── pico.test.ts         # Vitest: firmware-status null/unknown branching + caption composition + compatibilityStatus verdict/defensive-unknown branching + compile-time contract guards (CompatibilityStatus ↔ PicoUnitApiCompatibilityEnum, UnitStatus ↔ PicoUnitStatusEnum)
-    └── timeWindow.ts        # TimeWindow union + resolveTimeBounds() (store intent, resolve per fetch)
+    ├── timeWindow.ts        # TimeWindow union + resolveTimeBounds() (store intent, resolve per fetch)
+    ├── zodBounds.ts         # numericBounds() (inclusive min/max read off generated Zod checks, unwrapping optional/nullable) + rangeHint() (hint text like `10–90 %` / `Minimum 1 day`)
+    └── zodBounds.test.ts    # Vitest: gte/lte/.int()/optional/nullable/exclusive/no-bounds extraction + drift-free cross-check against the real CreateRecipeDto/CreateBatchDto shapes
 ```
 
 > **Removed path note**: `src/utils/charts.ts` was deleted — the server handles all chart aggregation (see §Charts (Recharts)). It is not structure and does not appear in the tree above.
@@ -224,6 +226,7 @@ The bare commands **without** `OPENAPI_SPEC` read the client's own gitignored `.
 
 - **Mutation identity in context `useMemo` deps**: React Query v5's `useMutation` returns a wrapper object that changes identity every render, but `mutate`/`mutateAsync` are referentially stable. In context-provider `useMemo` dependency arrays, **destructure** `mutate`, `mutateAsync`, and `isPending` from the mutation result and depend on those stable primitives — never the whole mutation wrapper object. Rebuilding the wrapper from stable parts keeps the memo honest and prevents cascading consumer re-renders.
 - **CSV download failures must surface via toast**: `useAsyncWithToast().run()` with `fallbackErrorMessage: 'Failed to download CSV'` and `rethrow: true`. Wrap the export+download logic inside `run()`. Server HTTP errors auto-surface; `fallbackErrorMessage` covers network/non-HTTP failures. Remove `console.error` calls from download catch blocks.
+- **`ModalForm`'s `formId` makes the content Stack a real `<form>`** (`component={formId ? 'form' : 'div'}` + submit button with `type="submit" form={formId}`). A `min`/`max` on number inputs is then enforced by the browser's native constraint validation — an out-of-range value blocks submit with a browser bubble **before** the schema-driven `validate()` can show the field error (a literal `min: 20` silently rejected valid 10–19 % humidity targets the schema accepts). Without `formId` (BatchForm), those attributes only affect the stepper/hint. This is why form bounds must come from the generated schemas via `numericBounds()` (AGENTS.md §Form Validation) — native and Zod constraints must never diverge.
 
 ## Known Quirks
 

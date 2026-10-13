@@ -81,6 +81,7 @@ Plus shared forms `BatchForm`/`PicoUnitForm`/`RecipeForm` and `components/provis
 All Create/Edit dialogs validate against generated Zod schemas (see `frontend-react` skill for general pattern). Project-specific rules:
 
 - **Never hardcode validation bounds** — use the generated Zod schemas as the single source of truth.
+- Derive form `min`/`max` + range hints from the schema: `numericBounds()`/`rangeHint()` (`~utils/zodBounds`), never literals.
 - Many server DTOs are `.partial()` — only validate constraints when a value is present.
 
 ## State Management

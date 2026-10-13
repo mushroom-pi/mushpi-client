@@ -1,7 +1,14 @@
 import { TextField } from '@mui/material';
 
+import { schemas } from '~api/generated/schemas';
 import { ModalForm } from '~components';
 import type { RecipeFormErrors, RecipeFormValues } from '~hook/RecipeForm/interfaces';
+import { numericBounds, rangeHint } from '~utils/zodBounds';
+
+// Bounds and hint text derive from the generated Zod schema via numericBounds() — never literal limits.
+const temperatureBounds = numericBounds(schemas.CreateRecipeDto.shape.temperature_target);
+const humidityBounds = numericBounds(schemas.CreateRecipeDto.shape.humidity_target);
+const durationBounds = numericBounds(schemas.CreateRecipeDto.shape.duration_days);
 
 export interface RecipeFormProps {
   // Dialog control
@@ -75,10 +82,14 @@ export function RecipeForm({
         onChange={(e) => updateField('temperature_target', e.target.value)}
         onBlur={() => touchField('temperature_target')}
         error={!!errors.temperature_target}
-        helperText={errors.temperature_target ?? '0–50 °C'}
+        helperText={errors.temperature_target ?? rangeHint(temperatureBounds, '°C')}
         required
         fullWidth
-        slotProps={{ input: { inputProps: { min: 0, max: 50, step: 0.1 } } }}
+        slotProps={{
+          input: {
+            inputProps: { min: temperatureBounds.min, max: temperatureBounds.max, step: 0.1 },
+          },
+        }}
       />
       <TextField
         label="Humidity target (%)"
@@ -87,10 +98,12 @@ export function RecipeForm({
         onChange={(e) => updateField('humidity_target', e.target.value)}
         onBlur={() => touchField('humidity_target')}
         error={!!errors.humidity_target}
-        helperText={errors.humidity_target ?? '20–90 %'}
+        helperText={errors.humidity_target ?? rangeHint(humidityBounds, '%')}
         required
         fullWidth
-        slotProps={{ input: { inputProps: { min: 20, max: 90, step: 0.1 } } }}
+        slotProps={{
+          input: { inputProps: { min: humidityBounds.min, max: humidityBounds.max, step: 0.1 } },
+        }}
       />
       <TextField
         label="Duration (days)"
@@ -99,10 +112,12 @@ export function RecipeForm({
         onChange={(e) => updateField('duration_days', e.target.value)}
         onBlur={() => touchField('duration_days')}
         error={!!errors.duration_days}
-        helperText={errors.duration_days ?? 'Minimum 1 day'}
+        helperText={errors.duration_days ?? rangeHint(durationBounds, 'day')}
         required
         fullWidth
-        slotProps={{ input: { inputProps: { min: 1, step: 1 } } }}
+        slotProps={{
+          input: { inputProps: { min: durationBounds.min, max: durationBounds.max, step: 1 } },
+        }}
       />
       <TextField
         label="Notes"
