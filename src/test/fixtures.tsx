@@ -34,9 +34,10 @@ export function makePicoUnit(
     firmware_version: '0.8.4',
     api_version: 1,
   };
-  // The generated Readings contract carries the full entity row: primary key,
-  // timestamp, and a back-reference to the unit it belongs to. The ts matches
-  // the unit's created_at and the DevicesDialog fixture's reading ts.
+  // The generated Readings contract carries the serialized entity row: primary
+  // key, timestamp, and the owning unit's id. The relation back to the unit is
+  // not serialized, so no back-reference object is fabricated here. The ts
+  // matches the unit's created_at and the DevicesDialog fixture's reading ts.
   const latestReading: Readings = {
     id: 1,
     ts: '2026-01-01T00:00:00.000Z',
@@ -53,7 +54,6 @@ export function makePicoUnit(
     board_used_mem: 100_000,
     board_used_fs: 200_000,
     time_to_response_ms: 120,
-    pico_unit: unit,
     pico_unit_id: unit.id,
   };
   const withReading: PicoUnit & { latest_reading: Readings } = {
