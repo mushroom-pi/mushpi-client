@@ -1,16 +1,14 @@
 import { Grid, Stack, Typography } from '@mui/material';
-import dayjs from 'dayjs';
 import { Link } from 'react-router-dom';
 
 import { InfoCard, InfoField } from '~components';
 import { useBatchContext } from '~ctx/Batch';
+import { formatDateTime as formatSharedDateTime } from '~utils/methods';
 
 import { BatchImages } from './BatchImages';
 
-const formatDateTime = (value?: string | null) => {
-  if (!value) return 'In progress';
-  return dayjs(value).format('DD MMM YYYY HH:mm');
-};
+const formatDateTime = (value?: string | null) =>
+  value ? formatSharedDateTime(value) : 'In progress';
 
 export const BatchMeta = () => {
   const { batch } = useBatchContext();

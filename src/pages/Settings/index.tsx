@@ -13,6 +13,9 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { schemas } from '~api/generated/schemas';
 import { Error, PageTitle } from '~components';
+import { useToast } from '~ctx/Toast';
+import { useDemoMode } from '~hook/useDemoMode';
+import { useDisplayTimezone } from '~hook/useDisplayTimezone';
 import { useDocumentTitle } from '~hook/useDocumentTitle';
 import { useSettings, useUpdateSettings } from '~hook/useSettings';
 import { Page } from '~layout/Page';
@@ -23,15 +26,26 @@ export const Settings = () => {
   useDocumentTitle('Settings');
   const { data, isLoading, isError, error, refetch } = useSettings();
   const update = useUpdateSettings();
+  const { isDemo } = useDemoMode();
+  const { timezone, isOverridden, setTimezone } = useDisplayTimezone();
+  const toast = useToast();
 
   const [selected, setSelected] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
 
+  // Demo hub: the effective setting is the stored override when present (the
+  // store honors it only on demo hubs). Non-demo hub: the server-persisted
+  // value — exactly the original derivation.
+  const baseline = isDemo ? (isOverridden ? timezone : '') : (data?.timezone ?? '');
+
   useEffect(() => {
-    if (data?.timezone && !isDirty) {
+    if (isDirty) return;
+    if (isDemo && isOverridden) {
+      setSelected(timezone);
+    } else if (data?.timezone) {
       setSelected(data.timezone);
     }
-  }, [data?.timezone, isDirty]);
+  }, [data?.timezone, isDirty, isDemo, isOverridden, timezone]);
 
   const timezones = useMemo(() => {
     try {
@@ -50,11 +64,17 @@ export const Settings = () => {
     ) as Record<string, string>;
   }, [selected]);
 
-  const canSave =
-    !!selected && selected !== (data?.timezone ?? '') && !Object.values(errors).some(Boolean);
+  const canSave = !!selected && selected !== baseline && !Object.values(errors).some(Boolean);
 
   const handleSave = () => {
     if (!canSave) return;
+    if (isDemo) {
+      // Per-browser save: no request is issued at all, so nothing can be
+      // refused and no server message can appear.
+      setTimezone(selected!);
+      toast.success('Timezone updated');
+      return;
+    }
     update.mutate(selected!);
   };
 
