@@ -1,8 +1,9 @@
 import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { useAsyncWithToast } from '~hook/useAsyncWithToast';
+import { getCooldownUntil, resetRetryCooldown } from '~utils/retryCooldown';
 
 const mockToast = {
   success: vi.fn(),
@@ -60,5 +61,41 @@ describe('useAsyncWithToast', () => {
     ).rejects.toThrow('x');
 
     expect(mockToast.error).toHaveBeenCalled();
+  });
+});
+
+describe('useAsyncWithToast cooldown behavior', () => {
+  afterEach(() => {
+    resetRetryCooldown();
+  });
+
+  it('extends the error toast duration and arms the cooldown on 429 + Retry-After', async () => {
+    const { result } = renderHook(() => useAsyncWithToast(), { wrapper });
+    const slowDown = {
+      response: {
+        status: 429,
+        data: { message: 'Please wait a moment' },
+        headers: { 'retry-after': '30' },
+      },
+    };
+
+    await result.current.run(() => Promise.reject(slowDown)).catch(() => {});
+
+    // the server's sentence renders verbatim; the toast lasts at least as long as the wait
+    expect(mockToast.error).toHaveBeenCalledWith('Please wait a moment', 30000);
+    expect(getCooldownUntil()).toBeGreaterThan(0);
+  });
+
+  it('renders the refusal message verbatim and never arms a cooldown on 403', async () => {
+    const { result } = renderHook(() => useAsyncWithToast(), { wrapper });
+    const refusal = {
+      response: { status: 403, data: { message: 'Changes are not accepted here' } },
+    };
+
+    await result.current.run(() => Promise.reject(refusal)).catch(() => {});
+
+    // single-argument call: the standard error toast, no duration extension
+    expect(mockToast.error).toHaveBeenCalledWith('Changes are not accepted here');
+    expect(getCooldownUntil()).toBe(0);
   });
 });

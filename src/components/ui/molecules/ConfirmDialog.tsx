@@ -2,6 +2,8 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/
 import type { ReactNode } from 'react';
 import React from 'react';
 
+import { useRetryCooldown } from '~hook/useRetryCooldown';
+
 export interface ConfirmDialogProps {
   open: boolean;
   onClose: () => void;
@@ -25,22 +27,27 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   isLoading = false,
   onConfirm,
   danger = false,
-}) => (
-  <Dialog open={open} onClose={isLoading ? undefined : onClose} fullWidth maxWidth="sm">
-    <DialogTitle>{title}</DialogTitle>
-    <DialogContent dividers>{children}</DialogContent>
-    <DialogActions>
-      <Button onClick={onClose} disabled={isLoading}>
-        Cancel
-      </Button>
-      <Button
-        color={danger ? 'error' : 'primary'}
-        variant="contained"
-        onClick={onConfirm}
-        disabled={isLoading}
-      >
-        {confirmLabel}
-      </Button>
-    </DialogActions>
-  </Dialog>
-);
+}) => {
+  // While a server-mandated cooldown is active the confirm affordance is
+  // disabled but stays visible; the store's timer re-enables it without a reload.
+  const { isCoolingDown } = useRetryCooldown();
+  return (
+    <Dialog open={open} onClose={isLoading ? undefined : onClose} fullWidth maxWidth="sm">
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent dividers>{children}</DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} disabled={isLoading}>
+          Cancel
+        </Button>
+        <Button
+          color={danger ? 'error' : 'primary'}
+          variant="contained"
+          onClick={onConfirm}
+          disabled={isLoading || isCoolingDown}
+        >
+          {confirmLabel}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
