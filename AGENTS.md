@@ -57,7 +57,7 @@ src/
 ├── assets/      static SVGs (~assets)
 ├── components/  shared components — see "Shared Components" below
 ├── contexts/    8: PicoUnit, PicoUnits, Recipe, Recipes, Batch, Batches, Charts, Toast
-├── hooks/       9 hooks + BatchForm/ + RecipeForm/
+├── hooks/       12 hooks (incl. useDemoMode, useDisplayTimezone, useRetryCooldown) + BatchForm/ + RecipeForm/
 ├── interfaces/  shared TS interfaces
 ├── layout/      app shell — Page wrapper, Sidebar
 ├── pages/       10 pages, one <Page>/index.tsx per route (never bare <Page>.tsx)
@@ -142,5 +142,6 @@ Standard conventions from `frontend-react` skill apply. Project-specific additio
 - **Page-scoped presentational components**: A presentational (stateless) component used by only one page stays co-located in `pages/<Page>/components/`, not under `components/ui/atoms/`. The shared `atoms/` directory is for components reused across 2+ pages. If a page-scoped component later gains a second consumer, promote it to `components/ui/atoms/` at that time.
 - **No cross-page imports**: Never import from another page's folder via `~pages/<OtherPage>/...`. If a component, dialog, or utility is needed by 2+ pages, promote it to `~components`. Conversely, if you find an existing `~pages/<X>/...` import in a different page's file, report it — it's a code smell that needs a promotion PR.
 - **Error boundaries are the sole exception to functional components**: React's error boundary lifecycle methods (`getDerivedStateFromError`, `componentDidCatch`) only exist on class components — there is no functional hook equivalent. The `ErrorBoundary` component in `molecules/` is intentionally a class component. Wrap it around `<Routes>` only (not the app shell) so the sidebar and `ServerDownBanner` survive page crashes.
+- **Server-owned message text**: refusal and slow-down sentences are rendered verbatim from the server's error body (`response.data.message` via `useAsyncWithToast`'s `extractMessage`); the client never composes or hardcodes them, wait-time wording included.
 
 Context-`useMemo` mutation-identity + CSV-download toast rules: REFERENCE.md §Component & Mutation Gotchas.
