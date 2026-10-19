@@ -16,9 +16,12 @@ import React from 'react';
 
 import mushPiSquareLogo from '~assets/MushPiSquareLogo.svg';
 import mushroomPiHorizontalLogo from '~assets/MushroomPiHorizontalLogo.svg';
+import { useDemoMode } from '~hook/useDemoMode';
 import { cardShadow, scrim, veil } from '~theme/tokens';
 import { RELEASE_LABEL } from '~utils/buildInfo';
 
+import { DemoBadge } from './components/DemoBadge';
+import { DemoNotice } from './components/DemoNotice';
 import { NavItem } from './components/NavItem';
 import { drawerWidth, navItems } from './constants';
 
@@ -28,6 +31,7 @@ const appBarHeight = 56;
 export default function Sidebar() {
   const theme = useTheme();
   const mdUp = useMediaQuery(theme.breakpoints.up('md'));
+  const { isDemo } = useDemoMode();
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
   const appBarGradient = `linear-gradient(180deg, ${theme.palette.background.default}, ${scrim.appBar})`;
@@ -95,8 +99,17 @@ export default function Sidebar() {
       <Divider sx={{ borderColor: veil.subtle }} />
 
       {/* footer pushed to bottom */}
-      <Box sx={{ mt: 'auto', color: 'text.secondary', fontSize: 12 }}>
-        <Typography variant="caption">{RELEASE_LABEL}</Typography>
+      <Box
+        sx={{
+          mt: 'auto',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1,
+          color: 'text.secondary',
+          fontSize: 12,
+        }}
+      >
+        {isDemo ? <DemoNotice /> : <Typography variant="caption">{RELEASE_LABEL}</Typography>}
       </Box>
     </Box>
   );
@@ -135,6 +148,8 @@ export default function Sidebar() {
               alt="Mushroom Pi"
               style={{ marginLeft: 8, height: 30, width: 'auto', display: 'block' }}
             />
+
+            <DemoBadge sx={{ ml: 'auto' }} />
           </Toolbar>
         </AppBar>
       )}
