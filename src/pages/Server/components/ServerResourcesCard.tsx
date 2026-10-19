@@ -4,6 +4,7 @@ import type { FC } from 'react';
 
 import type { HealthCheckResponseDto as ServerHealth } from '~api/generated';
 import { InfoCard, InfoField, ReadableTime } from '~components';
+import { useDemoMode } from '~hook/useDemoMode';
 
 function toGB(mb: number): number {
   return Math.round((mb / 1024) * 10) / 10;
@@ -28,6 +29,7 @@ interface ServerResourcesCardProps {
 }
 
 export const ServerResourcesCard: FC<ServerResourcesCardProps> = ({ serverHealth }) => {
+  const { isDemo } = useDemoMode();
   const system = serverHealth.system;
   const memory = system?.memory;
   const disk = system?.disk;
@@ -90,26 +92,30 @@ export const ServerResourcesCard: FC<ServerResourcesCardProps> = ({ serverHealth
           />
         </InfoField>
       )}
-      {disk && diskUsedPercent != null && disk.totalMb != null && disk.freeMb != null && (
-        <InfoField
-          label="Disk used"
-          extra={`${toGB(disk.totalMb - disk.freeMb)} / ${toGB(disk.totalMb)} GB`}
-        >
-          <LinearProgress
-            variant="determinate"
-            value={diskUsedPercent}
-            sx={{
-              height: 10,
-              borderRadius: 2,
-              mt: 1,
-              backgroundColor: 'divider',
-              '& .MuiLinearProgress-bar': {
-                bgcolor: severityColorForUsage(diskUsedPercent),
-              },
-            }}
-          />
-        </InfoField>
-      )}
+      {disk &&
+        !isDemo &&
+        diskUsedPercent != null &&
+        disk.totalMb != null &&
+        disk.freeMb != null && (
+          <InfoField
+            label="Disk used"
+            extra={`${toGB(disk.totalMb - disk.freeMb)} / ${toGB(disk.totalMb)} GB`}
+          >
+            <LinearProgress
+              variant="determinate"
+              value={diskUsedPercent}
+              sx={{
+                height: 10,
+                borderRadius: 2,
+                mt: 1,
+                backgroundColor: 'divider',
+                '& .MuiLinearProgress-bar': {
+                  bgcolor: severityColorForUsage(diskUsedPercent),
+                },
+              }}
+            />
+          </InfoField>
+        )}
     </InfoCard>
   );
 };

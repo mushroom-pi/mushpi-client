@@ -39,7 +39,9 @@ export const Server: FC = () => {
             size="small"
           />
           <Typography variant="subtitle2" color="text.secondary">
-            {serverHealth.server?.environment + ' environment'}
+            {serverHealth.server?.environment
+              ? `${serverHealth.server.environment} environment`
+              : 'unknown environment'}
           </Typography>
         </Stack>
 
