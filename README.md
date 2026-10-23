@@ -130,7 +130,7 @@ Convention: bare scripts are local (may mutate); `:ci` scripts are non-mutating 
 - [`AGENTS.md`](AGENTS.md) — authoritative agent instructions: path aliases, component inventory, state-management conventions, coding rules.
 - [`REFERENCE.md`](REFERENCE.md) — long-tail gotchas (regeneration offline, polling/mutation patterns, image handling, Husky, knip).
 - `mushpi-docs/architecture/c4-container.md` and `mushpi-docs/architecture/c4-component-client.md` — where this app fits in the system and its internals.
-- Release & version semantics — reader-facing on the docs site (`releases.mdx`); normative rules in `mushpi-ops/MAINTAINING.md` §Version & Release Semantics (the footer build/release versions).
+- Release & version semantics — reader-facing on the docs site (`releases.mdx`); normative rules in `mushpi-hub/MAINTAINING.md` §Version & Release Semantics (the footer build/release versions).
 
 > This README is for humans. `AGENTS.md` + `REFERENCE.md` are the authoritative instructions that coding agents read.
 

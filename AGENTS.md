@@ -113,7 +113,7 @@ Poll/mutation patterns (`createOptimisticMutation`, one-shot vs. control mutatio
 
 - Commit messages follow Conventional Commits, enforced by commitlint (`commitlint.config.cjs` + `.husky/commit-msg` hook).
 - The `package.json` version is bumped only when releasing (on the `main` branch) — never during day-to-day `dev` work.
-- Never edit `mushpi-ops/release.json` or git tags.
+- Never edit `mushpi-hub/release.json` or git tags.
 
 ## Testing
 
@@ -127,7 +127,7 @@ Poll/mutation patterns (`createOptimisticMutation`, one-shot vs. control mutatio
 
 - `VITE_API_BASE_URL` — API origin for the generated client and `resolveApiUrl()` (dev: `http://localhost:3000` via **local, gitignored `.env`**; prod: baked as `/` at Docker build — same-origin). Both use the shared `API_BASE` constant (`src/utils/apiUrl.ts`); its **trailing-slash normalization is load-bearing — never remove it** (mechanism: REFERENCE.md §Known Quirks).
 - `VITE_DOCS_PATH` — drives the Server page "API Docs" button link (default `contract` in local `.env`); read in `src/pages/Server/index.tsx`.
-- `__APP_BUILD_VERSION__` / `__APP_RELEASE_VERSION__` — **not env vars**; Vite `define` globals injected in `vite.config.ts` (client `package.json` version; `release.json` `release`, whose manifest now lives in the release repo **`mushpi-ops/`**, not the workspace root). `vite.config.ts` probes `../release.json` (the old workspace-root location, now a miss) then `./release.json` (the Docker image build), so a standalone client build resolves to `null` and the footer shows `dev` — **by design**: a dev build is not a release bundle, the build still succeeds. Consume only via `~utils/buildInfo`; typed in `src/types/buildInfo.d.ts` (no `vite-env.d.ts` by convention).
+- `__APP_BUILD_VERSION__` / `__APP_RELEASE_VERSION__` — **not env vars**; Vite `define` globals injected in `vite.config.ts` (client `package.json` version; `release.json` `release`, whose manifest now lives in the release repo **`mushpi-hub/`**, not the workspace root). `vite.config.ts` probes `../release.json` (the old workspace-root location, now a miss) then `./release.json` (the Docker image build), so a standalone client build resolves to `null` and the footer shows `dev` — **by design**: a dev build is not a release bundle, the build still succeeds. Consume only via `~utils/buildInfo`; typed in `src/types/buildInfo.d.ts` (no `vite-env.d.ts` by convention).
 - There is **no `vite-env.d.ts` / `ImportMetaEnv` typing** — env reads are untyped casts (`import.meta.env.VITE_*`).
 - There is **no Vite dev proxy** — all API traffic goes cross-origin to the server via `basePath`. Any server-emitted relative URL (images, or future assets) must be prefixed with the API base for dev rendering via `resolveApiUrl()`.
 
