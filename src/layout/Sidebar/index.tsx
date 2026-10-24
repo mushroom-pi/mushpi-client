@@ -163,13 +163,18 @@ export default function Sidebar() {
             sx: {
               width: drawerWidth,
               boxSizing: 'border-box',
+              // MUI's DrawerPaper pins only overflowY ('auto'), so overflow-x
+              // computes to auto and a 1px child overflow — or the classic
+              // scrollbar gutter on short windows — would render a horizontal
+              // scrollbar. Pin it closed; vertical scrolling stays default.
+              overflowX: 'hidden',
               background: `linear-gradient(180deg, ${veil.subtle}, ${veil.faint})`,
               borderRight: `1px solid ${veil.hairline}`,
               boxShadow: cardShadow,
             },
           }}
         >
-          <Box sx={{ width: drawerWidth, height: '100%' }}>{drawerContent}</Box>
+          <Box sx={{ width: '100%', height: '100%' }}>{drawerContent}</Box>
         </Drawer>
       ) : (
         /* Temporary drawer for mobile */
@@ -181,6 +186,9 @@ export default function Sidebar() {
           PaperProps={{
             sx: {
               width: drawerWidth,
+              // Same pin as the permanent drawer: overflow-x otherwise computes
+              // to auto and a classic scrollbar gutter could shift contents.
+              overflowX: 'hidden',
               bgcolor: 'background.paper',
               borderRight: `1px solid ${veil.hairline}`,
             },
