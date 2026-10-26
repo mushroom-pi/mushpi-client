@@ -9,10 +9,12 @@ export function BatchDetailSkeleton() {
         title={<Skeleton variant="text" width={180} height={40} />}
         titleAdornment={<Skeleton variant="rounded" width={70} height={24} />}
         actions={
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+          <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" alignItems="center">
             <Skeleton variant="rounded" width={150} height={36} />
-            <Skeleton variant="rounded" width={120} height={36} />
-            <Skeleton variant="rounded" width={120} height={36} />
+            <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
+              <Skeleton variant="rounded" width={120} height={36} />
+              <Skeleton variant="rounded" width={120} height={36} />
+            </Stack>
           </Stack>
         }
       >

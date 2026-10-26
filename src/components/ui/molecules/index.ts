@@ -4,6 +4,8 @@ export { ChartsTabs } from './ChartsTabs';
 export { ImageManager } from './ImageManager';
 export type { ImageManagerImage, ImageManagerProps } from './ImageManager';
 export { ItemPage } from './ItemPage';
+export { ItemActions } from './ItemActions';
+export type { ItemActionsProps } from './ItemActions';
 export { InfoCard } from './InfoCard';
 export { EditableInfoCard } from './EditableInfoCard';
 export { ConfirmDialog } from './ConfirmDialog';

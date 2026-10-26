@@ -72,7 +72,7 @@ App.tsx   main.tsx
 ## Shared Components
 
 - **atoms** (`components/ui/atoms/`): AddNew, BigDisplay, CardSkeleton, ColorSwatchPicker, DateTimeField, DeleteButton, EditButton, FieldRow, FirmwareCompatBadge, HeaderAndIcon, IconChartRow, InfoField, Loading, PageTitle, ReadableTime, RefreshButton, StatusChip, UnitHealthIcon
-- **molecules** (`components/ui/molecules/`): BatchesTable, CardGridSkeleton, ChartsTabs, ChartsTabsSkeleton, ConfirmDialog, CreateBatchDialog, DataTable, EditableInfoCard, Error, ErrorBoundary, GraphTab, ImageManager, InfoCard, Invalid, ItemPage, ModalForm, OnOffInfo, OnOffInput, ReadingsCsvDownloadButton, ServerDownBanner, TableSkeleton
+- **molecules** (`components/ui/molecules/`): BatchesTable, CardGridSkeleton, ChartsTabs, ChartsTabsSkeleton, ConfirmDialog, CreateBatchDialog, DataTable, EditableInfoCard, Error, ErrorBoundary, GraphTab, ImageManager, InfoCard, Invalid, ItemActions, ItemPage, ModalForm, OnOffInfo, OnOffInput, ReadingsCsvDownloadButton, ServerDownBanner, TableSkeleton
 
 Plus shared forms `BatchForm`/`PicoUnitForm`/`RecipeForm` and `components/provisioning/` (details: REFERENCE.md §Directory & File Detail). Import via the `~components` barrel.
 
