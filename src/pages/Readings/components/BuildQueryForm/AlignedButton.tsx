@@ -10,6 +10,6 @@ export const AlignedButton = ({
 }) => (
   <Stack>
     {tooltip ? <Tooltip title={tooltip}>{children}</Tooltip> : children}
-    <Box flex={1} sx={{ minHeight: '1.2em' }} />
+    <Box flex={1} sx={{ minHeight: { xs: 0, lg: '1.2em' } }} />
   </Stack>
 );
