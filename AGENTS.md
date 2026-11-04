@@ -112,7 +112,8 @@ Poll/mutation patterns (`createOptimisticMutation`, one-shot vs. control mutatio
 ## Versioning
 
 - Commit messages follow Conventional Commits, enforced by commitlint (`commitlint.config.cjs` + `.husky/commit-msg` hook).
-- The `package.json` version is bumped only when releasing (on the `main` branch) — never during day-to-day `dev` work.
+- The `package.json` version is bumped on `dev` as the **final commit of a release cycle** — never mid-cycle, and never on `main` after the merge, so the reviewed release PR *is* the shipped tree. Release model: root `AGENTS.md` §Release & Branching Model.
+- `src/api/generated/` is gitignored: regeneration against the released server spec happens at build time, never inside the release commit.
 - Never edit `mushpi-hub/release.json` or git tags.
 
 ## Testing
