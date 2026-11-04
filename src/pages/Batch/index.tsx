@@ -1,14 +1,13 @@
 import SaveIcon from '@mui/icons-material/Save';
-import { Box, Button, Stack } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import {
   ChartsTabs,
-  DeleteButton,
-  EditButton,
   Error,
   Invalid,
+  ItemActions,
   ItemPage,
   PageTitle,
   ReadingsCsvDownloadButton,
@@ -81,19 +80,21 @@ function BatchDetailInner() {
       title={batch.description ?? `Batch #${batch.id}`}
       titleAdornment={<StatusChip status={batch.status} />}
       actions={
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-          {batch.status === 'finished' && (
-            <Button
-              variant="outlined"
-              startIcon={<SaveIcon />}
-              onClick={() => setSaveRecipeOpen(true)}
-            >
-              Save as Recipe
-            </Button>
-          )}
-          <EditButton onClick={() => setEditOpen(true)} />
-          <DeleteButton onClick={() => setDeleteOpen(true)} />
-        </Stack>
+        <ItemActions
+          onEdit={() => setEditOpen(true)}
+          onDelete={() => setDeleteOpen(true)}
+          leading={
+            batch.status === 'finished' ? (
+              <Button
+                variant="outlined"
+                startIcon={<SaveIcon />}
+                onClick={() => setSaveRecipeOpen(true)}
+              >
+                Save as Recipe
+              </Button>
+            ) : undefined
+          }
+        />
       }
     >
       <BatchMeta />

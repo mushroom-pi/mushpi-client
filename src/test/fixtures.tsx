@@ -2,28 +2,65 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
 import type { ReactElement } from 'react';
 
+import type { PicoUnit, Readings } from '~api/generated';
+
 /**
- * Returns a minimal PicoUnit-like object for testing.
- * The PicoUnit TS interface is incomplete per AGENTS.md, so we cast as any.
+ * Returns a complete, properly-typed PicoUnit fixture for testing. The generated
+ * `PicoUnit` interface is complete, so the base object type-checks against it
+ * directly; `overrides` stays an open bag (tests deliberately shape-poke fields
+ * the DTO does not narrow), applied via a single typed merge.
  */
-export function makePicoUnit(overrides?: Record<string, unknown>): any {
-  return {
+export function makePicoUnit(
+  overrides?: Record<string, unknown>,
+): PicoUnit & { latest_reading: Readings } {
+  const unit: PicoUnit = {
     id: 1,
+    created_at: '2026-01-01T00:00:00.000Z',
     handle: 'test-unit',
     name: 'Test Unit',
-    latest_reading: {
-      temperature: 25,
-      humidity: 80,
-      humidifier_on: false,
-      fan_on: false,
-      heater_on: false,
-      temperature_set: 25,
-      humidity_set: 80,
-      control_loop_enabled: true,
-      ts: '2026-01-01T00:00:00.000Z',
-    },
-    ...overrides,
+    host: 'test-unit.local',
+    port: 5000,
+    monitored: true,
+    failed_calls: 0,
+    failed_readings: 0,
+    consecutive_empty_readings: 0,
+    address: 'http://test-unit.local:5000',
+    ipAddress: null,
+    status: 'healthy',
+    api_compatibility: 'compatible',
+    // Firmware that reports the version handshake fills both fields; pass
+    // { firmware_version: null, api_version: null } in overrides to simulate a
+    // legacy unit that hasn't announced since the migration.
+    firmware_version: '0.8.4',
+    api_version: 1,
   };
+  // The generated Readings contract carries the serialized entity row: primary
+  // key, timestamp, and the owning unit's id. The relation back to the unit is
+  // not serialized, so no back-reference object is fabricated here. The ts
+  // matches the unit's created_at and the DevicesDialog fixture's reading ts.
+  const latestReading: Readings = {
+    id: 1,
+    ts: '2026-01-01T00:00:00.000Z',
+    temperature: 25,
+    humidity: 80,
+    humidifier_on: false,
+    fan_on: false,
+    heater_on: false,
+    temperature_set: 25,
+    humidity_set: 80,
+    control_loop_enabled: true,
+    board_uptime_s: 0,
+    board_temp: 42,
+    board_used_mem: 100_000,
+    board_used_fs: 200_000,
+    time_to_response_ms: 120,
+    pico_unit_id: unit.id,
+  };
+  const withReading: PicoUnit & { latest_reading: Readings } = {
+    ...unit,
+    latest_reading: latestReading,
+  };
+  return { ...withReading, ...overrides };
 }
 
 /**

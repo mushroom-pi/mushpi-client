@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 
+# Yarn 4 — track configuration/patches, ignore regenerable caches
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -31,3 +39,6 @@ src/api/generated/*
 
 # OpenAPI spec copy (used for local regeneration, canonical source is mushpi-server/spec/)
 openapi.json
+
+# Accidental `husky --version` artifact (husky treats args as the install dir)
+--version/

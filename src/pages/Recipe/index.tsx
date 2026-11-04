@@ -2,7 +2,7 @@ import { Stack } from '@mui/material';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { DeleteButton, EditButton, Error, Invalid, ItemPage } from '~components';
+import { Error, Invalid, ItemActions, ItemPage } from '~components';
 import { RecipeProvider, useRecipeContext } from '~ctx/Recipe';
 import { useDocumentTitle } from '~hook/useDocumentTitle';
 
@@ -26,10 +26,7 @@ function RecipeDetailInner() {
     <ItemPage
       title={recipe.name}
       actions={
-        <Stack direction="row" spacing={1}>
-          <EditButton onClick={() => setEditOpen(true)} />
-          <DeleteButton onClick={() => setDeleteOpen(true)} />
-        </Stack>
+        <ItemActions onEdit={() => setEditOpen(true)} onDelete={() => setDeleteOpen(true)} />
       }
     >
       <Stack spacing={2}>

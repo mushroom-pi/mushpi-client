@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 
 import { useToast } from '~ctx/Toast';
+import { recordRetryCooldown, retryAfterSeconds } from '~utils/retryCooldown';
 
 type RunOptions<T = unknown> = {
   successMessage?: string;
@@ -50,7 +51,19 @@ export function useAsyncWithToast() {
         return result;
       } catch (err) {
         const msg = extractMessage(err, fallbackErrorMessage);
-        if (!skipErrorToast) toast.error(msg);
+        // A server-sent 429 + Retry-After arms the generic cooldown store; a
+        // 403 refusal carries no Retry-After and therefore never does.
+        const retryAfter = retryAfterSeconds(err);
+        if (retryAfter != null) recordRetryCooldown(retryAfter);
+        if (!skipErrorToast) {
+          if (retryAfter != null) {
+            // Lengthen the toast (never shorten it: 4000 mirrors the
+            // ToastProvider default) so the server's own sentence stays readable.
+            toast.error(msg, Math.max(retryAfter * 1000, 4000));
+          } else {
+            toast.error(msg);
+          }
+        }
         if (onError) await onError(err);
         if (rethrow) throw err;
         // keep a rejected promise so callers that `await` still get a rejection if they want to handle it

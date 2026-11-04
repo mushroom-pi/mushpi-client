@@ -103,27 +103,38 @@ export const BuildQueryForm: React.FC = () => {
           sx={controlSx}
         />
 
-        <AlignedButton>
-          <ReadingsCsvDownloadButton
-            onClick={download}
-            isLoading={isFetchingCsv}
-            disabled={isDownloadDisabled}
-            tooltip={downloadTooltip}
-          />
-        </AlignedButton>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'row', lg: 'column', xl: 'row' },
+            alignItems: { xs: 'center', lg: 'stretch', xl: 'center' },
+            gap: { xs: 0, lg: 2 },
+            flexGrow: 1,
+            '& > *': { flexShrink: 0 },
+          }}
+        >
+          <AlignedButton>
+            <ReadingsCsvDownloadButton
+              onClick={download}
+              isLoading={isFetchingCsv}
+              disabled={isDownloadDisabled}
+              tooltip={downloadTooltip}
+            />
+          </AlignedButton>
 
-        <Box sx={{ flexGrow: 1 }} />
+          <Box sx={{ flexGrow: 1 }} />
 
-        <AlignedButton>
-          <RefreshButton
-            onClick={() => {
-              const id = params?.picoUnitId;
-              if (id) pollPico.mutate({ picoUnitId: id });
-            }}
-            isLoading={pollPico.isPending}
-            tooltip="Poll Pico and refresh charts"
-          />
-        </AlignedButton>
+          <AlignedButton>
+            <RefreshButton
+              onClick={() => {
+                const id = params?.picoUnitId;
+                if (id) pollPico.mutate({ picoUnitId: id });
+              }}
+              isLoading={pollPico.isPending}
+              tooltip="Poll Pico and refresh charts"
+            />
+          </AlignedButton>
+        </Box>
       </Stack>
     </Stack>
   );

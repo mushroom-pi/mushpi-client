@@ -1,5 +1,4 @@
 import { alpha, useTheme } from '@mui/material';
-import dayjs from 'dayjs';
 import type React from 'react';
 import { useMemo } from 'react';
 import {
@@ -15,7 +14,7 @@ import {
 } from 'recharts';
 
 import { useChartsContext } from '~ctx/Charts';
-import { createTickFormatter, isLongSpan } from '~utils/chartLabels';
+import { createTickFormatter, formatChartTimestamp, isLongSpan } from '~utils/chartLabels';
 
 import { FallbackChart } from './FallbackChart';
 
@@ -122,7 +121,7 @@ export const ReadingsTargetChart: React.FC<ReadingsTargetChartProps> = ({
             minTickGap={30}
           />
           <YAxis unit={unit} tickCount={5} domain={yDomain} />
-          <Tooltip labelFormatter={(ts) => dayjs(ts).format('MMM DD HH:mm')} />
+          <Tooltip labelFormatter={(ts) => formatChartTimestamp(ts)} />
           <Area
             name="Range"
             dataKey={rangeKey}

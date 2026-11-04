@@ -17,7 +17,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 import type { PicoUnit } from '~api/generated';
-import { UnitHealthIcon } from '~components';
+import { FirmwareCompatBadge, UnitHealthIcon } from '~components';
+import { compatibilityStatus, firmwareCaption, firmwareStatus } from '~utils/pico';
 
 export default function PicoUnitCard({
   pico,
@@ -30,6 +31,8 @@ export default function PicoUnitCard({
 }) {
   const navigate = useNavigate();
   const offline = pico.status === 'offline';
+  const firmware = firmwareStatus(pico);
+  const compatibility = compatibilityStatus(pico);
 
   function friendlyDate(ts?: string) {
     if (!ts) return '—';
@@ -92,10 +95,24 @@ export default function PicoUnitCard({
             {pico.description ?? 'No description'}
           </Typography>
 
-          <Typography variant="caption" color="text.secondary">
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
             Host: {pico.host ?? '—'}
             {pico.port ? `:${pico.port}` : ''}
           </Typography>
+
+          {/* Firmware/API-generation caption: neutral styling; disabled tone when unreported.
+              Unknown here is the expected state for legacy units, not a warning. The
+              warning-only compatibility badge sits adjacent, rendering nothing unless the
+              server flags the unit `incompatible` — the neutral caption is left untouched. */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap' }}>
+            <Typography
+              variant="caption"
+              color={firmware.known ? 'text.secondary' : 'text.disabled'}
+            >
+              {firmwareCaption(firmware)}
+            </Typography>
+            <FirmwareCompatBadge status={compatibility} apiVersion={pico.api_version} />
+          </Box>
         </CardContent>
       </CardActionArea>
 

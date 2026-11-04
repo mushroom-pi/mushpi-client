@@ -42,3 +42,44 @@ export function urgencyColor(daysRemaining: number): 'error' | 'warning' | 'defa
   if (daysRemaining <= 3) return 'warning';
   return 'default';
 }
+
+/** Max graphemes kept from a batch description before the ellipsis is appended */
+const CLIP_MAX = 20;
+/** Trimmed descriptions up to this many graphemes render unchanged (no dots) */
+const CLIP_THRESHOLD = 23;
+/** Literal ellipsis appended to truncated descriptions (three ASCII periods) */
+const ELLIPSIS = '...';
+
+/** Split text into grapheme clusters; falls back to code points where Intl.Segmenter is unavailable */
+function splitGraphemes(text: string): string[] {
+  if (typeof Intl.Segmenter !== 'undefined') {
+    const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+    return Array.from(segmenter.segment(text), ({ segment }) => segment);
+  }
+  return Array.from(text);
+}
+
+/** Count grapheme clusters of a string */
+function countGraphemes(text: string): number {
+  return splitGraphemes(text).length;
+}
+
+/** First `n` graphemes of a string, joined — never splits a surrogate pair or ZWJ sequence */
+function takeGraphemes(text: string, n: number): string {
+  return splitGraphemes(text).slice(0, n).join('');
+}
+
+/**
+ * Clip a batch description for the single-line dashboard unit-card chip.
+ *
+ * Trims first; descriptions of up to CLIP_THRESHOLD graphemes pass through
+ * unchanged (no dots), longer ones keep their first CLIP_MAX graphemes plus a
+ * literal ellipsis — so a clipped result is always exactly CLIP_THRESHOLD
+ * graphemes. Counting and slicing are grapheme-based, so emoji (surrogate
+ * pairs, flags, ZWJ sequences) are never torn in half.
+ */
+export function clipBatchDescription(raw: string): string {
+  const trimmed = raw.trim();
+  if (countGraphemes(trimmed) <= CLIP_THRESHOLD) return trimmed;
+  return `${takeGraphemes(trimmed, CLIP_MAX)}${ELLIPSIS}`;
+}

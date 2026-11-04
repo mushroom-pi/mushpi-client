@@ -7,11 +7,7 @@ import type { Batch, BatchStatusEnum } from '~api/generated';
 import type { DataTableColumn } from '~components';
 import { DataTable } from '~components';
 import { ReadableTime, StatusChip } from '~components';
-
-const formatDateTime = (value?: string | null) => {
-  if (!value) return '—';
-  return dayjs(value).format('DD MMM YYYY HH:mm');
-};
+import { formatDateTime } from '~utils/methods';
 
 const DateTimeCell = ({ value, status }: { value?: string | null; status: BatchStatusEnum }) => {
   if (!value) {

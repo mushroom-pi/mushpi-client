@@ -2,8 +2,15 @@ import { TextField } from '@mui/material';
 import dayjs from 'dayjs';
 import type { ReactNode } from 'react';
 
+import { schemas } from '~api/generated/schemas';
+import { numericBounds, rangeHint } from '~utils/zodBounds';
+
 import { DateTimeField } from './ui/atoms/DateTimeField';
 import { ModalForm } from './ui/molecules/ModalForm';
+
+// Bounds and hint text derive from the generated Zod schema via numericBounds() — never literal limits.
+const temperatureBounds = numericBounds(schemas.CreateBatchDto.shape.temperature_target);
+const humidityBounds = numericBounds(schemas.CreateBatchDto.shape.humidity_target);
 
 export interface BatchFormProps {
   // Dialog control
@@ -124,8 +131,12 @@ export function BatchForm({
         onChange={(e) => setTemperatureTarget(e.target.value)}
         fullWidth
         error={!!temperatureTargetError}
-        helperText={temperatureTargetError ?? '0–50 °C'}
-        slotProps={{ input: { inputProps: { min: 0, max: 50, step: 0.1 } } }}
+        helperText={temperatureTargetError ?? rangeHint(temperatureBounds, '°C')}
+        slotProps={{
+          input: {
+            inputProps: { min: temperatureBounds.min, max: temperatureBounds.max, step: 0.1 },
+          },
+        }}
       />
       <TextField
         label="Humidity Target (%)"
@@ -134,8 +145,10 @@ export function BatchForm({
         onChange={(e) => setHumidityTarget(e.target.value)}
         fullWidth
         error={!!humidityTargetError}
-        helperText={humidityTargetError ?? '20–90 %'}
-        slotProps={{ input: { inputProps: { min: 20, max: 90, step: 0.1 } } }}
+        helperText={humidityTargetError ?? rangeHint(humidityBounds, '%')}
+        slotProps={{
+          input: { inputProps: { min: humidityBounds.min, max: humidityBounds.max, step: 0.1 } },
+        }}
       />
       <TextField
         label="Notes"

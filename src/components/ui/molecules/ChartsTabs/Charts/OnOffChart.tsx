@@ -1,5 +1,4 @@
 import { useTheme } from '@mui/material';
-import dayjs from 'dayjs';
 import type React from 'react';
 import { useMemo } from 'react';
 import {
@@ -14,7 +13,7 @@ import {
 
 import { useChartsContext } from '~ctx/Charts';
 import type { AggregatedChartPoint } from '~type/charts';
-import { createTickFormatter, isLongSpan } from '~utils/chartLabels';
+import { createTickFormatter, formatChartTimestamp, isLongSpan } from '~utils/chartLabels';
 
 import { FallbackChart } from './FallbackChart';
 
@@ -95,7 +94,7 @@ export const OnOffChart: React.FC<OnOffChartProps> = ({ dataKey, showXAxis = fal
             tickFormatter={(tick) => (tick === 0 ? 'OFF' : 'ON')}
           />
           <Tooltip
-            labelFormatter={(ts) => dayjs(ts).format('MMM DD HH:mm')}
+            labelFormatter={(ts) => formatChartTimestamp(ts)}
             content={({ active, payload }) => {
               if (!active || !payload?.length) return null;
               const point = payload[0].payload as AggregatedChartPoint;
@@ -113,7 +112,7 @@ export const OnOffChart: React.FC<OnOffChartProps> = ({ dataKey, showXAxis = fal
                   }}
                 >
                   <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                    {dayjs(point.ts).format('MMM DD HH:mm')}
+                    {formatChartTimestamp(point.ts)}
                   </div>
                   <div>
                     {label}: <strong>{isOn ? 'ON' : 'OFF'}</strong> ({count}/{total} readings)

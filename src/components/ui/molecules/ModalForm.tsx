@@ -2,6 +2,8 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack } from
 import type { Breakpoint } from '@mui/material';
 import type { ReactNode } from 'react';
 
+import { useRetryCooldown } from '~hook/useRetryCooldown';
+
 export interface ModalFormProps {
   open: boolean;
   onClose: () => void;
@@ -36,6 +38,9 @@ export function ModalForm({
   blockCloseWhenPending = false,
   maxWidth = 'sm',
 }: ModalFormProps) {
+  // While a server-mandated cooldown is active the submit affordance is
+  // disabled but stays visible; the store's timer re-enables it without a reload.
+  const { isCoolingDown } = useRetryCooldown();
   const effectiveOnClose = blockCloseWhenPending && isPending ? undefined : onClose;
 
   return (
@@ -64,7 +69,7 @@ export function ModalForm({
         <Button
           {...(formId ? { type: 'submit' as const, form: formId } : { onClick: onSubmit })}
           variant="contained"
-          disabled={!canSubmit || isPending}
+          disabled={!canSubmit || isPending || isCoolingDown}
         >
           {isPending ? pendingLabel : submitLabel}
         </Button>

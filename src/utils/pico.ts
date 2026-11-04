@@ -1,3 +1,4 @@
+import type { PicoUnitApiCompatibilityEnum } from '~api/generated';
 import { led } from '~theme/tokens';
 
 /** Temperature must be within ±2°C of target before a deviation warning fires */
@@ -65,9 +66,20 @@ export const LED_STATES = [
   },
 ] as const;
 
+/**
+ * Consecutive failed poll attempts at which the server flips a monitored unit to
+ * `offline`. Mirrors server `OFFLINE_FAILED_CALLS_THRESHOLD = failsToUnhealthy = 3`
+ * (`mushpi-server/src/modules/pico-units/pico-units.constant.ts`); the server does not
+ * expose the number at runtime, so it is kept local. For health *gating*, prefer the
+ * server-computed `pico.status` over re-deriving a verdict from `failed_calls` —
+ * this constant only backs the cosmetic failed-calls chip colouring below.
+ */
+export const OFFLINE_FAILED_CALLS_THRESHOLD = 3;
+
+/** Color for the failed_calls chip: 0=success(green), 1-2=warning(yellow), 3+=error(red) */
 export const chipColorForFailedCalls = (failedCalls: number | null) => {
   if (!failedCalls) return 'success';
-  if (failedCalls < 3) return 'warning';
+  if (failedCalls < OFFLINE_FAILED_CALLS_THRESHOLD) return 'warning';
   return 'error';
 };
 
@@ -80,3 +92,86 @@ export const chipColorForFailedReadings = (failedReadings: number | null | undef
   if (n < FAILS_READINGS_UNHEALTHY) return 'warning' as const;
   return 'error' as const;
 };
+
+/** Placeholder shown when a unit has not reported its firmware/API contract version */
+export const FIRMWARE_UNKNOWN = 'unknown';
+
+/** Minimal structural shape of the version fields (nullable until a unit first reports them via the announce/version handshake) */
+export interface FirmwareReportFields {
+  firmware_version?: string | null;
+  api_version?: number | null;
+}
+
+export interface FirmwareStatus {
+  /** Reported firmware version string, or `FIRMWARE_UNKNOWN` */
+  firmware: string;
+  /** Reported Pico↔Server API-contract generation (bare integer as string), or `FIRMWARE_UNKNOWN` */
+  apiGeneration: string;
+  /** True only when BOTH values were reported */
+  known: boolean;
+}
+
+/**
+ * Normalize a unit's self-reported firmware version and Pico↔Server API-contract
+ * generation for display. `null`/`undefined`/blank → `'unknown'` — the expected
+ * state for legacy units that have not announced since the server migration,
+ * not an error. Deliberately no "stale/incompatible" judgment (server-side
+ * range-check feature territory).
+ */
+export function firmwareStatus(pico: FirmwareReportFields | null | undefined): FirmwareStatus {
+  const firmware = pico?.firmware_version?.trim() || FIRMWARE_UNKNOWN;
+  const apiGeneration = pico?.api_version != null ? String(pico.api_version) : FIRMWARE_UNKNOWN;
+  return {
+    firmware,
+    apiGeneration,
+    known: firmware !== FIRMWARE_UNKNOWN && apiGeneration !== FIRMWARE_UNKNOWN,
+  };
+}
+
+/** One compact fleet-scan caption line, e.g. "Firmware 0.8.4 · API gen 1" */
+export function firmwareCaption(status: FirmwareStatus): string {
+  return `Firmware ${status.firmware} · API gen ${status.apiGeneration}`;
+}
+
+/**
+ * Server-owned verdict on whether a unit's Pico↔Server `api_version` falls inside
+ * the range this server supports.
+ *
+ * DERIVED from the generated contract (`PicoUnit.api_compatibility`) rather than
+ * hand-copied, so the value set is written exactly once (in `src/api/generated`) and can
+ * never silently drift from the server. Regenerating the API client is the only way this
+ * type changes. The `pico.test.ts` compile-time guard proves it tracks the contract.
+ */
+export type CompatibilityStatus = PicoUnitApiCompatibilityEnum;
+
+/**
+ * Minimal structural shape the compatibility helper reads off a unit. `api_version`
+ * is deliberately declared here but NEVER consulted — the server computes the verdict;
+ * the client must not re-derive it. Both `PicoUnit` and `DashboardUnitItemDto` satisfy
+ * this shape. `api_compatibility` is optional only for defensiveness: an older server
+ * that predates it omits the field entirely (see REFERENCE.md).
+ */
+export interface CompatibilityFields {
+  api_compatibility?: string | null;
+  /** Present-but-unused: proves the client never range-checks it. */
+  api_version?: number | null;
+}
+
+/**
+ * Map the server's computed `api_compatibility` verdict onto {@link CompatibilityStatus}.
+ *
+ * The server OWNS the "is this unit's API generation in range?" judgement (see
+ * `mushpi-server/spec` `PicoUnit.api_compatibility`). This helper only reads that verdict —
+ * it never compares `api_version` against any minimum/maximum and hardcodes no range. When
+ * `api_compatibility` is absent/`undefined`/`null` (talking to an older server) it returns
+ * `'unknown'`, which the badge renders as nothing — an unjudged unit is not an error.
+ */
+export function compatibilityStatus(
+  pico: CompatibilityFields | null | undefined,
+): CompatibilityStatus {
+  const verdict = pico?.api_compatibility;
+  if (verdict === 'compatible' || verdict === 'incompatible') return verdict;
+  // Explicit 'unknown', an absent/legacy field, null, or any unrecognised value all
+  // collapse to 'unknown' so the UI stays warning-only.
+  return 'unknown';
+}

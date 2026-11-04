@@ -4,8 +4,11 @@ import Inventory2Icon from '@mui/icons-material/Inventory2';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
+import SupportIcon from '@mui/icons-material/Support';
 import type { ComponentType } from 'react';
 import { FiActivity as ActivityIcon } from 'react-icons/fi';
+
+import { DOCUMENTATION_SITE_URL } from '~utils/externalLinks';
 
 /**
  * Props accepted by every sidebar icon. Covers MUI `SvgIcon` components and
@@ -29,6 +32,8 @@ export type NavItem = {
   icon: ComponentType<NavIconProps>;
   iconProps?: NavIconProps;
   end?: boolean;
+  /** When true, `to` is an absolute URL opened in a new tab (no router navigation). */
+  external?: boolean;
 };
 
 export const navItems: NavItem[] = [
@@ -39,6 +44,12 @@ export const navItems: NavItem[] = [
   { to: '/readings', label: 'Readings', icon: ShowChartIcon },
   { to: '/server', label: 'Server', icon: DnsIcon },
   { to: '/settings', label: 'Settings', icon: SettingsIcon },
+  {
+    to: DOCUMENTATION_SITE_URL,
+    label: 'Help',
+    icon: SupportIcon,
+    external: true,
+  },
 ];
 
 export const drawerWidth = 200;

@@ -1,0 +1,13 @@
+{
+  "entry": [
+    "src/main.tsx",
+    "index.html",
+    "src/types/buildInfo.d.ts",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "src/test/setup.ts",
+    "scripts/*.mjs"
+  ],
+  "project": ["src/**/*.{ts,tsx}", "scripts/**/*.mjs"],
+  "ignore": ["dist/**", "coverage/**"]
+}

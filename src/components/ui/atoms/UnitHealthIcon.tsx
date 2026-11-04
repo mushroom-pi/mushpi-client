@@ -5,7 +5,17 @@ import WarningIcon from '@mui/icons-material/Warning';
 import { Tooltip } from '@mui/material';
 import type { ReactElement } from 'react';
 
-type UnitStatus = 'unmonitored' | 'healthy' | 'degraded' | 'offline';
+import type { PicoUnitStatusEnum } from '~api/generated';
+
+/**
+ * Server-owned unit health value set, *derived* from the generated contract
+ * (`PicoUnit.status`) rather than hand-copied, so the literals are declared in
+ * exactly one place (`src/api/generated`) and can never silently drift from the
+ * server. Exported under the long-standing local name so call sites don't churn.
+ * The icon/tooltip mapping below stays client-local presentation.
+ * Guarded at compile time in `src/utils/pico.test.ts`.
+ */
+export type UnitStatus = PicoUnitStatusEnum;
 
 const STATUS_CONFIG: Record<UnitStatus, { icon: ReactElement; tooltip: string }> = {
   healthy: {
