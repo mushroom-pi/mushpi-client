@@ -32,18 +32,19 @@ Offline regeneration (no server running): REFERENCE.md §Regenerating the Client
 
 ## Routing
 
-| Path              | Page          |
-| ----------------- | ------------- |
-| `/`               | Dashboard     |
-| `/pico-units`     | Units list    |
-| `/pico-units/:id` | Unit detail   |
-| `/readings`       | Charts        |
-| `/recipes`        | Recipes list  |
-| `/recipes/:id`    | Recipe detail |
-| `/batches`        | Batches list  |
-| `/batches/:id`    | Batch detail  |
-| `/server`         | Server health |
-| `/settings`       | Settings      |
+| Path              | Page           |
+| ----------------- | -------------- |
+| `/`               | Dashboard      |
+| `/pico-units`     | Units list     |
+| `/pico-units/:id` | Unit detail    |
+| `/readings`       | Charts         |
+| `/recipes`        | Recipes list   |
+| `/recipes/:id`    | Recipe detail  |
+| `/batches`        | Batches list   |
+| `/batches/:id`    | Batch detail   |
+| `/server`         | Server health  |
+| `/settings`       | Settings       |
+| `*`               | 404 (NotFound) |
 
 Page h1 titles mirror `navItems` labels (`<PageTitle>` for lists, `<ItemPage title>` for details). Tab-title & dialog-auto-open rules: REFERENCE.md §Known Quirks.
 
@@ -60,7 +61,7 @@ src/
 ├── hooks/       12 hooks (incl. useDemoMode, useDisplayTimezone, useRetryCooldown) + BatchForm/ + RecipeForm/
 ├── interfaces/  shared TS interfaces
 ├── layout/      app shell — Page wrapper, Sidebar
-├── pages/       10 pages, one <Page>/index.tsx per route (never bare <Page>.tsx)
+├── pages/       11 pages, one <Page>/index.tsx per route (never bare <Page>.tsx)
 ├── styles/      global.css + variables.css (pre-mount token mirror)
 ├── test/        setup.ts, fixtures.tsx
 ├── theme/       tokens.ts (sole color source) + mushroomTheme.ts + tokens.test.ts
@@ -127,7 +128,7 @@ Poll/mutation patterns (`createOptimisticMutation`, one-shot vs. control mutatio
 ## Environment
 
 - `VITE_API_BASE_URL` — API origin for the generated client and `resolveApiUrl()` (dev: `http://localhost:3000` via **local, gitignored `.env`**; prod: baked as `/` at Docker build — same-origin). Both use the shared `API_BASE` constant (`src/utils/apiUrl.ts`); its **trailing-slash normalization is load-bearing — never remove it** (mechanism: REFERENCE.md §Known Quirks).
-- `VITE_DOCS_PATH` — drives the Server page "API Docs" button link (default `contract` in local `.env`); read in `src/pages/Server/index.tsx`.
+- `VITE_DOCS_PATH` — **local-dev fallback** for the Server page "API Docs" button (default `contract` in local `.env`; never set in the hub image build). Primary is the runtime `/health` `server.docsPath` — present only on instances configured with a docs endpoint; button hides when both are absent. Read in `src/pages/Server/index.tsx`.
 - `__APP_BUILD_VERSION__` / `__APP_RELEASE_VERSION__` — **not env vars**; Vite `define` globals injected in `vite.config.ts` (client `package.json` version; `release.json` `release`, whose manifest now lives in the release repo **`mushpi-hub/`**, not the workspace root). `vite.config.ts` probes `../release.json` (the old workspace-root location, now a miss) then `./release.json` (the Docker image build), so a standalone client build resolves to `null` and the footer shows `dev` — **by design**: a dev build is not a release bundle, the build still succeeds. Consume only via `~utils/buildInfo`; typed in `src/types/buildInfo.d.ts` (no `vite-env.d.ts` by convention).
 - There is **no `vite-env.d.ts` / `ImportMetaEnv` typing** — env reads are untyped casts (`import.meta.env.VITE_*`).
 - There is **no Vite dev proxy** — all API traffic goes cross-origin to the server via `basePath`. Any server-emitted relative URL (images, or future assets) must be prefixed with the API base for dev rendering via `resolveApiUrl()`.

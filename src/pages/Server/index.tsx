@@ -18,9 +18,14 @@ export const Server: FC = () => {
   const { data: serverHealth, isLoading, isError, error, refetch } = useServerHealth();
   const isHealthy = !!serverHealth?.server?.healthy && !error;
 
-  // API_BASE is normalized (trailing slashes stripped), so a same-origin prod
-  // build (`VITE_API_BASE_URL = /` → `''`) yields `/contract`, not `//contract`.
-  const docsPath = import.meta.env.VITE_DOCS_PATH as string | undefined;
+  // The server's runtime health signal wins: `/health` reports `docsPath` only
+  // when that instance serves the docs endpoint; `VITE_DOCS_PATH` stays the
+  // local-dev fallback for servers that report nothing. `||` guards absent,
+  // null and empty values alike. API_BASE is normalized (trailing slashes
+  // stripped), so a same-origin prod build (`VITE_API_BASE_URL = /` → `''`)
+  // yields `/contract`, not `//contract`.
+  const docsPath =
+    serverHealth?.server?.docsPath || (import.meta.env.VITE_DOCS_PATH as string | undefined);
   const docsUrl = docsPath ? `${API_BASE}/${docsPath}` : undefined;
 
   let content: React.ReactNode;

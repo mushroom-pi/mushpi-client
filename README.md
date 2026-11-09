@@ -35,10 +35,10 @@ yarn preview    # serve the built bundle locally
 
 The client is configured by two `VITE_*` environment variables, read from a local, gitignored `.env` (there is no committed `.env.example`):
 
-| Variable            | Default                 | Purpose                                                                              |
-| ------------------- | ----------------------- | ------------------------------------------------------------------------------------ |
-| `VITE_API_BASE_URL` | `http://localhost:3000` | API origin for the generated client and image-URL resolution (`src/utils/apiUrl.ts`) |
-| `VITE_DOCS_PATH`    | `contract`              | Path for the "API Docs" button on the Server page                                    |
+| Variable            | Default                 | Purpose                                                                                                                                                                                   |
+| ------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_API_BASE_URL` | `http://localhost:3000` | API origin for the generated client and image-URL resolution (`src/utils/apiUrl.ts`)                                                                                                      |
+| `VITE_DOCS_PATH`    | `contract`              | Local-development fallback for the Server page's "API Docs" button — the primary source is the runtime `/health` `server.docsPath`, and the button is hidden when neither provides a path |
 
 ```bash
 # .env
@@ -84,7 +84,7 @@ src/
 ├── hooks/       9 hooks + BatchForm/ + RecipeForm/
 ├── interfaces/  shared TS interfaces
 ├── layout/      app shell — Page wrapper, Sidebar
-├── pages/       10 pages, one <Page>/index.tsx per route
+├── pages/       11 pages, one <Page>/index.tsx per route
 ├── styles/      global.css + variables.css
 ├── test/        Vitest setup.ts + fixtures.tsx
 ├── theme/       tokens.ts (sole colour source) + mushroomTheme.ts
@@ -95,18 +95,19 @@ App.tsx   main.tsx
 
 Routes:
 
-| Path              | Page          |
-| ----------------- | ------------- |
-| `/`               | Dashboard     |
-| `/pico-units`     | Units list    |
-| `/pico-units/:id` | Unit detail   |
-| `/readings`       | Charts        |
-| `/recipes`        | Recipes list  |
-| `/recipes/:id`    | Recipe detail |
-| `/batches`        | Batches list  |
-| `/batches/:id`    | Batch detail  |
-| `/server`         | Server health |
-| `/settings`       | Settings      |
+| Path              | Page           |
+| ----------------- | -------------- |
+| `/`               | Dashboard      |
+| `/pico-units`     | Units list     |
+| `/pico-units/:id` | Unit detail    |
+| `/readings`       | Charts         |
+| `/recipes`        | Recipes list   |
+| `/recipes/:id`    | Recipe detail  |
+| `/batches`        | Batches list   |
+| `/batches/:id`    | Batch detail   |
+| `/server`         | Server health  |
+| `/settings`       | Settings       |
+| `*`               | 404 (NotFound) |
 
 ## Day-to-Day Commands
 

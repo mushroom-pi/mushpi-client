@@ -6,4 +6,4 @@ export const DOCUMENTATION_SITE_URL = 'https://mushroom-pi.mintlify.site/';
  * pending the real demo page being published; the sidebar demo notice is its
  * only consumer, so publishing the page is a one-line change here.
  */
-export const DEMO_DOCS_URL = `${DOCUMENTATION_SITE_URL}demo-environment`;
+export const DEMO_DOCS_URL = `${DOCUMENTATION_SITE_URL}try-the-demo`;
