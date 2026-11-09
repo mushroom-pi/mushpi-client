@@ -32,18 +32,19 @@ Offline regeneration (no server running): REFERENCE.md §Regenerating the Client
 
 ## Routing
 
-| Path              | Page          |
-| ----------------- | ------------- |
-| `/`               | Dashboard     |
-| `/pico-units`     | Units list    |
-| `/pico-units/:id` | Unit detail   |
-| `/readings`       | Charts        |
-| `/recipes`        | Recipes list  |
-| `/recipes/:id`    | Recipe detail |
-| `/batches`        | Batches list  |
-| `/batches/:id`    | Batch detail  |
-| `/server`         | Server health |
-| `/settings`       | Settings      |
+| Path              | Page           |
+| ----------------- | -------------- |
+| `/`               | Dashboard      |
+| `/pico-units`     | Units list     |
+| `/pico-units/:id` | Unit detail    |
+| `/readings`       | Charts         |
+| `/recipes`        | Recipes list   |
+| `/recipes/:id`    | Recipe detail  |
+| `/batches`        | Batches list   |
+| `/batches/:id`    | Batch detail   |
+| `/server`         | Server health  |
+| `/settings`       | Settings       |
+| `*`               | 404 (NotFound) |
 
 Page h1 titles mirror `navItems` labels (`<PageTitle>` for lists, `<ItemPage title>` for details). Tab-title & dialog-auto-open rules: REFERENCE.md §Known Quirks.
 
@@ -60,7 +61,7 @@ src/
 ├── hooks/       12 hooks (incl. useDemoMode, useDisplayTimezone, useRetryCooldown) + BatchForm/ + RecipeForm/
 ├── interfaces/  shared TS interfaces
 ├── layout/      app shell — Page wrapper, Sidebar
-├── pages/       10 pages, one <Page>/index.tsx per route (never bare <Page>.tsx)
+├── pages/       11 pages, one <Page>/index.tsx per route (never bare <Page>.tsx)
 ├── styles/      global.css + variables.css (pre-mount token mirror)
 ├── test/        setup.ts, fixtures.tsx
 ├── theme/       tokens.ts (sole color source) + mushroomTheme.ts + tokens.test.ts

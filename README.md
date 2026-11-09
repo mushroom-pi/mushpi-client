@@ -84,7 +84,7 @@ src/
 ├── hooks/       9 hooks + BatchForm/ + RecipeForm/
 ├── interfaces/  shared TS interfaces
 ├── layout/      app shell — Page wrapper, Sidebar
-├── pages/       10 pages, one <Page>/index.tsx per route
+├── pages/       11 pages, one <Page>/index.tsx per route
 ├── styles/      global.css + variables.css
 ├── test/        Vitest setup.ts + fixtures.tsx
 ├── theme/       tokens.ts (sole colour source) + mushroomTheme.ts
@@ -95,18 +95,19 @@ App.tsx   main.tsx
 
 Routes:
 
-| Path              | Page          |
-| ----------------- | ------------- |
-| `/`               | Dashboard     |
-| `/pico-units`     | Units list    |
-| `/pico-units/:id` | Unit detail   |
-| `/readings`       | Charts        |
-| `/recipes`        | Recipes list  |
-| `/recipes/:id`    | Recipe detail |
-| `/batches`        | Batches list  |
-| `/batches/:id`    | Batch detail  |
-| `/server`         | Server health |
-| `/settings`       | Settings      |
+| Path              | Page           |
+| ----------------- | -------------- |
+| `/`               | Dashboard      |
+| `/pico-units`     | Units list     |
+| `/pico-units/:id` | Unit detail    |
+| `/readings`       | Charts         |
+| `/recipes`        | Recipes list   |
+| `/recipes/:id`    | Recipe detail  |
+| `/batches`        | Batches list   |
+| `/batches/:id`    | Batch detail   |
+| `/server`         | Server health  |
+| `/settings`       | Settings       |
+| `*`               | 404 (NotFound) |
 
 ## Day-to-Day Commands
 

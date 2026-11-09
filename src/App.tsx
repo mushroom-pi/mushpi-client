@@ -2,19 +2,19 @@ import { Box } from '@mui/material';
 import { Route, Routes } from 'react-router-dom';
 
 import { ErrorBoundary, ServerDownBanner } from '~components';
-
-import Sidebar from './layout/Sidebar';
-import { drawerWidth } from './layout/Sidebar/constants';
-import BatchDetail from './pages/Batch';
-import BatchesPage from './pages/Batches';
-import Dashboard from './pages/Dashboard';
-import PicoUnitDetail from './pages/PicoUnit';
-import PicoUnits from './pages/PicoUnits';
-import { ReadingsPage } from './pages/Readings';
-import RecipeDetail from './pages/Recipe';
-import RecipesPage from './pages/Recipes';
-import { Server } from './pages/Server';
-import { Settings } from './pages/Settings';
+import Sidebar from '~layout/Sidebar';
+import { drawerWidth } from '~layout/Sidebar/constants';
+import BatchDetail from '~pages/Batch';
+import BatchesPage from '~pages/Batches';
+import Dashboard from '~pages/Dashboard';
+import NotFound from '~pages/NotFound';
+import PicoUnitDetail from '~pages/PicoUnit';
+import PicoUnits from '~pages/PicoUnits';
+import { ReadingsPage } from '~pages/Readings';
+import RecipeDetail from '~pages/Recipe';
+import RecipesPage from '~pages/Recipes';
+import { Server } from '~pages/Server';
+import { Settings } from '~pages/Settings';
 
 export default function App() {
   return (
@@ -41,6 +41,7 @@ export default function App() {
             <Route path="/readings" element={<ReadingsPage />} />
             <Route path="/server" element={<Server />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </ErrorBoundary>
       </Box>
