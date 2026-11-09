@@ -35,10 +35,10 @@ yarn preview    # serve the built bundle locally
 
 The client is configured by two `VITE_*` environment variables, read from a local, gitignored `.env` (there is no committed `.env.example`):
 
-| Variable            | Default                 | Purpose                                                                              |
-| ------------------- | ----------------------- | ------------------------------------------------------------------------------------ |
-| `VITE_API_BASE_URL` | `http://localhost:3000` | API origin for the generated client and image-URL resolution (`src/utils/apiUrl.ts`) |
-| `VITE_DOCS_PATH`    | `contract`              | Path for the "API Docs" button on the Server page                                    |
+| Variable            | Default                 | Purpose                                                                                                                                                                                   |
+| ------------------- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VITE_API_BASE_URL` | `http://localhost:3000` | API origin for the generated client and image-URL resolution (`src/utils/apiUrl.ts`)                                                                                                      |
+| `VITE_DOCS_PATH`    | `contract`              | Local-development fallback for the Server page's "API Docs" button — the primary source is the runtime `/health` `server.docsPath`, and the button is hidden when neither provides a path |
 
 ```bash
 # .env
